@@ -1,0 +1,19 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block extrahead %}
+<meta property="og:title" content="{{action_obj}}" />
+<meta property="og:description" content="{{action_obj.description}}" />
+<meta property="og:site_name" content="East Bay Forward" />
+<meta property="og:image" content="https://organizing.eastbayforward.org{% static 'img/unfurl-bg.png' %}" />
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:title" content="{{action_obj}}" />
+<meta property="twitter:description" content="{{action_obj.description}}" />
+<meta property="twitter:label1" content="When" />
+<link rel="alternate" type="application/json+oembed"
+                      href="https://organizing.eastbayforward.org/api/actions/{{action_obj.id}}/embed"
+                      />
+<script>
+var INLINE_ACTION_DATA = {{action_data|safe}};
+</script>
+{% endblock %}

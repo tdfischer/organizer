@@ -1,0 +1,9 @@
+*.pyc
+db.sqlite3
+*.swp
+dump.rdb
+node_modules
+coverage
+.env
+webpack-stats.json
+yarn-error.log

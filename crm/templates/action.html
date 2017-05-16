@@ -1,0 +1,14 @@
+{% extends 'layout.html' %}
+{% block title %}{{action.name}}{% endblock %}
+{% block subtitle %}{{action.date}}{% endblock %}
+
+{% block contents %}
+<h3>Forms</h3>
+<table>
+{% for form in action.forms %}
+<tr>
+  <td>{{form.title}}</td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}

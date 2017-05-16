@@ -1,0 +1,15 @@
+{
+  "short_name": "EBF Organizer",
+  "name": "East Bay Forward Organizer",
+  "display": "standalone",
+  "background_color": "#d7df23",
+  "theme_color": "#d7df23",
+  "icons": [
+    {
+      "src": "/static/img/logo-square.png",
+      "type": "image/png",
+      "sizes": "801x801"
+    }
+  ],
+  "start_url": "/organize/"
+}

@@ -1,0 +1,39 @@
+{% extends 'layout.html' %}
+{% block title %}{{action.name}}{% endblock %}
+{% block subtitle %}Organizer Report{% endblock %}
+{% block epicenter %}
+{% endblock %}
+
+{% block extrahead %}
+{% endblock %}
+
+{% block content %}
+<h1>{{action.name}}</h1>
+<h2>{{action.date}}</h2>
+
+<table>
+  <tr>
+    <th><input type="checkbox"/></th>
+    <th>Name</th>
+    <th>Email</th>
+    {% for field in action.fields %}
+    <th>{{field.name}}</th>
+    {% endfor %}
+  </tr>
+  {% for signup in action.signups.all %}
+    {% ifchanged signup.state_name %}
+    <tr>
+      <th colspan="{{action.fields.all|length|add:"4"}}">{{signup.state_name}}</th>
+    </tr>
+    {% endifchanged %}
+    <tr>
+      <td><input type="checkbox" name="selected" value="{{signup.id}}"/></td>
+      <td>{{signup.activist.name}}</td>
+      <td>{{signup.activist.email}}</td>
+      {% for field in signup.responses.all %}
+        <td>{{field.value}}</td>
+      {% endfor %}
+    </tr>
+  {% endfor %}
+</table>
+{% endblock %}

@@ -1,0 +1,35 @@
+body {
+  background-color: #888;
+  font-color: #fff;
+}
+
+.logo a {
+  margin: 2em 2em 2em 0;
+  display: block;
+  color: transparent;
+  height: 200px;
+  background: url(logo.png) center center no-repeat;
+  background-size: contain;
+}
+
+header {
+  background: url(bg.png) repeat;
+}
+
+.mastiff {
+  padding: 3em;
+  color: #000;
+}
+
+.mastiff h1, .mastiff h2 {
+  background-color: #fff;
+  padding: 0.25em;
+}
+
+.canvas {
+  background-color: #fff;
+}
+
+footer {
+  font-size: small;
+}

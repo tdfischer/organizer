@@ -1,0 +1,65 @@
+@import "~foundation-sites/scss/foundation";
+
+$primary-color: #d7df23;
+$secondary-color: rgba(3,44,54,.9);
+
+@include foundation-global-styles;
+@include foundation-grid;
+
+.the-app {
+  background-color: #fff;
+  display: flex;
+  flex-flow: column;
+  min-height: 100%;
+  padding-bottom: 56px;
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+.app-splash {
+  background-color: #fff;
+  margin: 2em;
+  padding: 1em;
+  text-align: center;
+  .pop {
+    font-size: 58pt;
+    font-family: 'Rock Salt', cursive;
+  }
+
+  .github-link {
+    font-size: 48pt;
+    a {
+      color: #8d2;
+    }
+  }
+}
+
+@import "base.scss";
+
+.membership-map {
+  overflow: hidden;
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-flow: column;
+
+  .leaflet-container {
+    flex: 1;
+    width: 100%;
+  }
+}
+
+.tag {
+  background-color: #aaa;
+  border-radius: 3px;
+  padding: 0.2rem 0.4rem;
+  margin: 0.1rem;
+}
+
+tr.even {
+  background-color: #eee;
+}

@@ -1,0 +1,89 @@
+.signin {
+  text-align: center;
+
+  a {
+    margin: 3em;
+    display: block;
+  }
+}
+
+nav {
+  background-color: #fff;
+  .breadcrumbs {
+    margin: 0;
+    li {
+      background-color: #fff;
+      padding: 1em;
+    }
+  }
+}
+
+body {
+  background: #333 url(../img/bg.png) repeat;
+  font-color: #fff;
+  font-family: "Roboto";
+  height: 100%;
+}
+html {
+  height: 100%;
+}
+
+#container {
+  height: 100%;
+}
+
+.logo {
+  text-align: center;
+}
+
+.logo a {
+  display: block;
+  color: transparent;
+  height: 200px;
+  margin: 0.7rem;
+  background: url(../img/logo.png) center center no-repeat;
+  background-size: contain;
+}
+
+.logo-full a {
+  @include breakpoint(small only) {
+    margin-left: auto;
+    margin-right: auto;
+    background-image: url(../img/logo-wide.png);
+    height: 4rem;
+  }
+
+  @include breakpoint(medium) {
+    position: absolute;
+    top: 0.7rem;
+    right: 10%;
+    margin: 0;
+  }
+}
+
+.mastiff {
+  padding: 3em 0 3em 3em;
+  color: #000;
+}
+
+.mastiff h1, .mastiff h2 {
+  background-color: #fff;
+  padding: 0.25em;
+}
+
+.canvas {
+  background-color: #fff;
+}
+
+footer {
+  font-size: small;
+  color: #fff;
+  background-color: rgba(0, 0, 0, 0.5);
+  margin-top: 1rem;
+  padding-top: 0.5rem;
+
+  a {
+    color: #fff;
+  }
+}
+

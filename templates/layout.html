@@ -1,0 +1,44 @@
+{% load static %}
+{% load raven %}
+{% load render_bundle from webpack_loader %}
+<!DOCTYPE html>
+<html>
+  <meta charset="utf-8" />
+  <meta http-equiv="x-ua-compatible" content="ie-edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="manifest" href="/static/manifest.json" />
+  {% render_bundle 'manifest' 'css' %}
+  {% render_bundle 'vendor' 'css' %}
+  {% render_bundle 'main' 'css' %}
+  <script src="https://cdn.ravenjs.com/3.15.0/raven.min.js"></script>
+  <script>
+    Raven.config('{% sentry_public_dsn %}').install();
+    window.onunhandledrejection = function(e) {Raven.captureException(e.reason);};
+  </script>
+  <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro"
+  rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css?family=Rock+Salt"
+  rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css?family=Roboto"
+  rel="stylesheet" />
+  <link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+  />
+  <script type="text/javascript"
+          src="https://maps.googleapis.com/maps/api/js?key={{settings.GOOGLE_MAPS_API_KEY}}&libraries=places"></script>
+  <script type="text/javascript">
+    var SLACK_LOGIN_URL = "{% url 'slack_auth' %}";
+    var CURRENT_USER = {{user_data|safe}};
+  </script>
+  {% block extrahead %}{% endblock %}
+  <title>East Bay Forward</title>
+  <body>
+    <div id="container"></div>
+  </body>
+  {% render_bundle 'manifest' 'js' %}
+  {% render_bundle 'vendor' 'js' %}
+  {% if settings.DEBUG %}
+    {% render_bundle 'webpack' 'js' %}
+  {% endif %}
+  {% render_bundle 'main' 'js' %}
+</html>
