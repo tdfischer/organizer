@@ -46,17 +46,33 @@ Once deployed, use ```herkou config:set VAR=VALUE ...``` to set:
 
 Running Organizer locally is similar to most django projects.
 
+Setup a python virtualenv:
+
+  $ virtualenv virtualenv/
+
+Load the virtualenv:
+
+  $ source virtualenv/bin/activate
+
+Install python dependencies:
+
+  $ pip install -r requirements.txt
+
+Install nodejs dependencies:
+
+  $ npm install
+
 Initialize the database:
 
   $ ./manage.py migrate
 
+Start a copy of redis in the background:
+
+  $ redis-server &
+
 Run the server:
 
-  $ ./manage.py runserver
-
-Run with gunicorn (or another wsgi server):
-  
-  $ gunicorn organizer.wsgi
+  $ npm start
 
 ## Contributions
 
