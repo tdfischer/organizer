@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
 import Model from '../store/model'
 import Selectable from '../store/select'
@@ -9,6 +9,13 @@ import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
 import Grid from '@material-ui/core/Grid'
 import Chip from '@material-ui/core/Chip'
+import Table from '@material-ui/core/Table'
+import TableBody from '@material-ui/core/TableBody'
+import TableCell from '@material-ui/core/TableCell'
+import TableRow from '@material-ui/core/TableRow'
+import TableHead from '@material-ui/core/TableHead'
+import Checkbox from '@material-ui/core/Checkbox'
+import Typography from '@material-ui/core/Typography'
 
 import MaterialFormText from './MaterialFormText'
 
@@ -73,48 +80,55 @@ const Tagger = connect(() => ({}), mapTaggerDispatchToProps)(props => (
     </Form>
 ))
 
-const PeopleIndex = connect(mapStateToProps, mapDispatchToProps)(props => {
-    const people = _.map(props.filtered, (person, idx) => {
-        const tags = _.map(person.tags, tag => (
-            <Chip key={tag} className="tag" label={tag} />
-        ))
-        return (
-            <tr key={person.id} className={idx % 2 == 0 ? 'even' : 'odd'}>
-                <td><input type="checkbox" checked={props.selection.indexOf(person.id) != -1} onChange={() => props.selector.toggle(person.id)}/></td>
-                <td>{person.name}{tags}</td>
-                <td>{person.email}</td>
-                <td>{_.get(person.address, 'locality', '')}</td>
-            </tr>
-        )
-    })
-    return (
-        <div>
-            <h1>People</h1>
-            <Grid container>
-                <Grid item xs={3}>
-                    <Button color="primary" variant="contained" onClick={() => props.people.refresh()}>Load</Button>
-                </Grid>
-                <Grid item xs={6}>
-                    <Tagger />
-                </Grid>
-                <Grid item xs={3}>
-                    <TextField label="Search" onChange={e => props.filter.set(e.target.value)} />
-                </Grid>
-            </Grid>
-            <table>
-                <thead>
-                    <tr>
-                        <th colSpan="2">Name</th>
-                        <th>Email</th>
-                        <th>City</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {people}
-                </tbody>
-            </table>
-        </div>
-    )
-})
+class PeopleIndex extends PureComponent {
+    componentDidMount() {
+        this.props.people.refresh()
+    }
 
-export default PeopleIndex
+    render() {
+        const props = this.props
+        const people = _.map(props.filtered, (person) => {
+            const tags = _.map(person.tags, tag => (
+                <Chip key={tag} className="tag" label={tag} />
+            ))
+            return (
+                <TableRow key={person.id}>
+                    <TableCell>
+                        <Checkbox checked={props.selection.indexOf(person.id) != -1} onChange={() => props.selector.toggle(person.id)}/>
+                    </TableCell>
+                    <TableCell>{person.name}{tags}</TableCell>
+                    <TableCell>{person.email}</TableCell>
+                    <TableCell>{_.get(person.address, 'locality', '') || 'Unknown'}</TableCell>
+                </TableRow>
+            )
+        })
+        return (
+            <div>
+                <h1>People</h1>
+                <Grid container spacing={24}>
+                    <Grid item xs={6}>
+                        <Tagger />
+                    </Grid>
+                    <Grid item xs={3}>
+                        <TextField label="Search" onChange={e => props.filter.set(e.target.value)} />
+                    </Grid>
+                </Grid>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Selected</TableCell>
+                            <TableCell>Name</TableCell>
+                            <TableCell>Email</TableCell>
+                            <TableCell>City</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {people}
+                    </TableBody>
+                </Table>
+            </div>
+        )
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(PeopleIndex)
