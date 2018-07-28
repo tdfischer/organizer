@@ -1,25 +1,20 @@
 import * as Model from '../store/model'
 import _ from 'lodash'
 
-function applyFor(matcher, func) {
-    return o => {
-        if (matcher(o)) {
-            return func(o)
-        }
-        return o
-    }
-}
-
 export default function(state = {}, action) {
     switch (action.type) {
     case Model.UPDATE_MODEL: {
-        const updater = m => ({...m, ...action.data})
-        const idMatch = _.matchesProperty('id', action.id)
+        // Extract full list of models from state
+        const currentModels = _.get(state.models, action.name, [])
+
+        // Replace model in full list with updated data
+        const updatedModels = _.unionBy([action.data], currentModels, 'id')
+
         return {
             ...state,
             models: {
                 ...state.models,
-                [action.name]: _.map(_.get(state.models, action.name, []), applyFor(idMatch, updater))
+                [action.name]: updatedModels
             }
         }
     }
