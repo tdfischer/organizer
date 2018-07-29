@@ -3,7 +3,7 @@ bleach==2.0.0
 dj-database-url==0.4.2
 Django==1.11.1
 git+https://github.com/eyesnz/django-address.git#egg=django-address
-django-anymail==0.9
+django-anymail==1.2.1
 django-markdownify==0.1.0
 enum34==1.1.6
 geopy==1.11.0
