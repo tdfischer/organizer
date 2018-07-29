@@ -11,9 +11,7 @@ const People = new Model('people')
 
 class OrganizerDashboardBase extends React.Component {
     componentDidMount() {
-        if (!this.props.currentPerson) {
-            this.props.people.refresh()
-        }
+        this.props.people.fetchIfNeeded(this.props.currentUser.email)
     }
 
     render() {
