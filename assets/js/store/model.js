@@ -103,7 +103,7 @@ export class ModelSelector {
     }
 
     shouldFetch(id) {
-        return this.filterBy('id', id).first() ? true : false
+        return this.filterBy('id', id).first() ? false : true
     }
 
     sortBy(key) {
