@@ -1,13 +1,9 @@
 import { createSelector } from 'reselect'
 import _ from 'lodash'
-import moment from 'moment'
-import slug from 'slug'
 import geolib from 'geolib'
-import { getGeocache }  from '../selectors/geocache'
 import { bindActionCreators } from 'redux'
 
 import { csrftoken } from '../Django'
-import { fetchGeocodeWithCache } from '../actions/geocache'
 import Queue from 'promise-queue'
 
 export const REQUEST_MODELS = 'REQUEST_MODELS'
@@ -25,39 +21,13 @@ function queuedFetch() {
     })
 }
 
-const sideloaders = {
-    people: (m, dispatch) => {
-        dispatch(fetchGeocodeWithCache(m.address.raw, ''))
-    }
-}
-
-const recipes = {
-    people: {
-        geo: (person, state) => _.get(getGeocache(state), [_.get(person, 'address.raw')])
-    },
-    actions: {
-        slug: action => slug(action.name || 'Untitled'),
-        date: action => moment(action.date)
-    }
-}
-
 const getAllModels = state => state.model.models
 
-const modelCooker = _.memoize((name) => {
+const modelGetter = _.memoize((name) => {
     return createSelector(
-        [getAllModels, _.identity],
-        (models, state) => {
-            const myModels = _.get(models, name, [])
-            const myRecipe = _.get(recipes, name, {})
-            return _.map(myModels, model => {
-                const cookedProperties = _.mapValues(myRecipe, relationFunc => {
-                    return relationFunc(model, state)
-                })
-                return {
-                    ...model,
-                    ...cookedProperties
-                }
-            })
+        [getAllModels],
+        models => {
+            return _.get(models, name, [])
         }
     )
 })
@@ -120,7 +90,7 @@ export default class Model {
     }
 
     select(state) {
-        return new ModelSelector(modelCooker(this.name)(state))
+        return new ModelSelector(modelGetter(this.name)(state))
     }
 
     bindActionCreators(dispatch) {
@@ -203,14 +173,12 @@ export default class Model {
             dispatch(this.request())
             const url = _.get(this.options, 'url', '/api/'+this.name+'/')
             const urlParams = new URLSearchParams(Object.entries(params))
-            const sideloader = _.get(sideloaders, this.name, _.identity)
             console.groupCollapsed('GET %s page=%s', this.name, _.get(params, 'page', 1))
             console.log(params)
             console.groupEnd()
             return queuedFetch(url+'?'+urlParams, {credentials: 'include'})
                 .then(response => response.json())
                 .then(json => {
-                    _.each(json.results, r => sideloader(r, dispatch))
                     if (json.next) {
                         const nextPage = (params.page || 1) + 1
                         const ret = dispatch(this.fetchAll({...params, page: nextPage}, this.options))

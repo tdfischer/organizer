@@ -26,13 +26,23 @@ class AddressSerializer(serializers.ModelSerializer):
         model = address.models.Address
         fields = ('raw', 'street_number', 'route', 'locality')
 
+class GeoField(serializers.Field):
+    def to_representation(self, obj):
+        return {'lat': obj.lat, 'lng': obj.lng,
+                'neighborhood': obj.neighborhood}
+
+    def get_attribute(self, obj):
+        return obj
+
 class PersonSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer):
-    address = AddressSerializer(required=False)
     tags = TagListSerializerField()
+    geo = GeoField()
 
     class Meta:
         model = models.Person
-        fields = ('name',  'id', 'email', 'address', 'created', 'url', 'tags')
+        fields = ('name',  'id', 'email', 'created', 'url', 'tags',
+        'geo')
+
         lookup_field = 'email'
         extra_kwargs = {
                 'url': {'lookup_field': 'email'},

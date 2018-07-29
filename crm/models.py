@@ -13,7 +13,10 @@ class Person(models.Model):
     name = models.CharField(max_length=200)
     email = models.CharField(max_length=200)
     address = AddressField(blank=True)
+    neighborhood = models.CharField(max_length=200, null=True, blank=False)
     created = models.DateTimeField(auto_now_add=True)
+    lat = models.FloatField()
+    lng = models.FloatField()
 
     tags = TaggableManager()
 

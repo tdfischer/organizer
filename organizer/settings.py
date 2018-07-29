@@ -195,6 +195,8 @@ RAVEN_CONFIG = {
 
 DEFAULT_CHARSET="utf-8"
 
+GOOGLE_MAPS_KEY = os.environ.get('GOOGLE_MAPS_KEY', None)
+
 AIRTABLE_API_KEY = os.environ.get('AIRTABLE_API_KEY', None)
 AIRTABLE_BASE_ID = os.environ.get('AIRTABLE_BASE_ID', None)
 AIRTABLE_TABLE_NAME = os.environ.get('AIRTABLE_TABLE_NAME', None)
