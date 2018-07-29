@@ -3,10 +3,14 @@
   "version": "0.0.1",
   "license": "GPL-3.0-or-later",
   "scripts": {
-    "heroku-postbuild": "webpack -p --config webpack.prod.js",
+    "heroku-postbuild": "build",
     "build": "webpack -p --config webpack.prod.js",
-    "server": "webpack-dev-server --config webpack.dev.js",
-    "start": "concurrently -c \"bgBlue.bold,bgMagenta.bold,bgRed.bold\" -p name --names \"WEBPACK,DJANGO,WORKER\" --kill-others \"npm run server\" \"python manage.py runserver\" \"python manage.py rqworker\"",
+    "frontend": "webpack-dev-server --config webpack.dev.js",
+    "backend": "python manage.py runserver",
+    "worker": "python manage.py rqworker",
+    "redis": "redis-server",
+    "start": "concurrently -c \"bgYellow,bgBlue.bold,bgGreen.bold,bgMagenta.bold,bgRed\" -p name --names \"JEST,WEBPACK,DJANGO,WORKER,REDIS\" --kill-others npm:watch-test npm:frontend npm:backend npm:worker npm:redis",
+    "watch-test": "jest --watch --color --coverage",
     "test": "jest"
   },
   "dependencies": {
