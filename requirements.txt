@@ -21,7 +21,7 @@ gunicorn
 mailchimp3
 raven
 python-cicero
-djangorestframework
+djangorestframework==3.6.3
 django-webpack-loader
 django-rq
 django-slack-oauth
