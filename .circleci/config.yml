@@ -10,6 +10,7 @@ jobs:
   test:
     environment:
         CC_TEST_REPORTER_ID: 0770301e1db2e5d01e2c0ec59f87f59de0ff3dcf06e5e09656822f0a5d19e99a
+        NODE_ENV: test
     docker:
       - image: circleci/node:latest-browsers
     steps:
@@ -28,7 +29,6 @@ jobs:
           name: Install dependencies
           command: |
             yarn install
-            yarn add jest jest-junit
       - run:
           name: Run tests
           command: |
