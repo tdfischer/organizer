@@ -5,8 +5,8 @@ jobs:
       - image: circleci/node:latest-browsers
     steps:
       - checkout
-      - run: npm install
-      - run: npm run build
+      - run: yarn install
+      - run: yarn run build
   test:
     environment:
         CC_TEST_REPORTER_ID: 0770301e1db2e5d01e2c0ec59f87f59de0ff3dcf06e5e09656822f0a5d19e99a
@@ -14,6 +14,11 @@ jobs:
       - image: circleci/node:latest-browsers
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - yarn-{{.Branch}}-{{checksum "yarn.lock"}}
+            - yarn-{{.Branch}}-
+            - yarn-
       - run:
           name: Setup Code Climate test reporter
           command: |
@@ -22,17 +27,21 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            npm install
-            npm install jest jest-junit
+            yarn install
+            yarn add jest jest-junit
       - run:
           name: Run tests
           command: |
             mkdir -p test-results/jest
             ./cc-test-reporter before-build
-            npm test --ci --testResultsProcessor=jest-junit
+            yarn test --ci --testResultsProcessor=jest-junit
             ./cc-test-reporter after-build
       - store_test_results:
           path: ./test-results/
+      - save_cache:
+          paths:
+            - ~/.cache/yarn
+          key: yarn-{{.Branch}}-{{checksum "yarn.lock"}}
 workflows:
   version: 2
   build-and-deploy:
