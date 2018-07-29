@@ -86,7 +86,7 @@ class AirtableImporter(Importer):
         super(AirtableImporter, self).__init__()
         self.__airtable = Airtable(
                 settings.AIRTABLE_BASE_ID,
-                'Members and Volunteers',
+                settings.AIRTABLE_TABLE_NAME,
                 api_key=settings.AIRTABLE_API_KEY)
         self.__members = iter(self.__airtable.get_all(view='Everyone'))
 

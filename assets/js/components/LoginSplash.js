@@ -2,8 +2,10 @@ import React from 'react'
 import Button from '@material-ui/core/Button'
 import Divider from '@material-ui/core/Divider'
 import Paper from '@material-ui/core/Paper'
-import EBFESymbol from 'svg-react-loader!../../img/symbol.svg'
+import _ from 'lodash'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+
+import EBFESymbol from 'svg-react-loader!../../img/symbol.svg'
 
 const LoginSplash = (_props) => (
     <Paper zDepth={1} className="app-splash">
@@ -13,14 +15,17 @@ const LoginSplash = (_props) => (
       housing. The solution is to organize for housing.</p>
         <p>East Bay for Everyone Organizer helps people organize for housing.</p>
         <Divider />
+        <p><EBFESymbol style={{width: 'auto', 'height': '4rem'}}/></p>
+        <p>Please sign in to continue.</p>
         <p />
-        <Button
-            variant="contained"
-            href={window.LOGIN_URL}>
-            Sign in with EBFE Discuss
-            <EBFESymbol style={{width: 'auto', 'height': '80%'}}/>
-        </Button>
-        <p>Please sign in with East Bay for Everyone Discuss to continue.</p>
+        {_.map(_.toPairs(window.LOGIN_URLS), ([name, url]) => (
+            <p><Button
+                variant="contained"
+                href={url}>
+                Sign in with {name} &nbsp;
+                <FontAwesomeIcon icon={['fab', name]} style={{height: '2rem', width: 'auto'}}/>
+            </Button></p>
+        ))}
         <p className="github-link"><a href="https://github.com/tdfischer/organizer/"><FontAwesomeIcon icon={['fab', 'github']} /></a></p>
     </Paper>
 )

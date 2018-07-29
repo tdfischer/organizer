@@ -13,12 +13,12 @@ import { library as faLibrary } from '@fortawesome/fontawesome'
 import faMapMarker from '@fortawesome/fontawesome-free-solid/faMapMarker'
 import faSpinner from '@fortawesome/fontawesome-free-solid/faSpinner'
 import faLocationArrow from '@fortawesome/fontawesome-free-solid/faLocationArrow'
-import faGithub from '@fortawesome/fontawesome-free-brands/faGithub'
 import faUsers from '@fortawesome/fontawesome-free-solid/faUsers'
 import faUserCircle from '@fortawesome/fontawesome-free-solid/faUserCircle'
 import faGlobe from '@fortawesome/fontawesome-free-solid/faGlobe'
+import { fab } from '@fortawesome/free-brands-svg-icons'
 
-faLibrary.add(faMapMarker, faSpinner, faGithub, faLocationArrow, faUsers, faGlobe, faUserCircle)
+faLibrary.add(faMapMarker, faSpinner, fab, faLocationArrow, faUsers, faGlobe, faUserCircle)
 
 injectTapEventPlugin()
 

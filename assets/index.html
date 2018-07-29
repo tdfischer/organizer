@@ -18,7 +18,12 @@
   <link href="https://fonts.googleapis.com/css?family=Roboto"
   rel="stylesheet" />
   <script>
-  var LOGIN_URL = "{% url 'social:begin' 'discourse' %}?next=/";
+  var LOGIN_URLS = {
+    {%for backend in backends.backends%}
+      "{{backend}}": "{% url 'social:begin' backend %}?next=/",
+    {% endfor %}
+  };
+  var LOGIN_URL = "{% url 'social:begin' 'slack' %}?next=/";
   var CURRENT_USER = {{user_data|safe}};
   </script>
   <body>

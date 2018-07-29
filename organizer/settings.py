@@ -55,15 +55,11 @@ INSTALLED_APPS = [
     'crm',
 ]
 
-SLACK_PIPELINES = [
-    'slack.pipelines.register_user',
-]
-
-SLACK_CLIENT_ID = os.environ.get('SLACK_CLIENT_ID', None)
-SLACK_CLIENT_SECRET = os.environ.get('SLACK_CLIENT_SECRET', None)
-SLACK_SCOPE = 'identity.basic,identity.team,identity.email'
-SLACK_TEAM_ID = os.environ.get('SLACK_TEAM_ID', None)
-SLACK_SUCCESS_REDIRECT_URL = '/organize/'
+SOCIAL_AUTH_SLACK_KEY = os.environ.get('SLACK_KEY', None)
+SOCIAL_AUTH_SLACK_SECRET = os.environ.get('SLACK_SECRET', None)
+SOCIAL_AUTH_SLACK_SLACK_SCOPE = ['identity.basic','identity.team',
+        'identity.email']
+SOCIAL_AUTH_SLACK_TEAM = os.environ.get('SLACK_TEAM_ID', None)
 
 CACHES = {
     'default': {
@@ -107,6 +103,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
                 'crm.context.add_user_data',
                 'crm.context.add_settings',
             ],
@@ -132,6 +129,7 @@ DATABASES['default'].update(db_from_env)
 
 AUTHENTICATION_BACKENDS = (
     'organizer.auth.DiscourseSSOAuth',
+    'social_core.backends.slack.SlackOAuth2'
 )
 
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
@@ -194,10 +192,8 @@ ANYMAIL = {
 
 EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', None)
-GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY', None)
 MAILCHIMP_USERNAME=os.environ.get("MAILCHIMP_USERNAME", None)
 MAILCHIMP_SECRET_KEY=os.environ.get("MAILCHIMP_SECRET_KEY", None)
-CICERO_API_KEY=os.environ.get('CICERO_API_KEY', None)
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
@@ -214,6 +210,7 @@ DEFAULT_CHARSET="utf-8"
 
 AIRTABLE_API_KEY = os.environ.get('AIRTABLE_API_KEY', None)
 AIRTABLE_BASE_ID = os.environ.get('AIRTABLE_BASE_ID', None)
+AIRTABLE_TABLE_NAME = os.environ.get('AIRTABLE_TABLE_NAME', None)
 
-DISCOURSE_BASE_URL = 'https://discuss.eastbayforeveryone.org/session/sso_provider'
+DISCOURSE_BASE_URL = os.environ.get('DISCOURSE_BASE_URL', None)
 DISCOURSE_SSO_SECRET = os.environ.get('DISCOURSE_SSO_SECRET', None)
