@@ -3,7 +3,6 @@ import { Route, Switch } from 'react-router-dom'
 import { ConnectedRouter } from 'connected-react-router'
 import importedComponent from 'react-imported-component'
 import { connect } from 'react-redux'
-import ThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import { hot } from 'react-hot-loader'
 
 import LoginSplash from './LoginSplash'
@@ -35,11 +34,9 @@ const mapStateToProps = state => {
 }
 
 const App = connect(mapStateToProps)((props) => (
-    <ThemeProvider>
-        <ConnectedRouter history={props.history}>
-            {props.logged_in ? <AppBase /> : <LoginSplash />}
-        </ConnectedRouter>
-    </ThemeProvider>
+    <ConnectedRouter history={props.history}>
+        {props.logged_in ? <AppBase /> : <LoginSplash />}
+    </ConnectedRouter>
 ))
 
 export default hot(module)(App)
