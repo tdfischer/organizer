@@ -27,9 +27,14 @@ class AddressSerializer(serializers.ModelSerializer):
         fields = ('raw', 'street_number', 'route', 'locality')
 
 class PersonSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer):
-    address = AddressSerializer(read_only=True)
+    address = AddressSerializer(required=False)
     tags = TagListSerializerField()
 
     class Meta:
         model = models.Person
-        fields = ('name',  'email', 'address', 'id', 'created', 'url', 'tags')
+        fields = ('name',  'id', 'email', 'address', 'created', 'url', 'tags')
+        lookup_field = 'email'
+        extra_kwargs = {
+                'url': {'lookup_field': 'email'},
+                'id': {'source': 'email'}
+        }
