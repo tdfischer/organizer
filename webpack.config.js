@@ -1,6 +1,5 @@
 //require our dependencies
 var path = require('path')
-var webpack = require('webpack')
 var BundleTracker = require('webpack-bundle-tracker')
 var LodashModuleReplacementPlugin = require('lodash-webpack-plugin')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
@@ -10,14 +9,14 @@ var WriteFilePlugin = require('write-file-webpack-plugin')
 
 module.exports = {
     //the base directory (absolute path) for resolving the entry option
-    context: __dirname,
+    context: __dirname, // eslint-disable-line no-undef
     //the entry point we created earlier. Note that './' means 
     //your current directory. You don't have to specify the extension  now,
     //because you will specify extensions later in the `resolve` section
     entry: {
-      main: [
-        './assets/js/index',
-      ], 
+        main: [
+            './assets/js/index',
+        ], 
     },
 
     devtool: 'cheap-module-eval-source-map',
@@ -31,24 +30,24 @@ module.exports = {
     },
 
     optimization: {
-      namedModules: true,
-      splitChunks: {
-        chunks: "all",
-        cacheGroups: {
-          fontAwesome: {
-            test: /[\\/]node_modules[\\/]@fortawesome/
-          },
-          components: {
-            test: /[\\/]assets[\\/]js[\\/]components/
-          },
-          redux: {
-            test: /[\\/]assets[\\/]js[\\/](reducers|selectors|actions)/
-          }
+        namedModules: true,
+        splitChunks: {
+            chunks: 'all',
+            cacheGroups: {
+                fontAwesome: {
+                    test: /[\\/]node_modules[\\/]@fortawesome/
+                },
+                components: {
+                    test: /[\\/]assets[\\/]js[\\/]components/
+                },
+                redux: {
+                    test: /[\\/]assets[\\/]js[\\/](reducers|selectors|actions)/
+                }
+            },
         },
-      },
-      runtimeChunk: {
-        name: "manifest"
-      },
+        runtimeChunk: {
+            name: 'manifest'
+        },
     },
     
     plugins: [
@@ -56,32 +55,32 @@ module.exports = {
         new BundleTracker({filename: './webpack-stats.json'}), 
         new LodashModuleReplacementPlugin(),
         new HtmlWebpackPlugin({
-          title: 'EBFE Organizer',
-          template: 'assets/index.html',
-          filename: 'webpack-index.html',
-          alwaysWriteToDisk: true
+            title: 'EBFE Organizer',
+            template: 'assets/index.html',
+            filename: 'webpack-index.html',
+            alwaysWriteToDisk: true
         }),
         new HtmlWebpackHarddiskPlugin(),
         new WriteFilePlugin({
-          test: /service-worker\.js/
+            test: /service-worker\.js/
         }),
         new WorkboxPlugin.GenerateSW({
-          clientsClaim: true,
-          skipWaiting: true,
-          runtimeCaching: [
-            {
-              urlPattern: new RegExp('https://fonts.(?:googleapis|gstatic).com/(.*)'),
-              handler: 'staleWhileRevalidate'
-            },
-            {
-              urlPattern: new RegExp('https://cdn.ravenjs.com/(.*)'),
-              handler: 'networkFirst'
-            },
-            {
-              urlPattern: new RegExp(/\/api\//),
-              handler: 'networkFirst'
-            },
-          ]
+            clientsClaim: true,
+            skipWaiting: true,
+            runtimeCaching: [
+                {
+                    urlPattern: new RegExp('https://fonts.(?:googleapis|gstatic).com/(.*)'),
+                    handler: 'staleWhileRevalidate'
+                },
+                {
+                    urlPattern: new RegExp('https://cdn.ravenjs.com/(.*)'),
+                    handler: 'networkFirst'
+                },
+                {
+                    urlPattern: new RegExp(/\/api\//),
+                    handler: 'networkFirst'
+                },
+            ]
         })
     ],
     
@@ -95,23 +94,23 @@ module.exports = {
                 exclude: /node_modules\/(?!(gravatar-url|md5-hex)\/).*/,
                 //use the babel loader 
                 use: [
-                  'babel-loader',
-                  'eslint-loader'
+                    'babel-loader',
+                    'eslint-loader'
                 ]
             },
             {test: /\.(png|jpe?g|gif)$/,
-              use: [
-                'file-loader?name=[path][name].[ext]',
-                'image-webpack-loader',
-              ]
+                use: [
+                    'file-loader?name=[path][name].[ext]',
+                    'image-webpack-loader',
+                ]
             },
             {
-              test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-              use: "file-loader?name=[path][name].[ext]"
+                test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+                use: 'file-loader?name=[path][name].[ext]'
             },
             {
-              test: /\.(ttf|eot)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-              use: "file-loader?name=[path][name].[ext]"
+                test: /\.(ttf|eot)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+                use: 'file-loader?name=[path][name].[ext]'
             }
         ]
     },
