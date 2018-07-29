@@ -14,14 +14,23 @@ jobs:
       - image: circleci/node:latest-browsers
     steps:
       - checkout
-      - run: curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-      - run: chmod +x ./cc-test-reporter
-      - run: ./cc-test-reporter before-build
-      - run: mkdir -p test-results/jest
-      - run: npm install
-      - run: npm install jest jest-junit
-      - run: npm test --ci --testResultsProcessor=jest-junit
-      - run: ./cc-test-reporter after-build
+      - run:
+          name: Setup Code Climate test reporter
+          command: |
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
+      - run:
+          name: Install dependencies
+          command: |
+            npm install
+            npm install jest jest-junit
+      - run:
+          name: Run tests
+          command: |
+            mkdir -p test-results/jest
+            ./cc-test-reporter before-build
+            npm test --ci --testResultsProcessor=jest-junit
+            ./cc-test-reporter after-build
       - store_test_results:
           path: ./test-results/
 workflows:
