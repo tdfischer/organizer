@@ -7,8 +7,21 @@ export default function(state = {}, action) {
         // Extract full list of models from state
         const currentModels = _.get(state.models, action.name, [])
 
-        // Replace model in full list with updated data
-        const updatedModels = _.unionBy([action.data], currentModels, 'id')
+        const index = _.findIndex(currentModels, {id: action.id})
+
+        var updatedModels
+
+        if (index == -1) {
+            updatedModels = [...currentModels, action.data]
+        } else {
+            updatedModels = _.map(currentModels, m => {
+                if (m.id == action.id) {
+                    return action.data
+                } else {
+                    return m
+                }
+            })
+        }
 
         return {
             ...state,
