@@ -17,26 +17,23 @@ const MaterialFormText = asField(({ fieldState, fieldApi, ...props }) => {
         ...rest
     } = props
     return (
-        <React.Fragment>
-            <TextField
-                {...rest}
-                ref={forwardedRef}
-                value={!value && value !== 0 ? '' : value}
-                onChange={e => {
-                    setValue(e.target.value)
-                    if (onChange) {
-                        onChange(e)
-                    }
-                }}
-                onBlur={e => {
-                    setTouched()
-                    if (onBlur) {
-                        onBlur(e)
-                    }
-                }}
-                errorText={fieldState.error}
-            />
-        </React.Fragment>
+        <TextField
+            {...rest}
+            ref={forwardedRef}
+            value={!value && value !== 0 ? '' : value}
+            onChange={e => {
+                setValue(e.target.value)
+                if (onChange) {
+                    onChange(e)
+                }
+            }}
+            onBlur={e => {
+                setTouched()
+                if (onBlur) {
+                    onBlur(e)
+                }
+            }}
+        />
     )
 })
 
