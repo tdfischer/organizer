@@ -25,30 +25,15 @@ function queuedFetch() {
     })
 }
 
-const preprocessors = {
-    'members': m => {
-        return {
-            ...m.fields,
-            id: m.id
-        }
-    }
-}
-
 const sideloaders = {
-    members: (m, dispatch) => {
-        dispatch(fetchGeocodeWithCache(m.fields['Full Address'], m.fields['Geocode Cache']))
-    },
     people: (m, dispatch) => {
         dispatch(fetchGeocodeWithCache(m.address.raw, ''))
     }
 }
 
 const recipes = {
-    members: {
-        geo: (member, state) => _.get(getGeocache(state), member['Full Address'])
-    },
     people: {
-        geo: (person, state) => _.get(getGeocache(state), person.address.raw)
+        geo: (person, state) => _.get(getGeocache(state), [_.get(person, 'address.raw')])
     },
     actions: {
         slug: action => slug(action.name || 'Untitled'),
@@ -218,7 +203,6 @@ export default class Model {
             dispatch(this.request())
             const url = _.get(this.options, 'url', '/api/'+this.name+'/')
             const urlParams = new URLSearchParams(Object.entries(params))
-            const preprocessor = _.get(preprocessors, this.name, _.identity)
             const sideloader = _.get(sideloaders, this.name, _.identity)
             console.group('GET %s page=%s', this.name, _.get(params, 'page', 1))
             console.log(params)
@@ -226,17 +210,14 @@ export default class Model {
             return queuedFetch(url+'?'+urlParams, {credentials: 'include'})
                 .then(response => response.json())
                 .then(json => {
-                    const processedResults = _.map(json.results, r => {
-                        sideloader(r, dispatch)
-                        return preprocessor(r)
-                    })
+                    _.each(json.results, r => sideloader(r, dispatch))
                     if (json.next) {
                         const nextPage = (params.page || 1) + 1
                         const ret = dispatch(this.fetchAll({...params, page: nextPage}, this.options))
-                        dispatch(this.receive(processedResults))
+                        dispatch(this.receive(json.results))
                         return ret
                     } else {
-                        return dispatch(this.receive(processedResults))
+                        return dispatch(this.receive(json.results))
                     }
                 })
         }
