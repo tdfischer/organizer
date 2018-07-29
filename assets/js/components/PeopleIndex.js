@@ -15,14 +15,13 @@ import TableCell from '@material-ui/core/TableCell'
 import TableRow from '@material-ui/core/TableRow'
 import TableHead from '@material-ui/core/TableHead'
 import Checkbox from '@material-ui/core/Checkbox'
-import Typography from '@material-ui/core/Typography'
 
 import MaterialFormText from './MaterialFormText'
+import ImportDialog from './ImportDialog'
+import DialogOpener from './DialogOpener'
 
 const People = new Model('people')
-
 const PeopleSelector = new Selectable('people')
-
 const PeopleFilter = new Filterable('people', p => _.get(p.address, 'raw', 'California') + ' ' + p.name + ' ' + p.tags.join(',') + ' ' + p.email)
 
 const mapStateToProps = state => {
@@ -38,6 +37,9 @@ const mapDispatchToProps = dispatch => {
         people: People.bindActionCreators(dispatch),
         selector: PeopleSelector.bindActionCreators(dispatch),
         filter: PeopleFilter.bindActionCreators(dispatch),
+        importPeople: people => {
+            return Promise.all(_.map(people, person => dispatch(People.updateAndSave(person.email, person))))
+        }
     }
 }
 
@@ -103,9 +105,18 @@ class PeopleIndex extends PureComponent {
             )
         })
         return (
-            <div>
-                <h1>People</h1>
+            <React.Fragment>
                 <Grid container spacing={24}>
+                    <Grid item xs={3}>
+                        <DialogOpener>
+                            {(open, close, isOpen) => (
+                                <React.Fragment>
+                                    <Button color="primary" variant="contained" onClick={open}>Import Spreadsheet</Button>
+                                    <ImportDialog onImport={props.importPeople} open={isOpen} onClose={close} />
+                                </React.Fragment>
+                            )}
+                        </DialogOpener>
+                    </Grid>
                     <Grid item xs={6}>
                         <Tagger />
                     </Grid>
@@ -126,7 +137,7 @@ class PeopleIndex extends PureComponent {
                         {people}
                     </TableBody>
                 </Table>
-            </div>
+            </React.Fragment>
         )
     }
 }
