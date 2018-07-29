@@ -1,5 +1,9 @@
 # Organizer
 
+[![Maintainability](https://api.codeclimate.com/v1/badges/86f7c614494ac53194e2/maintainability)](https://codeclimate.com/github/tdfischer/organizer/maintainability)
+[![CircleCI](https://circleci.com/gh/tdfischer/organizer.svg?style=svg)](https://circleci.com/gh/tdfischer/organizer)
+
+
 I don't think I have any unique perspectives on organizing people. It is hard
 work and the tools out there are never the best. Organizer is the particular
 windmill I have decided to tilt at in response.
