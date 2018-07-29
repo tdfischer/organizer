@@ -8,14 +8,20 @@ jobs:
       - run: npm install
       - run: npm run build
   test:
+    environment:
+        CC_TEST_REPORTER_ID: 0770301e1db2e5d01e2c0ec59f87f59de0ff3dcf06e5e09656822f0a5d19e99a
     docker:
       - image: circleci/node:latest-browsers
     steps:
       - checkout
+      - run: curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+      - run: chmod +x ./cc-test-reporter
+      - run: ./cc-test-reporter before-build
+      - run: mkdir -p test-results/jest
       - run: npm install
       - run: npm install jest jest-junit
-      - run: mkdir -p test-results/jest
       - run: npm test --ci --testResultsProcessor=jest-junit
+      - run: ./cc-test-reporter after-build
       - store_test_results:
           path: ./test-results/
 workflows:
