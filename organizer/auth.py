@@ -32,7 +32,6 @@ class DiscourseSSOAuth(BaseAuth):
         }
 
     def auth_complete(self, request, *args, **kwargs):
-        print "Auth complete!", args, kwargs
         ssoParams = request.GET.get('sso')
         ssoSignature = request.GET.get('sig')
         paramSignature = hmac.new(settings.DISCOURSE_SSO_SECRET, ssoParams, sha256).hexdigest()
