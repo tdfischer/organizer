@@ -55,12 +55,6 @@ INSTALLED_APPS = [
     'crm',
 ]
 
-SOCIAL_AUTH_SLACK_KEY = os.environ.get('SLACK_KEY', None)
-SOCIAL_AUTH_SLACK_SECRET = os.environ.get('SLACK_SECRET', None)
-SOCIAL_AUTH_SLACK_SLACK_SCOPE = ['identity.basic','identity.team',
-        'identity.email']
-SOCIAL_AUTH_SLACK_TEAM = os.environ.get('SLACK_TEAM_ID', None)
-
 CACHES = {
     'default': {
         'BACKEND': 'redis_cache.RedisCache',
@@ -127,11 +121,6 @@ DATABASES = {
 db_from_env = dj_database_url.config(conn_max_age=500)
 DATABASES['default'].update(db_from_env)
 
-AUTHENTICATION_BACKENDS = (
-    'organizer.auth.DiscourseSSOAuth',
-    'social_core.backends.slack.SlackOAuth2'
-)
-
 SOCIAL_AUTH_URL_NAMESPACE = 'social'
 
 # Password validation
@@ -192,8 +181,6 @@ ANYMAIL = {
 
 EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', None)
-MAILCHIMP_USERNAME=os.environ.get("MAILCHIMP_USERNAME", None)
-MAILCHIMP_SECRET_KEY=os.environ.get("MAILCHIMP_SECRET_KEY", None)
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
@@ -214,3 +201,17 @@ AIRTABLE_TABLE_NAME = os.environ.get('AIRTABLE_TABLE_NAME', None)
 
 DISCOURSE_BASE_URL = os.environ.get('DISCOURSE_BASE_URL', None)
 DISCOURSE_SSO_SECRET = os.environ.get('DISCOURSE_SSO_SECRET', None)
+
+SOCIAL_AUTH_SLACK_KEY = os.environ.get('SLACK_KEY', None)
+SOCIAL_AUTH_SLACK_SECRET = os.environ.get('SLACK_SECRET', None)
+SOCIAL_AUTH_SLACK_SLACK_SCOPE = ['identity.basic','identity.team',
+        'identity.email']
+SOCIAL_AUTH_SLACK_TEAM = os.environ.get('SLACK_TEAM_ID', None)
+
+AUTHENTICATION_BACKENDS = ()
+
+if DISCOURSE_SSO_SECRET is not None:
+    AUTHENTICATION_BACKENDS += ('organizer.auth.DiscourseSSOAuth',)
+
+if SOCIAL_AUTH_SLACK_KEY is not None:
+    AUTHENTICATION_BACKENDS += ('social_core.backends.slack.SlackOAuth2',)

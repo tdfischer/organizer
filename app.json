@@ -2,5 +2,60 @@
   "name": "Organizer",
   "description": "Getting people to show up is hard.",
   "repository": "https://github.com/tdfischer/organizer",
-  "keywords": ["organizing", "crm"]
+  "success_url": "/",
+  "keywords": ["organizing", "crm"],
+  "addons": [
+      "heroku-postgresql", "redistogo"
+  ],
+  "env": {
+    "SECRET_KEY": {
+      "description": "A secret key for verifying the integrity of signed cookies.",
+      "generator": "secret",
+      "required": true
+    },
+    "SLACK_KEY": {
+      "description": "Slack API key",
+      "required": false
+    },
+    "SLACK_SECRET": {
+      "description": "Slack API secret",
+      "required": false
+    },
+    "SLACK_TEAM_ID": {
+      "description": "Slack team ID",
+      "required": false
+    },
+    "AIRTABLE_API_KEY": {
+      "description": "Airtable API key",
+      "required": false
+    },
+    "AIRTABLE_BASE_ID": {
+      "description": "ID of Airtable base to use",
+      "required": false
+    },
+    "AIRTABLE_TABLE_NAME": {
+      "description": "Name of table in Airtable to use",
+      "required": false
+    },
+    "DISCOURSE_BASE_URL": {
+      "description": "URL of Discourse installation for SSO logins",
+      "required": false
+    },
+    "DISCOURSE_SSO_SECRET": {
+      "description": "Secret for Discourse SSO logins",
+      "required": false
+    }
+    "MAILGUN_API_KEY": {
+      "description": "Your API key from mailgun",
+      "required": false
+    },
+    "MAILGUN_DOMAIN": {
+      "description": "Your domain from mailgun",
+      "required": false
+    },
+    "DEFAULT_FROM_EMAIL": {
+      "description": "Who your emails will come from by default",
+      "required": false
+    }
+  }
 }

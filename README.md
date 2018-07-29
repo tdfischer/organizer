@@ -36,11 +36,49 @@ Organizer is primarily deployed as a Heroku app.
 
 Once deployed, use ```herkou config:set VAR=VALUE ...``` to set:
 
-* MAILGUN_API_KEY - Your API key from Mailgun.
-* GOOGLE_MAPS_API_KEY - Your Google Maps API key, for geocoding.
 * SECRET_KEY - A random key for django security magic
+
+### Sentry
+
+* SENTRY_DSN - If you use sentry.io, enter your DSN here to receive error logs
+
+### Redis
+
+* REDISTOGO_URL - Heroku often sets this one automatically. The default is
+  redis://localhost:6379/0
+
+### Email
+
+E-mails are sent using Mailgun. Support for other platforms can be added in the
+future; organizer uses Anymail, a django library with support for a broad list
+of mail services.
+
+* MAILGUN_API_KEY - Your API key from Mailgun.
+* MAILGUN_DOMAIN - Your mailgun domain 
+* ANYMAIL_WEBHOOK_AUTHORIZATION - Magic token you set in Mailgun
 * DEFAULT_FROM_EMAIL - Who your emails will be coming from when sent through
   mailgun.
+
+### Airtable
+
+Organizer supports importing and updating data through Airtable.
+
+* AIRTABLE_API_KEY
+* AIRTABLE_BASE_ID
+* AIRTABLE_TABLE_NAME
+
+### Discourse
+
+Login through an installation of Discourse with SSO authentication enabled
+
+* DISCOURSE_BASE_URL
+* DISCOURSE_SSO_SECRET
+
+### Slack
+
+* SLACK_KEY
+* SLACK_SECRET
+* SLACK_TEAM_ID
 
 ## Development
 
