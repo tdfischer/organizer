@@ -159,7 +159,7 @@ export default class Model {
                 body: JSON.stringify(model)
             }
             
-            console.group('PUT %s %s', this.name, id)
+            console.groupCollapsed('PUT %s %s', this.name, id)
             console.log(data)
             console.groupEnd()
             return queuedFetch('/api/'+this.name+'/'+id+'/', data).then(() => {
@@ -204,7 +204,7 @@ export default class Model {
             const url = _.get(this.options, 'url', '/api/'+this.name+'/')
             const urlParams = new URLSearchParams(Object.entries(params))
             const sideloader = _.get(sideloaders, this.name, _.identity)
-            console.group('GET %s page=%s', this.name, _.get(params, 'page', 1))
+            console.groupCollapsed('GET %s page=%s', this.name, _.get(params, 'page', 1))
             console.log(params)
             console.groupEnd()
             return queuedFetch(url+'?'+urlParams, {credentials: 'include'})
@@ -229,6 +229,9 @@ export default class Model {
                 const foundItem = this.select(getState()).filterBy('id', id).first()
                 return dispatch(this.update(id, dataOrCallback(foundItem)))
             } else {
+                console.groupCollapsed('update %s %s', this.name, id)
+                console.log(dataOrCallback)
+                console.groupEnd()
                 dispatch({
                     type: UPDATE_MODEL,
                     id: id,
