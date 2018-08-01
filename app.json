@@ -44,7 +44,7 @@
     "DISCOURSE_SSO_SECRET": {
       "description": "Secret for Discourse SSO logins",
       "required": false
-    }
+    },
     "MAILGUN_API_KEY": {
       "description": "Your API key from mailgun",
       "required": false
