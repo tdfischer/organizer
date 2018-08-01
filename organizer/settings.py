@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_nose',
     'anymail',
     'address',
     'rest_framework',
@@ -53,6 +54,15 @@ INSTALLED_APPS = [
     'taggit',
     'taggit_serializer',
     'crm',
+]
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+NOSE_ARGS = [
+    '--with-coverage',
+    '--cover-package=organizer,crm',
+    '--with-xunit',
+    '--xunit-file=./test-results/nose/results.xml'
 ]
 
 CACHES = {

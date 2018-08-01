@@ -7,3 +7,4 @@ coverage
 .env
 webpack-stats.json
 yarn-error.log
+test-results

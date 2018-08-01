@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/node:latest-browsers
+      - image: circleci/python:2-node-browsers
     steps:
       - checkout
       - run: yarn install
@@ -12,7 +12,7 @@ jobs:
         CC_TEST_REPORTER_ID: 0770301e1db2e5d01e2c0ec59f87f59de0ff3dcf06e5e09656822f0a5d19e99a
         NODE_ENV: test
     docker:
-      - image: circleci/node:latest-browsers
+      - image: circleci/python:2-node-browsers
     steps:
       - checkout
       - restore_cache:
@@ -20,6 +20,11 @@ jobs:
             - yarn-{{.Branch}}-{{checksum "yarn.lock"}}
             - yarn-{{.Branch}}-
             - yarn-
+      - restore_cache:
+          keys:
+            - pipenv-{{.Branch}}-{{checksum "requirements.txt"}}
+            - pipenv-{{.Branch}}-
+            - pipenv-
       - run:
           name: Setup Code Climate test reporter
           command: |
@@ -29,12 +34,15 @@ jobs:
           name: Install dependencies
           command: |
             yarn install
+            pipenv install -r requirements.txt
+            pipenv install django-nose
       - run:
           name: Run tests
           command: |
-            mkdir -p test-results/jest
+            mkdir -p test-results/jest test-results/nose
             ./cc-test-reporter before-build
             yarn test --ci --testResultsProcessor=jest-junit
+            pipenv run ./manage.py test
             ./cc-test-reporter after-build
       - store_test_results:
           path: ./test-results/
@@ -42,6 +50,11 @@ jobs:
           paths:
             - ~/.cache/yarn
           key: yarn-{{.Branch}}-{{checksum "yarn.lock"}}
+      - save_cache:
+          paths:
+            - ./.local
+            - ./.cache
+          key: pipenv-{{.Branch}}-{{checksum "requirements.txt"}}
 workflows:
   version: 2
   build-and-deploy:
