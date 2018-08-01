@@ -214,4 +214,6 @@ if DISCOURSE_SSO_SECRET is not None:
     AUTHENTICATION_BACKENDS += ('organizer.auth.DiscourseSSOAuth',)
 
 if SOCIAL_AUTH_SLACK_KEY is not None:
+    if SOCIAL_AUTH_SLACK_TEAM is None:
+        raise EnvironmentError("You must set a slack team/workspace ID to enable slack logins. I will not allow this to be open to all workspaces.")
     AUTHENTICATION_BACKENDS += ('social_core.backends.slack.SlackOAuth2',)

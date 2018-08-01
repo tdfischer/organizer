@@ -16,7 +16,7 @@ love for your patch submissions and pull requests.
 
 * Build a list of activists, tag them
 
-Features planned:
+Future ideas proprosed:
 
 * Create actions, drive signups, collect data through forms
 * Track action history: Who signed up, did they show up, how reliable are they?
@@ -34,17 +34,22 @@ Features planned:
 
 ## Installation
 
-Organizer is primarily deployed as a Heroku app.
+Organizer is best deployed as a Heroku app.
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
-Once deployed, use ```herkou config:set VAR=VALUE ...``` to set:
+Once your app is up and running, use ```herkou config:set VAR=VALUE ...``` to
+configure the following settings.
 
-* SECRET_KEY - A random key for django security magic
+### Required settings
+
+There is only one required setting that must be set for the app to run at all.
+
+* SECRET_KEY - A random key to securely verify cookies.
 
 ### Sentry
 
-* SENTRY_DSN - If you use sentry.io, enter your DSN here to receive error logs
+* SENTRY_DSN - If you use sentry.io, enter your DSN here to receive error logs.
 
 ### Redis
 
@@ -80,41 +85,49 @@ Login through an installation of Discourse with SSO authentication enabled
 
 ### Slack
 
+Enables logging in through Slack, optionally restricting it to a single team.
+
 * SLACK_KEY
 * SLACK_SECRET
-* SLACK_TEAM_ID
+* SLACK_TEAM_ID - Leave this unset to allow any team to access. It is an error
+  to not set this if slack API credentials are provided.
 
 ## Development
 
-Running Organizer locally is similar to most django projects.
+Organizer is split into two parts. The backend is written for Python 2.x, using
+Django. The frontend is written for node 9.x using React, Redux, webpack, and
+friends; webpack-dev-server runs in development mode, and compiles to static
+files in production.
+
+Running Organizer locally is similar to most django and npm projects.
 
 Setup a python virtualenv:
 
-  $ virtualenv virtualenv/
+    $ virtualenv virtualenv/
 
 Load the virtualenv:
 
-  $ source virtualenv/bin/activate
+    $ source virtualenv/bin/activate
 
 Install python dependencies:
 
-  $ pip install -r requirements.txt
+    $ pip install -r requirements.txt
 
 Install nodejs dependencies:
 
-  $ npm install
+    $ npm install
 
 Initialize the database:
 
-  $ ./manage.py migrate
+    $ ./manage.py migrate
 
 Start a copy of redis in the background:
 
-  $ redis-server &
+    $ redis-server &
 
 Run the server:
 
-  $ npm start
+    $ npm start
 
 ## Contributions
 
