@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import { hot } from 'react-hot-loader'
 
 import LoginSplash from './LoginSplash'
-import { getLoggedIn } from '../selectors'
+import { getLoggedIn } from '../selectors/auth'
 import OrganizerAppBar from './OrganizerAppBar'
 import OrganizerBottomNav from './OrganizerBottomNav'
 
