@@ -12,10 +12,8 @@ import faLocationArrow from '@fortawesome/fontawesome-free-solid/faLocationArrow
 import faUsers from '@fortawesome/fontawesome-free-solid/faUsers'
 import faUserCircle from '@fortawesome/fontawesome-free-solid/faUserCircle'
 import faGlobe from '@fortawesome/fontawesome-free-solid/faGlobe'
-import { fab } from '@fortawesome/free-brands-svg-icons'
 
-faLibrary.add(faMapMarker, faSpinner, fab, faLocationArrow, faUsers, faGlobe, faUserCircle)
-
+faLibrary.add(faMapMarker, faSpinner, faLocationArrow, faUsers, faGlobe, faUserCircle)
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {

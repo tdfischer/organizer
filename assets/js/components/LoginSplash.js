@@ -4,10 +4,15 @@ import Divider from '@material-ui/core/Divider'
 import Paper from '@material-ui/core/Paper'
 import _ from 'lodash'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { library as faLibrary } from '@fortawesome/fontawesome'
+import faDiscourse from '@fortawesome/fontawesome-free-brands/faDiscourse'
+import faSlack from '@fortawesome/fontawesome-free-brands/faSlack'
 
 import './LoginSplash.scss'
 
 import EBFESymbol from 'svg-react-loader!../../img/symbol.svg'
+
+faLibrary.add(faDiscourse, faSlack)
 
 const LoginSplash = (_props) => (
     <Paper zDepth={1} className="app-splash">
