@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect'
 import _ from 'lodash'
-import geolib from 'geolib'
+import distance from '@turf/distance'
 import { bindActionCreators } from 'redux'
 
 import { csrftoken } from '../Django'
@@ -72,7 +72,7 @@ export class ModelSelector {
     nearby(currentLocation, radius = 0) {
         const modelsWithDistance = _.map(this.withGeo().slice, m => ({
             ...m,
-            distance: geolib.getDistance(m.geo, currentLocation)
+            distance: distance(m.geo, currentLocation)
         }))
         const sorted = _.sortBy(modelsWithDistance, [m => m.distance])
         if (radius > 0) {
