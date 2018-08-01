@@ -5,6 +5,8 @@ import Paper from '@material-ui/core/Paper'
 import _ from 'lodash'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
+import './LoginSplash.scss'
+
 import EBFESymbol from 'svg-react-loader!../../img/symbol.svg'
 
 const LoginSplash = (_props) => (

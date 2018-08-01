@@ -1,0 +1,17 @@
+.app-splash {
+  background-color: #fff;
+  margin: 2em;
+  padding: 1em;
+  text-align: center;
+  .pop {
+    font-size: 58pt;
+    font-family: 'Rock Salt', cursive;
+  }
+
+  .github-link {
+    font-size: 48pt;
+    a {
+      color: #8d2;
+    }
+  }
+}
