@@ -1,8 +1,6 @@
 import React, { PureComponent } from 'react'
 import { connect } from 'react-redux'
-import Model from '../store/model'
-import Selectable from '../store/select'
-import Filterable from '../store/filter'
+import { Selectable , Filterable, Model } from '../store'
 import _ from 'lodash'
 import { Form } from 'informed'
 import TextField from '@material-ui/core/TextField'
@@ -15,10 +13,12 @@ import TableCell from '@material-ui/core/TableCell'
 import TableRow from '@material-ui/core/TableRow'
 import TableHead from '@material-ui/core/TableHead'
 import Checkbox from '@material-ui/core/Checkbox'
+import importedComponent from 'react-imported-component'
 
 import MaterialFormText from './MaterialFormText'
-import ImportDialog from './ImportDialog'
 import DialogOpener from './DialogOpener'
+
+const ImportDialog = importedComponent(() => import('./ImportDialog'))
 
 const People = new Model('people')
 const PeopleSelector = new Selectable('people')

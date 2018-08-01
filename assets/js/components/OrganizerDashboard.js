@@ -1,11 +1,11 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import Model from '../store/model'
+import { Model } from '../store'
 import _ from 'lodash'
 import Typography from '@material-ui/core/Typography'
 import Divider from '@material-ui/core/Divider'
 
-import { getCurrentUser } from '../selectors'
+import { getCurrentUser } from '../selectors/auth'
 
 const People = new Model('people')
 

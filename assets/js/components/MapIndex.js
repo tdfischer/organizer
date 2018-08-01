@@ -2,15 +2,21 @@ import React from 'react'
 import L from 'leaflet'
 import _ from 'lodash'
 import { connect } from 'react-redux'
-import Model from '../store/model'
+import { Model } from '../store'
 import HeatmapLayer from 'react-leaflet-heatmap-layer'
-import MarkerClusterGroup from 'react-leaflet-markercluster/src/react-leaflet-markercluster'
 import LocalMap from './mapping/LocalMap'
 import gravatar from 'gravatar'
+import importedComponent from 'react-imported-component'
 
 import markerIcon from 'leaflet/dist/images/marker-icon.png'
 import markerRetinaIcon from 'leaflet/dist/images/marker-icon-2x.png'
 import markerShadow from 'leaflet/dist/images/marker-shadow.png'
+
+import 'leaflet/dist/leaflet.css'
+import 'react-leaflet-markercluster/dist/styles.min.css'
+import './MapIndex.scss'
+
+const MarkerClusterGroup = importedComponent(() => import('react-leaflet-markercluster/src/react-leaflet-markercluster'))
 
 delete L.Icon.Default.prototype._getIconUrl
 

@@ -11,7 +11,7 @@ import gravatar from 'gravatar'
 
 import BusyIndicator from './BusyIndicator'
 import { logout } from '../actions'
-import { getCurrentUser, getLoggedIn } from '../selectors'
+import { getCurrentUser, getLoggedIn } from '../selectors/auth'
 
 const mapStateToProps = state => {
     return {

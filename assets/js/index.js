@@ -1,13 +1,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import '../scss/app.scss'
-import 'leaflet/dist/leaflet.css'
-import 'react-leaflet-markercluster/dist/styles.min.css'
 
 import App from './components/App'
 import { history, PersistentApp } from './store'
-
-import injectTapEventPlugin from 'react-tap-event-plugin'
 
 import { library as faLibrary } from '@fortawesome/fontawesome'
 import faMapMarker from '@fortawesome/fontawesome-free-solid/faMapMarker'
@@ -16,11 +12,8 @@ import faLocationArrow from '@fortawesome/fontawesome-free-solid/faLocationArrow
 import faUsers from '@fortawesome/fontawesome-free-solid/faUsers'
 import faUserCircle from '@fortawesome/fontawesome-free-solid/faUserCircle'
 import faGlobe from '@fortawesome/fontawesome-free-solid/faGlobe'
-import { fab } from '@fortawesome/free-brands-svg-icons'
 
-faLibrary.add(faMapMarker, faSpinner, fab, faLocationArrow, faUsers, faGlobe, faUserCircle)
-
-injectTapEventPlugin()
+faLibrary.add(faMapMarker, faSpinner, faLocationArrow, faUsers, faGlobe, faUserCircle)
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
