@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "license": "GPL-3.0-or-later",
   "scripts": {
-    "heroku-postbuild": "build",
+    "heroku-postbuild": "yarn run build",
     "build": "webpack -p --config webpack.prod.js",
     "frontend": "webpack-dev-server --config webpack.dev.js",
     "backend": "python manage.py runserver",
