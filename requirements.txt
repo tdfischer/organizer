@@ -33,3 +33,4 @@ social-auth-core
 social-auth-app-django
 django-taggit
 django-taggit-serializer
+django-nose
