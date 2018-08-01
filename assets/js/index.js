@@ -5,8 +5,6 @@ import '../scss/app.scss'
 import App from './components/App'
 import { history, PersistentApp } from './store'
 
-import injectTapEventPlugin from 'react-tap-event-plugin'
-
 import { library as faLibrary } from '@fortawesome/fontawesome'
 import faMapMarker from '@fortawesome/fontawesome-free-solid/faMapMarker'
 import faSpinner from '@fortawesome/fontawesome-free-solid/faSpinner'
@@ -18,7 +16,6 @@ import { fab } from '@fortawesome/free-brands-svg-icons'
 
 faLibrary.add(faMapMarker, faSpinner, fab, faLocationArrow, faUsers, faGlobe, faUserCircle)
 
-injectTapEventPlugin()
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
