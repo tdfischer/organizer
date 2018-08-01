@@ -13,10 +13,12 @@ import TableCell from '@material-ui/core/TableCell'
 import TableRow from '@material-ui/core/TableRow'
 import TableHead from '@material-ui/core/TableHead'
 import Checkbox from '@material-ui/core/Checkbox'
+import importedComponent from 'react-imported-component'
 
 import MaterialFormText from './MaterialFormText'
-import ImportDialog from './ImportDialog'
 import DialogOpener from './DialogOpener'
+
+const ImportDialog = importedComponent(() => import('./ImportDialog'))
 
 const People = new Model('people')
 const PeopleSelector = new Selectable('people')
