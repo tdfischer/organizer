@@ -5,12 +5,16 @@ import thunkMiddleware from 'redux-thunk'
 import { persistStore } from 'redux-persist'
 import { PersistGate } from 'redux-persist/integration/react'
 import { Provider } from 'react-redux'
-import * as _model from './model'
+import _model from './model'
+import _selectable from './select'
+import _filterable from './filter'
 
 import { connectRouter, routerMiddleware } from 'connected-react-router'
 import { createBrowserHistory } from 'history'
 
 export const Model = _model
+export const Selectable = _selectable
+export const Filterable = _filterable
 
 const composer = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
