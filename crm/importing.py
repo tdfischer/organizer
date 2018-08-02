@@ -10,15 +10,15 @@ __addr_cache = {}
 
 def translate_google_result(res):
     ret = {}
-    for prop in res['address_components']:
-        if 'locality' in prop['types']:
-            ret['locality'] = prop['long_name']
-        if 'administrative_area_level_1' in prop['types']:
-            ret['state'] = prop['long_name']
-        if 'country' in prop['types']:
-            ret['country'] = prop['long_name']
-        if 'postal_code' in prop['types']:
-            ret['postal_code'] = prop['long_name']
+    GOOGLE_PROP_MAP = {
+        'locality': 'locality',
+        'administrative_area_level_1': 'state',
+        'country': 'country',
+        'postal_code': 'postal_code'
+    }
+    for src,dst in GOOGLE_PROP_MAP.iteritems():
+        if src in prop['types']:
+            ret[dst] = prop['long_name']
     ret['raw'] = res['formatted_address']
     return ret
 
