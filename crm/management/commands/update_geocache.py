@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from geopy.geocoders import GoogleV3
+from geopy.geocoders import GoogleV3, Nominatim
 from geopy.exc import GeocoderQueryError
 from django.core.cache import caches
 from crm.models import Person
