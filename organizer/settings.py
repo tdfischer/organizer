@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'taggit',
     'taggit_serializer',
     'crm',
+    'onboarding',
 ]
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'

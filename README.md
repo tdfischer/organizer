@@ -15,6 +15,8 @@ love for your patch submissions and pull requests.
 ## Features
 
 * Build a list of activists, tag them
+* Send an e-mail notification for each neighborhood when new people are added
+  based on street address.
 
 Future ideas proprosed:
 
@@ -92,6 +94,26 @@ Enables logging in through Slack, optionally restricting it to a single team.
 * SLACK_TEAM_ID - Leave this unset to allow any team to access. It is an error
   to not set this if slack API credentials are provided.
 
+
+## Management commands and batch processing
+
+### ``new_neighbors``
+
+This will send out email notifications for any new people that have been added
+to a neighborhood based on their street address. This should be run fairly
+regularly, but at most once per day.
+
+
+### ``import [importer]``
+
+A bit of a swiss army knife of importing data. Two importers are provided,
+``airtable`` and ``csv``. ``airtable`` will use the relevant configuration
+documented elsewhere in this README to import people. ``csv`` will read a csv
+file from stdin. Expect more importers to be added in the future. If you have an
+idea for one, open a Github issue or submit a pull request.
+
+The ``airtable`` importer is meant to be ran daily.
+
 ## Development
 
 Organizer is split into two parts. The backend is written for Python 2.x, using
@@ -121,13 +143,20 @@ Initialize the database:
 
     $ ./manage.py migrate
 
-Start a copy of redis in the background:
-
-    $ redis-server &
-
-Run the server:
+Run the backend server, frontend server, and redis-server all at once:
 
     $ npm start
+
+This performs the following:
+
+* Starts ``redis-server``
+* Runs ``webpack-dev-server`` on port 8080. You should never have to point your
+  browser at this directly.
+* Runs ``./manage.py runserver``, the django development server, on port 8000.
+  This is where you send your browser.
+
+After starting the application, send your browser to the django server on
+http://localhost:8000/
 
 ## Contributions
 
