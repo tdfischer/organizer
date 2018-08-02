@@ -1,9 +1,10 @@
 from django.core.management.base import BaseCommand, CommandError
 from geopy.geocoders import GoogleV3, Nominatim
-from geopy.exc import GeocoderQueryError
+from geopy.exc import GeocoderQueryError, GeocoderTimedOut
 from django.core.cache import caches
-from crm.models import Person
+from crm.models import Person, Turf, TurfMembership
 from django.conf import settings
+from address.models import Country, State, Locality
 
 geocache = caches['default']
 
@@ -22,6 +23,8 @@ class Command(BaseCommand):
                 geocoded = None
                 try:
                     geocoded = geolocator.geocode(currentAddr, exactly_one=True)
+                except GeocoderTimedOut:
+                    pass
                 except GeocoderQueryError:
                     pass
                 if geocoded is not None:
@@ -40,7 +43,26 @@ class Command(BaseCommand):
                         'administrative_area_level_1': values.get('administrative_area_level_1', None),
                         'country': values.get('country', None),
                     }
-                    person.neighborhood = values.get('neighborhood', None)
+                    if values.get('neighborhood') is not None:
+                        country, newCountry = Country.objects.get_or_create(name=values.get('country'))
+                        state, newState = State.objects.get_or_create(name=values.get('administrative_area_level_1'),
+                                country=country)
+                        city, newCity = Locality.objects.get_or_create(name=values.get('locality'),
+                                state=state)
+                        neighborhoodTurf, newNeighborhood = Turf.objects.get_or_create(name=values.get('neighborhood'),
+                                locality=city)
+                        neighborhoodMembership, joinedNeighborhood = TurfMembership.objects.get_or_create(turf=neighborhoodTurf,
+                                person=person)
+                        if newCountry:
+                            print "New country:", country.name
+                        if newState:
+                            print "New state:", state.name
+                        if newCity:
+                            print "New city:", city.name
+                        if newNeighborhood:
+                            print "New neighborhood:", neighborhoodTurf.name
+                        if joinedNeighborhood:
+                            print person, "joined neighborhood:", neighborhoodTurf.name
                     geocache.set('geocache:' + currentAddr, {'longitude': longitude,
                         'latitude': latitude})
             else:

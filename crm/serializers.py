@@ -28,8 +28,7 @@ class AddressSerializer(serializers.ModelSerializer):
 
 class GeoField(serializers.Field):
     def to_representation(self, obj):
-        return {'lat': obj.lat, 'lng': obj.lng,
-                'neighborhood': obj.neighborhood}
+        return {'lat': obj.lat, 'lng': obj.lng}
 
     def get_attribute(self, obj):
         return obj
