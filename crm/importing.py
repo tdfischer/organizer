@@ -48,15 +48,9 @@ def address_from_row(row):
     logging.debug("%s -> %r", addr_to_geocode, __addr_cache[addr_to_geocode])
     return __addr_cache[addr_to_geocode]
 
-def import_file(f):
-    imp = Importer(f)
-    imported_count = 0
-    for activist in imp:
-        print 'Imported ', unicode(activist)
-        imported_count += 1
-    return imported_count
-
 class Importer(object):
+    """Implement the import_next method in a subclass to provide a custom
+    importer."""
     def __init__(self):
         self.__imported_count = 0
 
@@ -68,6 +62,9 @@ class Importer(object):
         if created:
             self.__imported_count += 1
         return activist, created
+
+    def import_next(self):
+        raise NotImplementedError()
 
 class CSVImporter(Importer):
     def __init__(self, src_file):
