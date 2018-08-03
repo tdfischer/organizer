@@ -1,7 +1,8 @@
 # Organizer
 
-[![Maintainability](https://api.codeclimate.com/v1/badges/86f7c614494ac53194e2/maintainability)](https://codeclimate.com/github/tdfischer/organizer/maintainability)
 [![CircleCI](https://circleci.com/gh/tdfischer/organizer.svg?style=svg)](https://circleci.com/gh/tdfischer/organizer)
+[![Maintainability](https://api.codeclimate.com/v1/badges/86f7c614494ac53194e2/maintainability)](https://codeclimate.com/github/tdfischer/organizer/maintainability)
+[![codecov](https://codecov.io/gh/tdfischer/organizer/branch/master/graph/badge.svg)](https://codecov.io/gh/tdfischer/organizer)
 
 
 I don't think I have any unique perspectives on organizing people. It is hard

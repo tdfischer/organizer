@@ -52,6 +52,7 @@ jobs:
             ./cc-test-reporter before-build
             pipenv run ./manage.py test --cover-xml
             ./cc-test-reporter format-coverage --output ./codeclimate/python.json
+            bash <(curl -s https://codecov.io/bash) -cF python
       - persist_to_workspace:
           root: .
           paths:
@@ -88,6 +89,7 @@ jobs:
             ./cc-test-reporter before-build
             yarn test --ci --testResultsProcessor=jest-junit
             ./cc-test-reporter format-coverage --output ./codeclimate/node.json
+            bash <(curl -s https://codecov.io/bash) -cF node
       - persist_to_workspace:
           root: .
           paths:
