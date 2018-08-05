@@ -101,7 +101,7 @@ export default class Model {
     }
 
     bindActionCreators(dispatch) {
-        const funcNames = ['saving', 'saved', 'save', 'fetchOne', 'fetchIfNeeded', 'refresh', 'fetchAll', 'update', 'updateAndSave', 'request', 'receive']
+        const funcNames = ['saving', 'saved', 'save', 'fetchOne', 'fetchIfNeeded', 'refresh', 'fetchAll', 'update', 'create', 'updateAndSave', 'request', 'receive']
         const funcPairs = _.map(funcNames, name => [name, _.bind(_.get(this, name), this)])
         const bindable = _.fromPairs(funcPairs)
         return bindActionCreators(bindable, dispatch)
@@ -215,6 +215,31 @@ export default class Model {
                 })
                 return Promise.resolve()
             }
+        }
+    }
+
+    create(modelData) {
+        return dispatch => {
+            const data = {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json; charset=utf-8'
+                },
+                body: JSON.stringify(modelData)
+            }
+            console.groupCollapsed('POST %s', this.name)
+            console.log(data)
+            console.groupEnd()
+            return queuedFetch('/api/'+this.name+'/', data)
+                .then(response => response.json())
+                .then(json => {
+                    if (!_.isEmpty(json)) {
+                        dispatch(this.update(json.id, json))
+                        return Promise.resolve(json.id)
+                    }
+                })
         }
     }
 
