@@ -26,16 +26,19 @@ class AddressSerializer(serializers.ModelSerializer):
         model = address.models.Address
         fields = ('raw', 'street_number', 'route', 'locality')
 
-class GeoField(serializers.Field):
-    def to_representation(self, obj):
-        return {'lat': obj.lat, 'lng': obj.lng}
-
-    def get_attribute(self, obj):
-        return obj
+class PersonStateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.PersonState
+        fields = ('name', 'id')
+        lookup_field = 'name'
+        extra_kwargs = {
+                'id': {'read_only': True}
+        }
 
 class PersonSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer):
     tags = TagListSerializerField()
-    geo = GeoField()
+    state = serializers.SlugRelatedField(queryset=models.PersonState.objects.all(),
+            slug_field='name')
 
     class Meta:
         model = models.Person
@@ -45,5 +48,6 @@ class PersonSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer)
         lookup_field = 'email'
         extra_kwargs = {
                 'url': {'lookup_field': 'email'},
-                'id': {'source': 'email'}
+                'id': {'source': 'email', 'read_only': True},
+                'geo': {'read_only': True}
         }

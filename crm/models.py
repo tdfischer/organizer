@@ -18,6 +18,10 @@ class Person(models.Model):
 
     tags = TaggableManager()
 
+    @property
+    def geo(self):
+        return {'lat': self.lat, 'lng': self.lng}
+
     def save(self, *args, **kwargs):
         if not self.address_id:
             self.address = Address.objects.create()
