@@ -115,6 +115,12 @@ idea for one, open a Github issue or submit a pull request.
 
 The ``airtable`` importer is meant to be ran daily.
 
+### ``make_superuser``
+
+Use this command after you've logged in for the first time to make a given
+e-mail address superuser. Superusers are able to access the administration
+interface at ``/admin/``.
+
 ## Development
 
 Organizer is split into two parts. The backend is written for Python 2.x, using
