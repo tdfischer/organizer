@@ -18,6 +18,13 @@ function queuedFetch() {
     const args = arguments
     return fetchQueue.add(() => {
         return fetch.apply(null, args)
+            .then(response => {
+                if (!response.ok) {
+                    return Promise.reject(response)
+                } else {
+                    return response
+                }
+            })
     })
 }
 
