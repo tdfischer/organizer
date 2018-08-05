@@ -34,3 +34,4 @@ social-auth-app-django
 django-taggit
 django-taggit-serializer
 django-nose
+Faker==0.8.17

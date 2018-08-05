@@ -121,6 +121,12 @@ Use this command after you've logged in for the first time to make a given
 e-mail address superuser. Superusers are able to access the administration
 interface at ``/admin/``.
 
+### ``fake_data``
+
+Generates some fake data for you to play around with during development.
+Requires that the ``DEBUG`` environment variable not be set, i.e. running in a
+production environment.
+
 ## Development
 
 Organizer is split into two parts. The backend is written for Python 2.x, using
