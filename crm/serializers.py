@@ -20,6 +20,23 @@ class AddressSerializer(serializers.ModelSerializer):
         model = address.models.Address
         fields = ('raw', 'street_number', 'route', 'locality')
 
+class TurfSerializer(serializers.HyperlinkedModelSerializer):
+    locality = LocalitySerializer()
+
+    class Meta:
+        model = models.Turf
+        fields = ('name', 'locality', 'url', 'id')
+
+class TurfMembershipSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source='turf.name', read_only=True)
+    turf = serializers.PrimaryKeyRelatedField(read_only=True)
+    url = serializers.HyperlinkedRelatedField(source='turf', queryset=models.Turf.objects.all(),
+    view_name='turf-detail')
+
+    class Meta:
+        model = models.TurfMembership
+        fields = ('name', 'joined_on', 'is_captain', 'turf', 'url')
+
 class PersonStateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.PersonState
@@ -40,13 +57,15 @@ class PersonStateSerializer(serializers.ModelSerializer):
 
 class PersonSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer):
     tags = TagListSerializerField()
+    current_turf_membership = TurfMembershipSerializer(read_only=True)
+    turf_memberships = TurfMembershipSerializer(many=True, read_only=True)
     state = serializers.SlugRelatedField(queryset=models.PersonState.objects.all(),
             slug_field='name')
 
     class Meta:
         model = models.Person
         fields = ('name',  'id', 'email', 'created', 'url', 'tags',
-        'geo', 'state')
+        'geo', 'current_turf_membership', 'turf_memberships', 'state')
 
         lookup_field = 'email'
         extra_kwargs = {
