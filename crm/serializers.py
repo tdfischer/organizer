@@ -35,6 +35,15 @@ class PersonStateSerializer(serializers.ModelSerializer):
                 'id': {'read_only': True}
         }
 
+class PersonStateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.PersonState
+        fields = ('name', 'id')
+        lookup_field = 'name'
+        extra_kwargs = {
+                'id': {'read_only': True}
+        }
+
 class PersonSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer):
     tags = TagListSerializerField()
     state = serializers.SlugRelatedField(queryset=models.PersonState.objects.all(),
@@ -43,7 +52,7 @@ class PersonSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer)
     class Meta:
         model = models.Person
         fields = ('name',  'id', 'email', 'created', 'url', 'tags',
-        'geo')
+        'geo', 'state')
 
         lookup_field = 'email'
         extra_kwargs = {
