@@ -64,8 +64,8 @@ export class ModelSelector {
         return _.head(this.slice)
     }
 
-    shouldFetch(id) {
-        return this.filterBy('id', id).first() ? false : true
+    exists(id) {
+        return _.find(this.slice, {id: id}) != undefined
     }
 
     sortBy(key) {
@@ -148,7 +148,7 @@ export default class Model {
 
     fetchIfNeeded(id) {
         return (dispatch, getState) => {
-            if (this.select(getState()).shouldFetch(id)) {
+            if (!this.select(getState()).exists(id)) {
                 return dispatch(this.fetchOne(id))
             }
         }
