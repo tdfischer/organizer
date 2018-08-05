@@ -33,6 +33,8 @@ const MaterialFormText = asField(({ fieldState, fieldApi, ...props }) => {
                     onBlur(e)
                 }
             }}
+            error={!!fieldState.error}
+            helperText={fieldState.error}
         />
     )
 })
