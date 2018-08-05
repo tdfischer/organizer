@@ -245,7 +245,7 @@ export default class Model {
 
     updateAndSave(id, dataOrCallback) {
         return dispatch => {
-            dispatch(this.update(id, dataOrCallback))
+            return dispatch(this.update(id, dataOrCallback))
                 .then(() => dispatch(this.save(id)))
         }
     }
