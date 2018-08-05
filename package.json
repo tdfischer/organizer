@@ -34,6 +34,7 @@
     "babel-preset-env": "^1.5.2",
     "babel-preset-react": "^6.24.1",
     "base-64": "^0.1.0",
+    "bloomfilter": "^0.0.18",
     "concurrently": "^3.5.1",
     "connected-react-router": "^4.3.0",
     "css-loader": "^0.28.4",
