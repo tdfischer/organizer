@@ -69,7 +69,11 @@ export class ModelSelector {
     }
 
     sortBy(key) {
-        return new ModelSelector(_.sortBy(this.slice, _.property(key)))
+        if (key.startsWith('-')) {
+            return new ModelSelector(_.reverse(_.sortBy(this.slice, _.property(key.substr(1)))))
+        } else {
+            return new ModelSelector(_.sortBy(this.slice, _.property(key)))
+        }
     }
 
     withGeo() {
