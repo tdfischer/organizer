@@ -1,16 +1,52 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
+from mock import MagicMock, patch
 from hypothesis.extra.django import TestCase
+from hypothesis.extra.django.models import models as djangoModels
 from django.test import override_settings
 from django.conf import settings
-from hypothesis import given, assume, note
+from django.contrib.auth.models import User
+from urllib import quote_plus
+from hypothesis import given, assume, note, settings as hypothesisSettings
 import math
-from hypothesis.strategies import sampled_from, emails, floats, composite, lists, dictionaries, one_of, text, none, fixed_dictionaries
+from hypothesis.strategies import characters, just, sampled_from, emails, floats, composite, lists, dictionaries, one_of, text, none, fixed_dictionaries
 import string
 from geopy.location import Location
 from geopy.point import Point
-from . import geocache, models
+from . import geocache, models, api_views
+from rest_framework.test import APITestCase
+import pytest
+from address.models import Address
+import functools
+
+
+CONFIG = {
+    'CACHES': {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.dummy.DummyCache'
+        }
+    },
+}
+
+
+def mockRedis(f):
+    @functools.wraps(f)
+    @override_settings(**CONFIG)
+    def wrapped(*args, **kwargs):
+        with mockedQueue():
+            return f(*args, **kwargs)
+    return wrapped
+
+def mockedQueue():
+    return patch('django_rq.queues.get_queue')
+
+def skipAuth(f):
+    @functools.wraps(f)
+    def wrapped(*args, **kwargs):
+        with patch('rest_framework.views.APIView.check_permissions') as patched:
+            return f(*args, **kwargs)
+    return wrapped
 
 geocodeDict = {
     'raw': text(),
@@ -30,6 +66,19 @@ geocodeTest = \
         dictionaries(text(), one_of(text(), none())),
         fixed_dictionaries(geocodeDict)
     )
+
+@composite
+def people(draw):
+    return models.Person.objects.create(
+        name=draw(nonblanks()),
+        email=draw(emails().filter(lambda x: len(x) < 100 and '/' not in x)),
+        address=None,
+        state=models.PersonState.objects.get_or_create(name='Default')[0]
+    )
+
+@composite
+def nonblanks(draw):
+    return draw(text(min_size=1, alphabet=characters(whitelist_categories=('Lu', 'Ll'))))
 
 @composite
 def latlngs(draw):
@@ -88,7 +137,6 @@ def locations(draw):
     asPoint = Point(resp['geometry']['location']['lat'], resp['geometry']['location']['lng'])
     return Location(resp['formatted_address'], asPoint, resp)
 
-
 @override_settings(GEOCODE_ADAPTOR='crm.geocache.DummyAdaptor')
 class GeocodeTests(TestCase):
     @given(geocodeTest)
@@ -121,28 +169,17 @@ class GeocodeTests(TestCase):
         self.assertEqual(response.longitude, decoded['lng'])
         turf = geocache.turf(decoded)
 
-class DummyAdaptor(geocache.GeocodeAdaptor):
-    def __init__(self, response):
-        self.response = response
-
-    def resolve(self, address):
-        return self.response
-
-@override_settings(CACHES={'default': {'BACKEND': 'django.core.cache.backends.dummy.DummyCache'}})
 class PersonTests(TestCase):
-    def setUp(self):
-        self.defaultState, _ = models.PersonState.objects.get_or_create(name='Default')
-        # Monkeypatch this to not create redis jobs
-        models.Person.queue_geocache_update = lambda _: None
-
-    @given(emails(), locations())
-    def testUpdateGeo(self, email, response):
-        settings.GEOCODE_ADAPTOR = DummyAdaptor(response)
+    @mockRedis
+    @given(emails(), locations(), djangoModels(models.PersonState))
+    @pytest.mark.filterwarnings("ignore::django.core.cache.backends.base.CacheKeyWarning")
+    def testUpdateGeo(self, email, response, defaultState):
+        settings.GEOCODE_ADAPTOR = MagicMock()
+        settings.GEOCODE_ADAPTOR.resolve.return_value = response
         note('Raw: %r' % (response.raw,))
 
         p = models.Person.objects.create(email=email, name=email,
-                state=self.defaultState, address=response.address)
-        p.save()
+                state=defaultState, address=response.address)
         if models.updatePersonGeo(p.id):
             p = models.Person.objects.get(pk=p.id)
             self.assertEqual(p.lat, response.latitude)
@@ -150,3 +187,67 @@ class PersonTests(TestCase):
         else:
             self.assertIsNone(p.lat)
             self.assertIsNone(p.lng)
+
+class ApiTests(APITestCase, TestCase):
+    def setUp(self):
+        self.authUser = User.objects.create(username='test')
+
+    def tearDown(self):
+        self.authUser.delete()
+
+    @mockRedis
+    @given(people())
+    def testPermissions(self, person):
+        self.assertValidResponse(self.client.get('/api/people/'), 403)
+        self.assertValidResponse(self.client.get('/api/people/'+quote_plus(person.email)+'/'), 403)
+        self.assertValidResponse(self.client.get('/api/users/me/'), 403)
+        self.assertValidResponse(self.client.get('/api/users/1/'), 403)
+
+    @skipAuth
+    @mockRedis
+    @given(people())
+    def testGetPersonByEmail(self, person):
+        self.client.logout()
+        quoted_url = '/api/people/' + quote_plus(person.email) + '/'
+        note("URL: "+quoted_url)
+        response = self.assertValidResponse(self.client.get(quoted_url), 200)
+        self.assertEqual(response.data.get('email'), person.email)
+        person.delete()
+        self.assertValidResponse(self.client.get(quoted_url), 404)
+
+    def assertValidResponse(self, resp, status=200):
+        note('Response: %r' %(resp.data,))
+        self.assertEqual(resp.status_code, status)
+        return resp
+
+    @given(djangoModels(User))
+    def testGetSelfUser(self, otherUser):
+        assume(self.authUser.id != otherUser.id)
+        # Ensure we can't list anything without logging in
+        self.assertValidResponse(self.client.get('/api/users/'), 403)
+        anonUser = self.assertValidResponse(self.client.get('/api/users/me/'),
+                403).data
+        self.client.force_authenticate(user=self.authUser)
+        self.assertValidResponse(self.client.get('/api/users/'), 200)
+        myUser = self.assertValidResponse(self.client.get('/api/users/me/'),
+                200).data
+        otherUserData = self.assertValidResponse(self.client.get('/api/users/'+str(otherUser.id)+'/'),
+                200).data
+
+        self.assertEqual(myUser.get('id'), self.authUser.id)
+        self.assertNotEqual(anonUser.get('id'), self.authUser.id)
+        self.assertEqual(otherUserData.get('id'), otherUser.id)
+        self.assertNotEqual(otherUserData.get('id'), self.authUser.id)
+
+    @skipAuth
+    @mockRedis
+    @given(people(), nonblanks())
+    def testAddPersonTag(self, person, newTag):
+        quotedUrl = '/api/people/' + quote_plus(person.email) + '/'
+        note('Email %s'%person.email)
+        resp = dict(self.assertValidResponse(self.client.get(quotedUrl)).data)
+        resp['tags'] = list(resp['tags']) + [newTag]
+        note("Submit %r"%(resp,))
+        resp = self.assertValidResponse(self.client.put(quotedUrl, 
+                resp, format='json')).data
+        self.assertEqual(resp['tags'], [newTag])

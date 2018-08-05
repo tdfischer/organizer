@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.db.models import Q, Subquery, OuterRef
 from django.utils import timezone
 from django.urls import reverse
 from address.models import AddressField, Address, Locality
@@ -33,6 +34,11 @@ class PersonState(models.Model):
     def __unicode__(self):
         return self.name
 
+class PersonManager(models.Manager):
+    def get_queryset(self):
+        myTurfs = Turf.objects.filter(members__person__id=OuterRef('pk')).order_by('-members__joined_on')
+        return super(PersonManager, self).get_queryset().annotate(current_turf_id=Subquery(myTurfs.values('id')[:1]))
+
 class Person(models.Model):
     name = models.CharField(max_length=200)
     email = models.EmailField(max_length=200, unique=True, db_index=True)
@@ -41,6 +47,9 @@ class Person(models.Model):
     lat = models.FloatField(null=True, blank=True)
     lng = models.FloatField(null=True, blank=True)
     state = models.ForeignKey(PersonState, db_index=True)
+
+
+    objects = PersonManager()
 
     tags = TaggableManager(blank=True)
 
@@ -58,6 +67,10 @@ class Person(models.Model):
         super(Person, self).save(*args, **kwargs)
         if runUpdate:
             self.queue_geocache_update()
+
+    @property
+    def current_turf(self):
+        return Turf.objects.get(pk=self.current_turf_id)
 
     def __unicode__(self):
         ret = self.name.strip()
@@ -85,3 +98,6 @@ class TurfMembership(models.Model):
         if not self.id:
             self.joined_on = timezone.now()
         return super(TurfMembership, self).save(*args, **kwargs)
+
+    def __unicode__(self):
+        return "%s -> %s"%(self.person, self.turf)
