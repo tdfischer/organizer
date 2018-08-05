@@ -9,11 +9,8 @@ import { library as faLibrary } from '@fortawesome/fontawesome'
 import faMapMarker from '@fortawesome/fontawesome-free-solid/faMapMarker'
 import faSpinner from '@fortawesome/fontawesome-free-solid/faSpinner'
 import faLocationArrow from '@fortawesome/fontawesome-free-solid/faLocationArrow'
-import faUsers from '@fortawesome/fontawesome-free-solid/faUsers'
-import faUserCircle from '@fortawesome/fontawesome-free-solid/faUserCircle'
-import faGlobe from '@fortawesome/fontawesome-free-solid/faGlobe'
 
-faLibrary.add(faMapMarker, faSpinner, faLocationArrow, faUsers, faGlobe, faUserCircle)
+faLibrary.add(faMapMarker, faSpinner, faLocationArrow)
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {

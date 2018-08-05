@@ -5,6 +5,13 @@ import Icon from '@material-ui/core/Icon'
 import { push } from 'connected-react-router'
 import { connect } from 'react-redux'
 
+import { library as faLibrary } from '@fortawesome/fontawesome'
+import faUsers from '@fortawesome/fontawesome-free-solid/faUsers'
+import faUserCircle from '@fortawesome/fontawesome-free-solid/faUserCircle'
+import faGlobe from '@fortawesome/fontawesome-free-solid/faGlobe'
+
+faLibrary.add(faUsers, faGlobe, faUserCircle)
+
 const mapStateToProps = state => {
     return {
         path: state.router.location.pathname
