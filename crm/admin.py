@@ -46,3 +46,4 @@ class PersonAdmin(admin.ModelAdmin):
 admin.site.register(models.Person, PersonAdmin)
 admin.site.register(models.Turf)
 admin.site.register(models.TurfMembership)
+admin.site.register(models.PersonState)
