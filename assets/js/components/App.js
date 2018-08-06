@@ -15,6 +15,7 @@ const LoginSplash = importedComponent(() => import('./LoginSplash'))
 const MapIndex = importedComponent(() => import('./MapIndex'))
 const OrganizerDashboard = importedComponent(() => import('./OrganizerDashboard'))
 const PeopleIndex = importedComponent(() => import('./PeopleIndex'))
+const CaptainIndex = importedComponent(() => import('./CaptainIndex'))
 
 export const App = props => (
     props.logged_in ? (
@@ -23,6 +24,7 @@ export const App = props => (
             <Switch>
                 <Route exact path="/map" component={MapIndex} />
                 <Route exact path="/people" component={PeopleIndex} />
+                <Route exact path="/captain" component={CaptainIndex} />
                 <Route component={OrganizerDashboard} />
             </Switch>
             <OrganizerBottomNav />
@@ -39,7 +41,7 @@ const mapStateToProps = state => {
 
 const RouterApp = (props) => (
     <ConnectedRouter history={props.history}>
-        <AppBase {...props} />
+        <App {...props} />
     </ConnectedRouter>
 )
 

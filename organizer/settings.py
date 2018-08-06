@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'taggit_serializer',
     'crm',
     'onboarding',
+    'messaging'
 ]
 
 CACHES = {
