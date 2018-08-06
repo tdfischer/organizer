@@ -11,14 +11,15 @@ export const setFilter = (key, filter) => {
 }
 
 export default class Filterable {
-    constructor(key, reducer = _.identity) {
+    constructor(key, reducer = _.identity, matcher = _.isMatch) {
         this.key = key
         this.reducer = reducer
+        this.matcher = matcher
     }
 
     filtered(state, values) {
-        const regexp = _.get(state.filters.filters, this.key, '')
-        return _.filter(values, v => !!this.reducer(v).match(regexp))
+        const regexp = _.get(state.filters.filters, this.key)
+        return _.filter(values, v => this.matcher(this.reducer(v), regexp))
     }
 
     bindActionCreators(dispatch) {
