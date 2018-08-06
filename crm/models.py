@@ -7,6 +7,20 @@ from django.urls import reverse
 from address.models import AddressField, Address, Locality
 from enumfields import EnumIntegerField, Enum
 from taggit.managers import TaggableManager
+from crm import geocache
+import django_rq
+
+def updatePersonGeo(personID):
+    person = Person.objects.get(pk=personID)
+    resolved = geocache.geocode(person.address.raw)
+    turf = geocache.turfForAddress(person.address.raw)
+    neighborhoodMembership, joinedNeighborhood = TurfMembership.objects.get_or_create(turf=turf,
+            person=person)
+    person.address = resolved
+    person.lng = resolved.get('lng')
+    person.lat = resolved.get('lat')
+    person.save(_updateGeocache=False)
+
 
 class PersonState(models.Model):
     name = models.CharField(max_length=200)
@@ -30,10 +44,16 @@ class Person(models.Model):
     def geo(self):
         return {'lat': self.lat, 'lng': self.lng}
 
+    def queue_geocache_update(self):
+        django_rq.enqueue(updatePersonGeo, self.id)
+
     def save(self, *args, **kwargs):
         if not self.address_id:
             self.address = Address.objects.create()
+        runUpdate = kwargs.pop('_updateGeocache', True)
         super(Person, self).save(*args, **kwargs)
+        if runUpdate:
+            self.queue_geocache_update()
 
     def __unicode__(self):
         ret = self.name.strip()
