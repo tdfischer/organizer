@@ -1,27 +1,16 @@
 import * as Model from '../store/model'
 import _ from 'lodash'
 
+function mergeModels(currentModels, updatedModels) {
+    return _.unionBy(updatedModels, currentModels, 'id')
+}
+
 export default function(state = {}, action) {
     switch (action.type) {
     case Model.UPDATE_MODEL: {
         // Extract full list of models from state
         const currentModels = _.get(state.models, action.name, [])
-
-        const index = _.findIndex(currentModels, {id: action.id})
-
-        var updatedModels
-
-        if (index == -1) {
-            updatedModels = [...currentModels, action.data]
-        } else {
-            updatedModels = _.map(currentModels, m => {
-                if (m.id == action.id) {
-                    return action.data
-                } else {
-                    return m
-                }
-            })
-        }
+        const updatedModels = mergeModels(currentModels, [action.data])
 
         return {
             ...state,
@@ -48,15 +37,17 @@ export default function(state = {}, action) {
             ...state,
             loading: state.loading + 1
         }
-    case Model.RECEIVE_MODELS:
+    case Model.RECEIVE_MODELS: {
+        const currentModels = _.get(state.models, action.name, [])
         return {
             ...state,
             loading: state.loading - 1,
             models: {
                 ...state.models,
-                [action.name]: [...action.models, ..._.get(state.models, action.name, [])]
+                [action.name]: mergeModels(currentModels, action.models)
             }
         }
+    }
     default:
         return {
             loading: 0,

@@ -22,7 +22,7 @@ const ImportDialog = importedComponent(() => import('./ImportDialog'))
 
 const People = new Model('people')
 const PeopleSelector = new Selectable('people')
-const PeopleFilter = new Filterable('people', p => _.get(p.address, 'raw', 'California') + ' ' + p.name + ' ' + p.tags.join(',') + ' ' + p.email)
+const PeopleFilter = new Filterable('people', p => _.get(p.address, 'raw', 'California') + ' ' + p.name + ' ' + p.tags.join(',') + ' ' + p.email, (a, b) => a.match(new RegExp(b || '')))
 
 const mapStateToProps = state => {
     return {

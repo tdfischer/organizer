@@ -18,6 +18,13 @@ function queuedFetch() {
     const args = arguments
     return fetchQueue.add(() => {
         return fetch.apply(null, args)
+            .then(response => {
+                if (!response.ok) {
+                    return Promise.reject(response)
+                } else {
+                    return response
+                }
+            })
     })
 }
 
@@ -57,12 +64,20 @@ export class ModelSelector {
         return _.head(this.slice)
     }
 
-    shouldFetch(id) {
-        return this.filterBy('id', id).first() ? false : true
+    exists(id) {
+        return _.find(this.slice, {id: id}) != undefined
     }
 
     sortBy(key) {
-        return new ModelSelector(_.sortBy(this.slice, _.property(key)))
+        if (key.startsWith('-')) {
+            return new ModelSelector(_.reverse(_.sortBy(this.slice, _.property(key.substr(1)))))
+        } else {
+            return new ModelSelector(_.sortBy(this.slice, _.property(key)))
+        }
+    }
+
+    map(f) {
+        return new ModelSelector(_.map(this.slice, f))
     }
 
     withGeo() {
@@ -94,7 +109,7 @@ export default class Model {
     }
 
     bindActionCreators(dispatch) {
-        const funcNames = ['saving', 'saved', 'save', 'fetchOne', 'fetchIfNeeded', 'refresh', 'fetchAll', 'update', 'updateAndSave', 'request', 'receive']
+        const funcNames = ['saving', 'saved', 'save', 'fetchOne', 'fetchIfNeeded', 'refresh', 'fetchAll', 'update', 'create', 'updateAndSave', 'request', 'receive']
         const funcPairs = _.map(funcNames, name => [name, _.bind(_.get(this, name), this)])
         const bindable = _.fromPairs(funcPairs)
         return bindActionCreators(bindable, dispatch)
@@ -141,7 +156,7 @@ export default class Model {
 
     fetchIfNeeded(id) {
         return (dispatch, getState) => {
-            if (this.select(getState()).shouldFetch(id)) {
+            if (!this.select(getState()).exists(id)) {
                 return dispatch(this.fetchOne(id))
             }
         }
@@ -172,7 +187,7 @@ export default class Model {
         return dispatch => {
             dispatch(this.request())
             const url = _.get(this.options, 'url', '/api/'+this.name+'/')
-            const urlParams = new URLSearchParams(Object.entries(params))
+            const urlParams = new URLSearchParams(Object.entries(_.pickBy(params, _.negate(_.isUndefined))))
             console.groupCollapsed('GET %s page=%s', this.name, _.get(params, 'page', 1))
             console.log(params)
             console.groupEnd()
@@ -211,9 +226,34 @@ export default class Model {
         }
     }
 
+    create(modelData) {
+        return dispatch => {
+            const data = {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json; charset=utf-8'
+                },
+                body: JSON.stringify(modelData)
+            }
+            console.groupCollapsed('POST %s', this.name)
+            console.log(data)
+            console.groupEnd()
+            return queuedFetch('/api/'+this.name+'/', data)
+                .then(response => response.json())
+                .then(json => {
+                    if (!_.isEmpty(json)) {
+                        dispatch(this.update(json.id, json))
+                        return Promise.resolve(json.id)
+                    }
+                })
+        }
+    }
+
     updateAndSave(id, dataOrCallback) {
         return dispatch => {
-            dispatch(this.update(id, dataOrCallback))
+            return dispatch(this.update(id, dataOrCallback))
                 .then(() => dispatch(this.save(id)))
         }
     }
