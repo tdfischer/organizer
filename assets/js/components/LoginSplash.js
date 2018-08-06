@@ -16,7 +16,7 @@ import EBFESymbol from 'svg-react-loader!../../img/symbol.svg'
 faLibrary.add(faDiscourse, faSlack, faGithub)
 
 const LoginSplash = (_props) => (
-    <Paper zDepth={1} className="app-splash">
+    <Paper className="app-splash">
         <h1>East Bay for Everyone <div className="pop">Organizer</div></h1>
         <p>The housing shortage is not an unintended policy failure. The Bay Area
       has a housing shortage because of decades of voting and organizing against
@@ -27,7 +27,7 @@ const LoginSplash = (_props) => (
         <p>Please sign in to continue.</p>
         <p />
         {_.map(_.toPairs(window.LOGIN_URLS), ([name, url]) => (
-            <p><Button
+            <p key={name}><Button
                 variant="contained"
                 href={url}>
                 Sign in with {name} &nbsp;
