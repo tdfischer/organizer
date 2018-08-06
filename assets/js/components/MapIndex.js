@@ -36,7 +36,7 @@ class MapIndexBase extends React.Component {
 
     render() {
         const markers = _.map(this.props.allPeople.slice, person => {
-            const position = [person.geo.lat, person.geo.lng]
+            const position = person.geo
             return {
                 position: position,
                 popup: person.name,
