@@ -5,6 +5,9 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 import django.db.models.deletion
 
+def create_default_state(apps, schema_editor):
+    PersonState = apps.get_model('crm', 'PersonState')
+    PersonState.objects.get_or_create(pk=1, defaults={'name': 'Default'})
 
 class Migration(migrations.Migration):
 
@@ -21,6 +24,7 @@ class Migration(migrations.Migration):
                 ('description', models.TextField(blank=True, default='')),
             ],
         ),
+        migrations.RunPython(create_default_state),
         migrations.AddField(
             model_name='person',
             name='state',
