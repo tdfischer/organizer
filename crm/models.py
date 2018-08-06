@@ -20,11 +20,11 @@ class Person(models.Model):
     email = models.CharField(max_length=200)
     address = AddressField(blank=True)
     created = models.DateTimeField(auto_now_add=True)
-    lat = models.FloatField(null=True)
-    lng = models.FloatField(null=True)
+    lat = models.FloatField(null=True, blank=True)
+    lng = models.FloatField(null=True, blank=True)
     state = models.ForeignKey(PersonState)
 
-    tags = TaggableManager()
+    tags = TaggableManager(blank=True)
 
     @property
     def geo(self):
