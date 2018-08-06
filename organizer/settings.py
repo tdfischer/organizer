@@ -79,6 +79,8 @@ RQ_QUEUES = {
     }
 }
 
+RQ_SHOW_ADMIN_LINK = True
+
 MARKDOWNIFY_WHITELIST_TAGS = [
     'a', 'abbr', 'acronym', 'b', 'blockquote', 'em', 'i', 'li', 'ol', 'p',
     'string', 'ul', 'img'

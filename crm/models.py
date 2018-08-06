@@ -7,7 +7,6 @@ from django.urls import reverse
 from address.models import AddressField, Address, Locality
 from enumfields import EnumIntegerField, Enum
 from taggit.managers import TaggableManager
-import inspect
 
 class Person(models.Model):
     name = models.CharField(max_length=200)

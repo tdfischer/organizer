@@ -17,39 +17,6 @@ import address
 from airtable import Airtable
 import requests
 
-class MemberViewSet(viewsets.ViewSet):
-    permission_classes = (IsAuthenticated,)
-    base_name = 'member'
-    lookup_value_regex = '[a-zA-Z0-9@-_\+.]+'
-    def list(self, request, format=None):
-        airtable = Airtable(settings.AIRTABLE_BASE_ID, 'Members and Volunteers', api_key=settings.AIRTABLE_API_KEY)
-        members = airtable.get_all(view='Everyone')
-        return Response({'results': members})
-
-    @detail_route(methods=['get'])
-    def topics(self, request, pk=None):
-        params = {
-            'api_key': '3855d634b19ea24775b13f8697885c4688863ff5d7950a1395244a15635f1a05',
-            'api_username': 'system',
-        }
-
-        users = requests.get(
-            'https://discuss.eastbayforeveryone.org/admin/users/list/all.json?email={0}'.format(pk),
-            params=params
-        ).json()
-
-        username = ''
-        try:
-            username = users[0]['username']
-        except:
-            return Response({'results': []})
-
-        topics = requests.get(
-            'https://discuss.eastbayforeveryone.org/topics/created-by/{0}.json'.format(username),
-            params=params
-        ).json()
-        return Response({'results': topics})
-
 class IntrospectiveViewSet(viewsets.ModelViewSet):
     @list_route(methods=['get'])
     def fields(self, request):
@@ -172,5 +139,4 @@ views = {
     'users': UserViewSet,
     'people': PersonViewSet,
     'cities': CityViewSet,
-    'members': MemberViewSet
 }
