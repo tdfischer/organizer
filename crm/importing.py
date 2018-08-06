@@ -92,12 +92,16 @@ class AirtableImporter(Importer):
             row = self.__members.next()
             try:
                 state, _ = models.PersonState.objects.get_or_create(name=row['fields']['Membership Basis'])
-                return models.Person.objects.update_or_create(
+                person, _ = models.Person.objects.update_or_create(
                         email=row['fields']['Email'],
-                        state=state,
                         defaults={
                             'name': row['fields']['Name'],
-                            'address': row['fields']['Full Address']
+                            'address': row['fields']['Full Address'],
+                            'state': state
                         })
+                person.name = row['fields']['Name']
+                person.state = state
+                person.address = row['fields']['Full Address']
+                person.save()
             except KeyError, e:
                 pass
