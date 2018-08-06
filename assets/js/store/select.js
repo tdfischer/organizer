@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import { BloomFilter } from 'bloomfilter'
 
 export const SET_SELECTION = 'SET_SELECTION'
 export const ADD_SELECTION = 'ADD_SELECTION'
@@ -37,6 +38,21 @@ export const toggleSelection = (key, item) => {
     }
 }
 
+class SelectionRange {
+    constructor(slice) {
+        this.slice = slice
+        this.bloom = new BloomFilter(32 * 256, 16)
+        _.each(slice, i => this.bloom.add(i))
+    }
+
+    contains(value) {
+        if (this.bloom.test(value)) {
+            return this.slice.indexOf(value) != -1
+        } else {
+            return false
+        }
+    }
+}
 
 export default class Selectable {
     constructor(key) {
@@ -44,7 +60,7 @@ export default class Selectable {
     }
 
     selected(state) {
-        return _.get(state.selections.selections, this.key, [])
+        return new SelectionRange(_.get(state.selections.selections, this.key, []))
     }
 
     bindActionCreators(dispatch) {

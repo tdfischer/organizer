@@ -22,7 +22,7 @@ const ImportDialog = importedComponent(() => import('./ImportDialog'))
 
 const People = new Model('people')
 const PeopleSelector = new Selectable('people')
-const PeopleFilter = new Filterable('people', p => _.get(p.address, 'raw', 'California') + ' ' + p.name + ' ' + p.tags.join(',') + ' ' + p.email, (a, b) => a.match(new RegExp(b || '')))
+const PeopleFilter = new Filterable('people', p => _.get(p.address, 'raw', 'California') + ' ' + p.name + ' ' + p.tags.join(',') + ' ' + p.email + ' ' + p.state, (a, b) => a.match(new RegExp(b || '')))
 
 const mapStateToProps = state => {
     return {
@@ -89,20 +89,24 @@ class PeopleIndex extends PureComponent {
 
     render() {
         const props = this.props
-        const people = _.map(props.filtered, (person) => {
-            const tags = _.map(person.tags, tag => (
-                <Chip key={tag} className="tag" label={tag} />
-            ))
-            return (
-                <TableRow key={person.id}>
-                    <TableCell>
-                        <Checkbox checked={props.selection.indexOf(person.id) != -1} onChange={() => props.selector.toggle(person.id)}/>
-                    </TableCell>
-                    <TableCell>{person.name}{tags}</TableCell>
-                    <TableCell>{person.email}</TableCell>
-                    <TableCell>{_.get(person.address, 'locality', '') || 'Unknown'}</TableCell>
-                </TableRow>
-            )
+        const people = _.flatMap(_.groupBy(props.filtered, 'state'), (people, state) => {
+            var ret = []
+            ret.push((<TableRow key={'state-'+state.id}><TableCell variant="head" colSpan={3}>{state}</TableCell></TableRow>))
+            ret.push(_.map(people, person => {
+                const tags = _.map(person.tags, tag => (
+                    <Chip key={tag} className="tag" label={tag} />
+                ))
+                return (
+                    <TableRow key={person.id}>
+                        <TableCell padding="checkbox">
+                            <Checkbox checked={props.selection.contains(person.id)} onChange={() => props.selector.toggle(person.id)}/>
+                        </TableCell>
+                        <TableCell>{person.name}{tags}</TableCell>
+                        <TableCell>{person.email}</TableCell>
+                    </TableRow>
+                )
+            }))
+            return ret
         })
         return (
             <React.Fragment>
@@ -127,10 +131,9 @@ class PeopleIndex extends PureComponent {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Selected</TableCell>
+                            <TableCell padding="checkbox"></TableCell>
                             <TableCell>Name</TableCell>
                             <TableCell>Email</TableCell>
-                            <TableCell>City</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>

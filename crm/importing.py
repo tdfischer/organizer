@@ -91,8 +91,10 @@ class AirtableImporter(Importer):
         while True:
             row = self.__members.next()
             try:
+                state, _ = models.PersonState.objects.get_or_create(name=row['fields']['Membership Basis'])
                 return models.Person.objects.update_or_create(
                         email=row['fields']['Email'],
+                        state=state,
                         defaults={
                             'name': row['fields']['Name'],
                             'address': row['fields']['Full Address']

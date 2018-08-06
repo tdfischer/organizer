@@ -134,9 +134,14 @@ class CityViewSet(IntrospectiveViewSet):
         serializer = self.get_serializer(results, many=True)
         return Response(serializer.data)
 
+class PersonStateViewSet(IntrospectiveViewSet):
+    permission_classes = (IsAuthenticated,)
+    queryset = models.PersonState.objects.all()
+    serializer_class = serializers.PersonStateSerializer
 
 views = {
     'users': UserViewSet,
     'people': PersonViewSet,
     'cities': CityViewSet,
+    'states': PersonStateViewSet
 }

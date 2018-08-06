@@ -8,6 +8,13 @@ from address.models import AddressField, Address, Locality
 from enumfields import EnumIntegerField, Enum
 from taggit.managers import TaggableManager
 
+class PersonState(models.Model):
+    name = models.CharField(max_length=200)
+    description = models.TextField(blank=True, default='')
+
+    def __unicode__(self):
+        return self.name
+
 class Person(models.Model):
     name = models.CharField(max_length=200)
     email = models.CharField(max_length=200)
@@ -15,8 +22,13 @@ class Person(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     lat = models.FloatField(null=True)
     lng = models.FloatField(null=True)
+    state = models.ForeignKey(PersonState)
 
     tags = TaggableManager()
+
+    @property
+    def geo(self):
+        return {'lat': self.lat, 'lng': self.lng}
 
     def save(self, *args, **kwargs):
         if not self.address_id:
