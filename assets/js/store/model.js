@@ -187,7 +187,7 @@ export default class Model {
         return dispatch => {
             dispatch(this.request())
             const url = _.get(this.options, 'url', '/api/'+this.name+'/')
-            const urlParams = new URLSearchParams(Object.entries(params))
+            const urlParams = new URLSearchParams(Object.entries(_.pickBy(params, _.negate(_.isUndefined))))
             console.groupCollapsed('GET %s page=%s', this.name, _.get(params, 'page', 1))
             console.log(params)
             console.groupEnd()
