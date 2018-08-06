@@ -36,7 +36,8 @@ class Command(BaseCommand):
         # Grab new turf memberships created since this email was
         # last notified. > instead of >= means it excludes anything since 00:00
         # today
-        newbies = target.turf.members.filter(joined_on__gt=lastSent)
+        newbies = target.turf.members.filter(joined_on__gt=lastSent,
+                person__state=target.state)
 
         if len(newbies) > 0:
             generated_email = email_template.render({
