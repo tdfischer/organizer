@@ -76,6 +76,10 @@ export class ModelSelector {
         }
     }
 
+    map(f) {
+        return new ModelSelector(_.map(this.slice, f))
+    }
+
     withGeo() {
         return this.filter(m => m.geo && !_.isEmpty(m.geo))
     }
