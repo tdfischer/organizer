@@ -27,7 +27,7 @@ def updatePersonGeo(personID):
 
 
 class PersonState(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
     description = models.TextField(blank=True, default='')
 
     def __unicode__(self):
@@ -35,12 +35,12 @@ class PersonState(models.Model):
 
 class Person(models.Model):
     name = models.CharField(max_length=200)
-    email = models.CharField(max_length=200)
+    email = models.EmailField(max_length=200, unique=True, db_index=True)
     address = AddressField(blank=True)
     created = models.DateTimeField(auto_now_add=True)
     lat = models.FloatField(null=True, blank=True)
     lng = models.FloatField(null=True, blank=True)
-    state = models.ForeignKey(PersonState)
+    state = models.ForeignKey(PersonState, db_index=True)
 
     tags = TaggableManager(blank=True)
 
@@ -73,10 +73,13 @@ class Turf(models.Model):
         return "%s, %s"%(self.name, self.locality)
 
 class TurfMembership(models.Model):
-    person = models.ForeignKey(Person, related_name='turf_memberships')
-    turf = models.ForeignKey(Turf, related_name='members')
+    person = models.ForeignKey(Person, related_name='turf_memberships',
+            db_index=True)
+    turf = models.ForeignKey(Turf, related_name='members', db_index=True)
     joined_on = models.DateField()
     is_captain = models.BooleanField(default=False)
+
+    person_turf_index = models.Index(fields=['person', 'turf'])
 
     def save(self, *args, **kwargs):
         if not self.id:
