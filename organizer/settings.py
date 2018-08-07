@@ -208,6 +208,8 @@ RAVEN_CONFIG = {
 
 DEFAULT_CHARSET="utf-8"
 
+GEOCODE_ADAPTOR = 'crm.geocache.GoogleAdaptor'
+
 GOOGLE_MAPS_KEY = os.environ.get('GOOGLE_MAPS_KEY', None)
 
 AIRTABLE_API_KEY = os.environ.get('AIRTABLE_API_KEY', None)
