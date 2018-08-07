@@ -1,46 +1,79 @@
 from django.conf import settings
 from django.core.cache import caches
-from geopy.geocoders import GoogleV3, Nominatim
+from geopy.geocoders import GoogleV3
+from geopy.location import Location
+from geopy.exc import GeocoderQueryError
 from address.models import Country, State, Locality
+import importlib
 import crm.models
 
-geocache = caches['default']
+class GeocodeAdaptor(object):
+    def resolve(self, address):
+        return self.geolocator.geocode(address, exactly_one=True)
+
+class GoogleAdaptor(GeocodeAdaptor):
+    def __init__(self):
+        self.geolocator = GoogleV3(settings.GOOGLE_MAPS_KEY)
+
+def decode_response(response):
+    values = {}
+    for component in response.raw.get('address_components', []):
+        values[component['types'][0]] = component['long_name']
+    return {
+        'raw': response.address,
+        'street_number': values.get('street_number', None),
+        'route': values.get('route', None),
+        'locality': values.get('locality', ''),
+        'postal_code': values.get('postal_code', None),
+        'state': values.get('administrative_area_level_1', None),
+        'country': values.get('country', None),
+        'neighborhood': values.get('neighborhood', None),
+        'lat': response.latitude,
+        'lng': response.longitude,
+    }
 
 def geocode(address):
-    if settings.GOOGLE_MAPS_KEY:
-        geolocator = GoogleV3(settings.GOOGLE_MAPS_KEY)
+    if type(settings.GEOCODE_ADAPTOR) is str:
+        module, cls = settings.GEOCODE_ADAPTOR.rsplit('.', 1)
+        Adaptor = getattr(importlib.import_module(module), cls)
+        adaptor = Adaptor()
     else:
-        geolocator = Nominatim('Organizer')
+        adaptor = settings.GEOCODE_ADAPTOR
+    geocache = caches['default']
     cachedAddr = geocache.get('geocache:' + address)
     if cachedAddr is None:
-        geocoded = geolocator.geocode(address, exactly_one=True)
-        values = {}
-        for component in geocoded.raw['address_components']:
-            values[component['types'][0]] = component['long_name']
-        cachedAddr = {
-            'raw': geocoded.address,
-            'street_number': values.get('street_number', None),
-            'route': values.get('route', None),
-            'locality': values.get('locality', ''),
-            'postal_code': values.get('postal_code', None),
-            'state': values.get('administrative_area_level_1', None),
-            'country': values.get('country', None),
-            'neighborhood': values.get('neighborhood', None),
-            'lat': geocoded.latitude,
-            'lng': geocoded.longitude
-        }
+        try:
+            cachedAddr = decode_response(adaptor.resolve(address))
+        except GeocoderQueryError:
+            # FIXME: Log geocoder failure
+            return None
         geocache.set('geocache:' + address, cachedAddr)
     return cachedAddr
+
+def country(data):
+    return Country.objects.get_or_create(name=data.get('country') or 'Earth')[0]
+
+def state(data):
+    return State.objects.get_or_create(name=data.get('state') or 'National',
+            country=country(data))[0]
+
+def locality(data):
+    return Locality.objects.get_or_create(
+        name = data.get('locality') or 'State-wide',
+        postal_code = data.get('postal_code') or '',
+        state = state(data)
+    )[0]
+
+def turf(data):
+    # We need a minimum of a zipcode to invent a turf, for now.
+    # This implies we also know city, state, country.
+    return crm.models.Turf.objects.get_or_create(
+        name = data.get('neighborhood') or (data.get('postal_code') or 'State-wide'),
+        locality = locality(data)
+    )[0]
+
 
 def turfForAddress(address):
     geocoded = geocode(address)
     if geocoded is not None:
-        print geocoded
-        country, newCountry = Country.objects.get_or_create(name=geocoded.get('country'))
-        state, newState = State.objects.get_or_create(name=geocoded.get('state'),
-                country=country)
-        city, newCity = Locality.objects.get_or_create(name=geocoded.get('locality'),
-                state=state)
-        neighborhoodTurf, newNeighborhood = crm.models.Turf.objects.get_or_create(name=geocoded.get('neighborhood'),
-                locality=city)
-        return neighborhoodTurf
+        return turf(geocoded)

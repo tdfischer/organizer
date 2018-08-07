@@ -14,12 +14,17 @@ def updatePersonGeo(personID):
     person = Person.objects.get(pk=personID)
     resolved = geocache.geocode(person.address.raw)
     turf = geocache.turfForAddress(person.address.raw)
-    neighborhoodMembership, joinedNeighborhood = TurfMembership.objects.get_or_create(turf=turf,
-            person=person)
-    person.address = resolved
-    person.lng = resolved.get('lng')
-    person.lat = resolved.get('lat')
-    person.save(_updateGeocache=False)
+    if turf:
+        neighborhoodMembership, joinedNeighborhood = TurfMembership.objects.get_or_create(turf=turf,
+                person=person)
+        person.address = resolved
+        person.lng = resolved.get('lng')
+        person.lat = resolved.get('lat')
+        person.save(_updateGeocache=False)
+        return True
+    else:
+        #FIXME: log failure to find turf
+        return False
 
 
 class PersonState(models.Model):
