@@ -1,6 +1,6 @@
 import * as Filter from '../store/filter'
 
-export default function(state = {}, action) {
+export default function(state = {}, action = {}) {
     switch (action.type) {
     case Filter.SET_FILTER:
         return {

@@ -1,6 +1,6 @@
 import * as Actions from '../actions'
 
-export default function(state = {}, action) {
+export default function(state = {}, action={}) {
     switch (action.type) {
     case Actions.RECEIVE_USER:
         return {

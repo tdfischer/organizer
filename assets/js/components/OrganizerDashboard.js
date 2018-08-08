@@ -12,7 +12,7 @@ import { getCurrentUser } from '../selectors/auth'
 
 const People = new Model('people')
 
-class OrganizerDashboardBase extends React.Component {
+export class OrganizerDashboard extends React.Component {
     componentDidMount() {
         this.props.people.fetchIfNeeded(this.props.currentUser.email)
     }
@@ -57,6 +57,4 @@ const mapDispatchToProps = dispatch => {
 }
 
 
-const OrganizerDashboard = connect(mapStateToProps, mapDispatchToProps)(OrganizerDashboardBase)
-
-export default OrganizerDashboard
+export default connect(mapStateToProps, mapDispatchToProps)(OrganizerDashboard)
