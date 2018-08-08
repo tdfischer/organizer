@@ -19,7 +19,7 @@ function removeSelection(state, action) {
     }
 }
 
-export default function selections(state = {}, action) {
+export default function selections(state = {}, action = {}) {
     switch (action.type) {
     case Select.SET_SELECTION:
         return {

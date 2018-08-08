@@ -5,7 +5,7 @@ function mergeModels(currentModels, updatedModels) {
     return _.unionBy(updatedModels, currentModels, 'id')
 }
 
-export default function(state = {}, action) {
+export default function(state = {}, action = {}) {
     switch (action.type) {
     case Model.UPDATE_MODEL: {
         // Extract full list of models from state

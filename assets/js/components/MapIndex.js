@@ -28,7 +28,7 @@ L.Icon.Default.mergeOptions({
 
 const People = new Model('people')
 
-class MapIndexBase extends React.Component {
+export class MapIndex extends React.Component {
     constructor(props) {
         super(props)
         this.props.people.refresh()
@@ -77,6 +77,4 @@ const mapDispatchToProps = (dispatch) => {
     }
 }
 
-const MapIndex = connect(mapStateToProps, mapDispatchToProps)(MapIndexBase)
-
-export default MapIndex
+export default connect(mapStateToProps, mapDispatchToProps)(MapIndex)

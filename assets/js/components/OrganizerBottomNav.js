@@ -24,7 +24,7 @@ const mapDispatchToProps = dispatch => {
     }
 }
 
-const OrganizerBottomNav = connect(mapStateToProps, mapDispatchToProps)(props => (
+export const OrganizerBottomNav = props => (
     <BottomNavigation
         className="bottom-nav"
         showLabels  
@@ -34,6 +34,6 @@ const OrganizerBottomNav = connect(mapStateToProps, mapDispatchToProps)(props =>
         <BottomNavigationAction value="/" icon={<Icon className="fa fa-user-circle" />}  label="Me" />
         <BottomNavigationAction value="/map" icon={<Icon className="fa fa-globe" />} label="Map" />
     </BottomNavigation>
-))
+)
 
-export default OrganizerBottomNav
+export default connect(mapStateToProps, mapDispatchToProps)(OrganizerBottomNav)

@@ -82,7 +82,7 @@ const Tagger = connect(() => ({}), mapTaggerDispatchToProps)(props => (
     </Form>
 ))
 
-class PeopleIndex extends PureComponent {
+export class PeopleIndex extends PureComponent {
     componentDidMount() {
         this.props.people.refresh()
     }

@@ -15,7 +15,7 @@ import EBFESymbol from 'svg-react-loader!../../img/symbol.svg'
 
 faLibrary.add(faDiscourse, faSlack, faGithub)
 
-const LoginSplash = (_props) => (
+export const LoginSplash = (_props) => (
     <Paper className="app-splash">
         <h1>East Bay for Everyone <div className="pop">Organizer</div></h1>
         <p>The housing shortage is not an unintended policy failure. The Bay Area
@@ -38,4 +38,4 @@ const LoginSplash = (_props) => (
     </Paper>
 )
 
-export default LoginSplash
+export default (LoginSplash)

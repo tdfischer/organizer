@@ -1,9 +1,11 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import { Route, Switch } from 'react-router-dom'
 import { ConnectedRouter } from 'connected-react-router'
 import importedComponent from 'react-imported-component'
 import { connect } from 'react-redux'
 import { hot } from 'react-hot-loader'
+import { history } from '../store'
 
 import { getLoggedIn } from '../selectors/auth'
 import OrganizerAppBar from './OrganizerAppBar'
@@ -14,16 +16,18 @@ const MapIndex = importedComponent(() => import('./MapIndex'))
 const OrganizerDashboard = importedComponent(() => import('./OrganizerDashboard'))
 const PeopleIndex = importedComponent(() => import('./PeopleIndex'))
 
-const AppBase = _props => (
-    <div className="the-app">
-        <OrganizerAppBar />
-        <Switch>
-            <Route exact path="/map" component={MapIndex} />
-            <Route exact path="/people" component={PeopleIndex} />
-            <Route component={OrganizerDashboard} />
-        </Switch>
-        <OrganizerBottomNav />
-    </div>
+export const App = props => (
+    props.logged_in ? (
+        <div className="the-app">
+            <OrganizerAppBar />
+            <Switch>
+                <Route exact path="/map" component={MapIndex} />
+                <Route exact path="/people" component={PeopleIndex} />
+                <Route component={OrganizerDashboard} />
+            </Switch>
+            <OrganizerBottomNav />
+        </div>
+    ) : <LoginSplash />
 )
 
 
@@ -33,10 +37,18 @@ const mapStateToProps = state => {
     }
 }
 
-const App = connect(mapStateToProps)((props) => (
+const RouterApp = (props) => (
     <ConnectedRouter history={props.history}>
-        {props.logged_in ? <AppBase /> : <LoginSplash />}
+        <AppBase {...props} />
     </ConnectedRouter>
-))
+)
 
-export default hot(module)(App)
+RouterApp.propTypes = {
+    history: PropTypes.object
+}
+
+RouterApp.defaultProps = {
+    history: history
+}
+
+export default hot(module)(connect(mapStateToProps)(RouterApp))
