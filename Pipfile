@@ -10,6 +10,7 @@ pytest-cov = "*"
 pytest-django = "*"
 coverage = "*"
 pytest = "*"
+mock = "*"
 
 [packages]
 appdirs = "==1.4.3"
