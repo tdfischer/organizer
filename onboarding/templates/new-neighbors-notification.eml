@@ -1,6 +1,6 @@
-You have some new neighbors in {{turf.name}}!
+You have some new neighbors!
 
-{% for newbie in newbies %}* {{newbie.person.name}} <{{newbie.person.email}}>
+{% for newbie in newbies %}* {{newbie.current_turf}} {{newbie.name}} <{{newbie.email}}>
 {% endfor %}
 
 Why not send them an e-mail and say hello?

@@ -5,10 +5,10 @@ from django.db import models
 from crm.models import Turf, PersonState
 
 class NewNeighborNotificationTarget(models.Model):
-    turf = models.ForeignKey(Turf, related_name='notification_targets')
+    turfs = models.ManyToManyField(Turf)
     email = models.CharField(max_length=200)
     last_notified = models.DateField(null=True)
-    state = models.ForeignKey(PersonState)
+    states = models.ManyToManyField(PersonState)
 
     def __unicode__(self):
-        return '%s: %s'%(self.email, self.turf)
+        return '%s: %s states, %s turfs'%(self.email, self.states.count(), self.turfs.count())
