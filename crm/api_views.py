@@ -53,7 +53,7 @@ class IntrospectiveViewSet(viewsets.ModelViewSet):
         return results
 
 class UserViewSet(IntrospectiveViewSet):
-    queryset = User.objects.all()
+    queryset = User.objects.order_by('id')
     serializer_class = serializers.UserSerializer
     permission_classes = (IsAuthenticated,)
 
