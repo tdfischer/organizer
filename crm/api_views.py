@@ -117,23 +117,6 @@ class PersonViewSet(AllowPUTAsCreateMixin, IntrospectiveViewSet):
     lookup_field = 'email'
     lookup_value_regex = '[^/]+'
 
-class CityViewSet(IntrospectiveViewSet):
-    permission_classes = (IsAuthenticated,)
-    queryset = address.models.Locality.objects.all()
-    serializer_class = serializers.CitySerializer
-
-    @list_route(methods=['get'])
-    def search(self, request):
-        results = address.models.Locality.objects.filter(name__icontains=request.GET.get('q')).order_by('name')
-        page = self.paginate_queryset(results)
-
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(results, many=True)
-        return Response(serializer.data)
-
 class PersonStateViewSet(IntrospectiveViewSet):
     permission_classes = (IsAuthenticated,)
     queryset = models.PersonState.objects.all()
@@ -142,6 +125,5 @@ class PersonStateViewSet(IntrospectiveViewSet):
 views = {
     'users': UserViewSet,
     'people': PersonViewSet,
-    'cities': CityViewSet,
     'states': PersonStateViewSet
 }
