@@ -43,8 +43,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            pipenv install -r requirements.txt
-            pipenv install coverage
+            pipenv install --dev
       - run:
           name: Run tests
           command: |

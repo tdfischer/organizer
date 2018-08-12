@@ -134,19 +134,12 @@ Django. The frontend is written for node 9.x using React, Redux, webpack, and
 friends; webpack-dev-server runs in development mode, and compiles to static
 files in production.
 
-Running Organizer locally is similar to most django and npm projects.
-
-Setup a python virtualenv:
-
-    $ virtualenv virtualenv/
-
-Load the virtualenv:
-
-    $ source virtualenv/bin/activate
+Running Organizer locally is similar to most django and npm projects. Organizer
+suggests using ``pipenv`` to manage your virtualenv and dependencies.
 
 Install python dependencies:
 
-    $ pip install -r requirements.txt
+    $ pipenv install
 
 Install nodejs dependencies:
 
@@ -158,7 +151,7 @@ Initialize the database:
 
 Run the backend server, frontend server, and redis-server all at once:
 
-    $ npm start
+    $ pipenv run npm start
 
 This performs the following:
 
