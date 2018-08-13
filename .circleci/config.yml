@@ -1,6 +1,7 @@
 defaults: &defaults
   environment:
     CC_TEST_REPORTER_ID: 0770301e1db2e5d01e2c0ec59f87f59de0ff3dcf06e5e09656822f0a5d19e99a
+    HYPOTHESIS_PROFILE: ci
     NODE_ENV: test
   docker:
     - image: circleci/python:2-node-browsers
@@ -32,9 +33,13 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - pipenv-{{.Branch}}-{{checksum "requirements.txt"}}
+            - pipenv-{{.Branch}}-{{checksum "Pipfile.lock"}}
             - pipenv-{{.Branch}}-
             - pipenv-
+      - restore_cache:
+          keys:
+            - hypothesis-{{.Branch}}-
+            - hypothesis-
       - run:
           name: Setup Code Climate test reporter
           command: |
@@ -43,14 +48,13 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            pipenv install -r requirements.txt
-            pipenv install coverage
+            pipenv install --dev
       - run:
           name: Run tests
           command: |
             mkdir -p test-results/nose codeclimate/
             ./cc-test-reporter before-build
-            pipenv run ./manage.py test --cover-xml
+            pipenv run pytest --cov=./ --cov-report xml --cov-branch --hypothesis-show-statistics
             ./cc-test-reporter format-coverage --output ./codeclimate/python.json
             bash <(curl -s https://codecov.io/bash) -cF python
       - persist_to_workspace:
@@ -63,7 +67,11 @@ jobs:
           paths:
             - ./.local
             - ./.cache
-          key: pipenv-{{.Branch}}-{{checksum "requirements.txt"}}
+          key: pipenv-{{.Branch}}-{{checksum "Pipfile.lock"}}
+      - save_cache:
+          paths:
+            - ./.hypothesis
+          key: pipenv-{{.Branch}}
   test-node:
     <<: *defaults
     steps:
@@ -87,7 +95,7 @@ jobs:
           command: |
             mkdir -p test-results/jest codeclimate/
             ./cc-test-reporter before-build
-            yarn test --ci --testResultsProcessor=jest-junit
+            yarn test --ci
             ./cc-test-reporter format-coverage --output ./codeclimate/node.json
             bash <(curl -s https://codecov.io/bash) -cF node
       - persist_to_workspace:

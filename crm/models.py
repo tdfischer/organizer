@@ -5,7 +5,6 @@ from django.db import models
 from django.utils import timezone
 from django.urls import reverse
 from address.models import AddressField, Address, Locality
-from enumfields import EnumIntegerField, Enum
 from taggit.managers import TaggableManager
 from crm import geocache
 import django_rq

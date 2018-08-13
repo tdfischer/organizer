@@ -1,7 +1,6 @@
 //require our dependencies
 var path = require('path')
 var BundleTracker = require('webpack-bundle-tracker')
-var LodashModuleReplacementPlugin = require('lodash-webpack-plugin')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
 var HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin')
 var WorkboxPlugin = require('workbox-webpack-plugin')
@@ -53,7 +52,6 @@ module.exports = {
     plugins: [
         //tells webpack where to store data about your bundles.
         new BundleTracker({filename: './webpack-stats.json'}), 
-        new LodashModuleReplacementPlugin(),
         new HtmlWebpackPlugin({
             title: 'EBFE Organizer',
             template: 'assets/index.html',
