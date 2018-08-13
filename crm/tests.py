@@ -68,12 +68,16 @@ geocodeTest = \
     )
 
 @composite
+def defaultStates(draw):
+    return models.PersonState.objects.get_or_create(name='Default')[0]
+
+@composite
 def people(draw):
     return models.Person.objects.create(
         name=draw(nonblanks()),
         email=draw(emails().filter(lambda x: len(x) < 100 and '/' not in x)),
         address=None,
-        state=models.PersonState.objects.get_or_create(name='Default')[0]
+        state=draw(defaultStates())
     )
 
 @composite
