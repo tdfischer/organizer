@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Selectable , Filterable, Model } from '../store'
 import _ from 'lodash'
@@ -13,21 +13,31 @@ import TableCell from '@material-ui/core/TableCell'
 import TableRow from '@material-ui/core/TableRow'
 import TableHead from '@material-ui/core/TableHead'
 import Checkbox from '@material-ui/core/Checkbox'
+import Tabs from '@material-ui/core/Tabs'
+import Tab from '@material-ui/core/Tab'
+import Snackbar from '@material-ui/core/Snackbar'
+import Badge from '@material-ui/core/Badge'
 import importedComponent from 'react-imported-component'
+import copy from 'copy-to-clipboard'
 
 import MaterialFormText from './MaterialFormText'
 import DialogOpener from './DialogOpener'
 
 const ImportDialog = importedComponent(() => import('./ImportDialog'))
 
+const States = new Model('states')
 const People = new Model('people')
 const PeopleSelector = new Selectable('people')
 const PeopleFilter = new Filterable('people', p => _.get(p.address, 'raw', 'California') + ' ' + p.name + ' ' + p.tags.join(',') + ' ' + p.email + ' ' + p.state, (a, b) => a.match(new RegExp(b || '')))
 
 const mapStateToProps = state => {
+    const selection = PeopleSelector.selected(state)
+    const stateCounts = _.countBy(selection.slice, 'state')
     return {
-        allPeople: People.select(state).all(),
-        selection: PeopleSelector.selected(state),
+        allStates: States.select(state).all().slice,
+        allPeople: People.select(state).all().slice,
+        stateCounts,
+        selection,
         filtered: PeopleFilter.filtered(state, People.select(state).all().slice),
     }
 }
@@ -35,7 +45,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     return {
         people: People.bindActionCreators(dispatch),
-        selector: PeopleSelector.bindActionCreators(dispatch),
+        states: States.bindActionCreators(dispatch),
         filter: PeopleFilter.bindActionCreators(dispatch),
         importPeople: people => {
             return Promise.all(_.map(people, person => dispatch(People.updateAndSave(person.email, person))))
@@ -47,24 +57,24 @@ const mapTaggerDispatchToProps = dispatch => {
     return {
         removeTag: (formApi) => {
             dispatch((dispatch, getState) => {
-                const selectedPeople = PeopleSelector.selected(getState())
-                _.each(selectedPeople, id => {
-                    dispatch(People.updateAndSave(id, person => ({
+                const selectedPeople = PeopleSelector.selected(getState()).slice
+                return Promise.all(_.map(selectedPeople, person=> {
+                    dispatch(People.updateAndSave(person.id, person => ({
                         ...person,
                         tags: _.without(person.tags, formApi.getValue('tag'))
                     })))
-                })
+                }))
             })
         },
         addTag: (formApi) => {
             dispatch((dispatch, getState) => {
-                const selectedPeople = PeopleSelector.selected(getState())
-                _.each(selectedPeople, id => {
-                    dispatch(People.updateAndSave(id, person => ({
+                const selectedPeople = PeopleSelector.selected(getState()).slice
+                return Promise.all(_.map(selectedPeople, person => (
+                    dispatch(People.updateAndSave(person.id, person => ({
                         ...person,
                         tags: [...person.tags, formApi.getValue('tag')]
                     })))
-                })
+                )))
             })
         }
     }
@@ -82,44 +92,88 @@ const Tagger = connect(() => ({}), mapTaggerDispatchToProps)(props => (
     </Form>
 ))
 
-export class PeopleIndex extends PureComponent {
-    componentDidMount() {
-        this.props.people.refresh()
+const mapPeopleStateToProps = (state, props) => {
+    const selection = PeopleSelector.selected(state)
+    const selectedPeople = _.filter(selection.slice, {state: props.state})
+    return {
+        people: People.select(state).filterBy('state', props.state).slice,
+        selection,
+        selectedPeople
     }
+}
 
-    render() {
-        const props = this.props
-        const people = _.flatMap(_.groupBy(props.filtered, 'state'), (people, state) => {
-            var ret = []
-            ret.push((<TableRow key={'state-'+state.id}><TableCell variant="head" colSpan={3}>{state}</TableCell></TableRow>))
-            ret.push(_.map(people, person => {
+const mapPeopleDispatchToProps = dispatch => {
+    return {
+        selector: PeopleSelector.bindActionCreators(dispatch),
+    }
+}
+
+const PeopleTable = connect(mapPeopleStateToProps, mapPeopleDispatchToProps)(props => (
+    <Table>
+        <TableHead>
+            <TableRow>
+                <TableCell padding="checkbox">
+                    <Checkbox checked={props.selectedPeople.length >= props.people.length} onChange={(_e, newValue) => _.each(props.people, newValue ? props.selector.add : props.selector.remove)} />
+                </TableCell>
+                <TableCell>Name</TableCell>
+                <TableCell>Email</TableCell>
+            </TableRow>
+        </TableHead>
+        <TableBody>
+            {_.map(props.people, person => {
                 const tags = _.map(person.tags, tag => (
                     <Chip key={tag} className="tag" label={tag} />
                 ))
                 return (
                     <TableRow key={person.id}>
                         <TableCell padding="checkbox">
-                            <Checkbox checked={props.selection.contains(person.id)} onChange={() => props.selector.toggle(person.id)}/>
+                            <Checkbox checked={props.selection.contains(person)} onChange={() => props.selector.toggle(person)}/>
                         </TableCell>
                         <TableCell>{person.name}{tags}</TableCell>
                         <TableCell>{person.email}</TableCell>
                     </TableRow>
                 )
-            }))
-            return ret
-        })
+            })}
+        </TableBody>
+    </Table>
+))
+
+export class PeopleIndex extends Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            currentState: 0,
+            copied: false
+        }
+        this.onCopy = this.onCopy.bind(this)
+    }
+
+    onCopy() {
+        this.setState({copied: true})
+        copy(_.map(this.props.selection.slice, 'email').join(', '))
+    }
+
+    componentDidMount() {
+        this.props.people.fetchAll()
+        this.props.states.fetchAll()
+    }
+
+    render() {
+        const props = this.props
         return (
             <React.Fragment>
+                <Snackbar open={this.state.copied} onClose={() => this.setState({copied: false})} message={'Copied '+this.props.selection.slice.length+' e-mails'}/>
                 <Grid container spacing={24}>
                     <Grid item xs={3}>
                         <DialogOpener>
                             {(open, close, isOpen) => (
                                 <React.Fragment>
-                                    <Button color="primary" variant="contained" onClick={open}>Import Spreadsheet</Button>
+                                    <Button color="primary" onClick={open}>Import Spreadsheet</Button>
                                     <ImportDialog onImport={props.importPeople} open={isOpen} onClose={close} />
                                 </React.Fragment>
                             )}
                         </DialogOpener>
+                        <Button color="primary" onClick={this.onCopy}>Copy E-mails</Button>
                     </Grid>
                     <Grid item xs={6}>
                         <Tagger />
@@ -128,18 +182,20 @@ export class PeopleIndex extends PureComponent {
                         <TextField label="Search" onChange={e => props.filter.set(e.target.value)} />
                     </Grid>
                 </Grid>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell padding="checkbox"></TableCell>
-                            <TableCell>Name</TableCell>
-                            <TableCell>Email</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {people}
-                    </TableBody>
-                </Table>
+                {(props.allStates.length > 0) ? (
+                    <React.Fragment>
+                        <Tabs fullWidth onChange={(_e, v) => this.setState({currentState: v})} value={this.state.currentState}>
+                            {_.map(props.allStates, state => (
+                                <Tab key={state.id} label={
+                                    _.get(props.stateCounts, state.name)
+                                        ? (<Badge color="primary" badgeContent={props.stateCounts[state.name]} >{state.name}</Badge>)
+                                        : state.name
+                                } />
+                            ))}
+                        </Tabs>
+                        <PeopleTable state={props.allStates[this.state.currentState].name} />
+                    </React.Fragment>
+                ) : null}
             </React.Fragment>
         )
     }
