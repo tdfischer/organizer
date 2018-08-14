@@ -3,7 +3,7 @@ import { BloomFilter } from 'bloomfilter'
 
 export const SET_SELECTION = 'SET_SELECTION'
 export const ADD_SELECTION = 'ADD_SELECTION'
-export const REMOVE_SELECTION = 'ADD_SELECTION'
+export const REMOVE_SELECTION = 'REMOVE_SELECTION'
 export const TOGGLE_SELECTION = 'TOGGLE_SELECTION'
 
 export const setSelection = (key, selection) => {
