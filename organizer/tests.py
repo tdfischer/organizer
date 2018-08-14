@@ -5,6 +5,7 @@ from hypothesis import given, example
 from hypothesis.strategies import characters, just, sampled_from, emails, floats, composite, lists, dictionaries, one_of, text, none, fixed_dictionaries
 import pytest
 from . import auth, exporting, importing
+import os
 
 @pytest.mark.skip
 def testDiscourseLogin(client, settings):
@@ -15,6 +16,42 @@ def testDiscourseLogin(client, settings):
         resp = client.get('/login/discourse/')
         assert resp.status_code == 302
         assert resp.url.split('?')[0] == 'http://discourse-host/session/sso-provider'
+
+@pytest.mark.django_db
+def testDevLoginDisabledByDefault(client, settings):
+    with patch('social_core.backends.utils.get_backend') as patched:
+        patched.return_value = auth.LocalDevAuth
+        settings.DEBUG = False
+        settings.AUTHENTICATION_BACKENDS = ('organizer.auth.LocalDevAuth',)
+        if 'USE_REALLY_INSECURE_DEVELOPMENT_AUTHENTICATION_BACKEND' in os.environ:
+            del os.environ['USE_REALLY_INSECURE_DEVELOPMENT_AUTHENTICATION_BACKEND']
+        resp = client.get('/login/local-dev/?next=/')
+        assert resp.status_code == 302
+        assert resp.url == 'http://testserver/complete/local-dev/'
+        with pytest.raises(EnvironmentError):
+            resp = client.get('/complete/local-dev/')
+            assert resp.status_code == 500
+
+@pytest.mark.django_db
+@pytest.mark.mock_redis
+def testDevLogin(client, settings):
+    with patch('social_core.backends.utils.get_backend') as patched:
+        patched.return_value = auth.LocalDevAuth
+        settings.DEBUG = True
+        settings.AUTHENTICATION_BACKENDS = ('organizer.auth.LocalDevAuth',)
+        os.environ['USE_REALLY_INSECURE_DEVELOPMENT_AUTHENTICATION_BACKEND'] = 'yes'
+        resp = client.get('/login/local-dev/?next=/')
+        assert resp.status_code == 302
+        assert resp.url == 'http://testserver/complete/local-dev/'
+        resp = client.get('/complete/local-dev/')
+        assert resp.status_code == 302
+
+def testDevGetUserDetails():
+    authBackend = auth.LocalDevAuth()
+    ret = authBackend.get_user_details(None)
+    assert len(ret.keys()) == 4
+    assert ret['is_staff']
+    assert ret['is_superuser']
 
 # Sentry #EBF-ORGANIZER-2R
 @example({

@@ -11,6 +11,7 @@ pytest-django = "*"
 coverage = "*"
 pytest = "*"
 mock = "*"
+pytest-forked = "*"
 
 [packages]
 appdirs = "==1.4.3"

@@ -295,6 +295,11 @@ SOCIAL_AUTH_SLACK_TEAM = os.environ.get('SLACK_TEAM_ID', None)
 
 AUTHENTICATION_BACKENDS = ()
 
+# This also must match the condition in the LocalDevAuth class.
+if DEBUG and ('USE_REALLY_INSECURE_DEVELOPMENT_AUTHENTICATION_BACKEND' in
+        os.environ):
+    AUTHENTICATION_BACKENDS += ('organizer.auth.LocalDevAuth',)
+
 if DISCOURSE_SSO_SECRET is not None:
     AUTHENTICATION_BACKENDS += ('organizer.auth.DiscourseSSOAuth',)
 

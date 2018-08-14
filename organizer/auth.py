@@ -1,3 +1,4 @@
+import os
 from social_core.backends.base import BaseAuth
 from social_core.exceptions import AuthException
 from hashlib import sha256
@@ -6,6 +7,8 @@ from base64 import b64encode, b64decode
 import urllib
 import urlparse
 from crm.models import Person
+from django.conf import settings
+from django.contrib.auth.models import User
 
 from django.conf import settings
 
@@ -53,4 +56,28 @@ class DiscourseSSOAuth(BaseAuth):
         kwargs.update({'sso':'', 'sig': '', 'backend': self, 'response':
             urlparse.parse_qs(decodedParams)})
 
+        return self.strategy.authenticate(*args, **kwargs)
+
+class LocalDevAuth(BaseAuth):
+    name = 'local-dev'
+
+    def auth_url(self):
+        return self.redirect_uri
+
+    def get_user_id(self, details, response):
+        return 1
+
+    def get_user_details(self, response):
+        return {
+            'username': 'test',
+            'email': 'test@localhost',
+            'is_staff': True,
+            'is_superuser': True,
+        }
+
+    def auth_complete(self, request, *args, **kwargs):
+        if not (settings.DEBUG and ('USE_REALLY_INSECURE_DEVELOPMENT_AUTHENTICATION_BACKEND' in
+                os.environ)):
+            raise EnvironmentError("LocalDevAuth was used inappropriately.")
+        kwargs.update({'sso': '', 'sig': '', 'backend': self, 'response': {}})
         return self.strategy.authenticate(*args, **kwargs)
