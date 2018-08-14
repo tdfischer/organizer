@@ -13,6 +13,14 @@ import TableCell from '@material-ui/core/TableCell'
 import TableRow from '@material-ui/core/TableRow'
 import TableHead from '@material-ui/core/TableHead'
 import Checkbox from '@material-ui/core/Checkbox'
+import Select from '@material-ui/core/Select'
+import FormControl from '@material-ui/core/FormControl'
+import MenuItem from '@material-ui/core/MenuItem'
+import InputLabel from '@material-ui/core/InputLabel'
+import Typography from '@material-ui/core/Typography'
+import ExpansionPanel from '@material-ui/core/ExpansionPanel'
+import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary'
+import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails'
 import importedComponent from 'react-imported-component'
 
 import MaterialFormText from './MaterialFormText'
@@ -23,6 +31,25 @@ const ImportDialog = importedComponent(() => import('./ImportDialog'))
 const People = new Model('people')
 const PeopleSelector = new Selectable('people')
 const PeopleFilter = new Filterable('people', p => _.get(p.address, 'raw', 'California') + ' ' + p.name + ' ' + p.tags.join(',') + ' ' + p.email + ' ' + p.state, (a, b) => a.match(new RegExp(b || '')))
+
+const Turfs = new Model('turfs')
+
+const mapTurfStateToProps = state => {
+    return {
+        turfs: Turfs.select(state).all().slice
+    }
+}
+
+const TurfSelector = connect(mapTurfStateToProps)(props => (
+    <FormControl>
+        <InputLabel>Turf</InputLabel>
+        <Select>
+            {_.map(props.turfs, turf => (
+                <MenuItem value={turf.id} >{turf.name}</MenuItem>
+            ))}
+        </Select>
+    </FormControl>
+))
 
 const mapStateToProps = state => {
     return {
@@ -35,6 +62,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     return {
         people: People.bindActionCreators(dispatch),
+        turfs: Turfs.bindActionCreators(dispatch),
         selector: PeopleSelector.bindActionCreators(dispatch),
         filter: PeopleFilter.bindActionCreators(dispatch),
         importPeople: people => {
@@ -84,7 +112,8 @@ const Tagger = connect(() => ({}), mapTaggerDispatchToProps)(props => (
 
 export class PeopleIndex extends PureComponent {
     componentDidMount() {
-        this.props.people.refresh()
+        this.props.people.fetchAll()
+        this.props.turfs.fetchAll()
     }
 
     render() {
@@ -124,8 +153,18 @@ export class PeopleIndex extends PureComponent {
                     <Grid item xs={6}>
                         <Tagger />
                     </Grid>
-                    <Grid item xs={3}>
-                        <TextField label="Search" onChange={e => props.filter.set(e.target.value)} />
+                </Grid>
+                <Grid container>
+                    <Grid item xs>
+                        <ExpansionPanel>
+                            <ExpansionPanelSummary>
+                                <Typography variant="title">Filters</Typography>
+                            </ExpansionPanelSummary>
+                            <ExpansionPanelDetails>
+                                <TextField fullwidth label="Search" onChange={e => props.filter.set(e.target.value)} />
+                                <TurfSelector />
+                            </ExpansionPanelDetails>
+                        </ExpansionPanel>
                     </Grid>
                 </Grid>
                 <Table>
