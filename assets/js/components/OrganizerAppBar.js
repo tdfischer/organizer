@@ -5,6 +5,7 @@ import Button from '@material-ui/core/Button'
 import Avatar from '@material-ui/core/Avatar'
 import Toolbar from '@material-ui/core/Toolbar'
 import AppBar from '@material-ui/core/AppBar'
+import { withStyles } from '@material-ui/core/styles'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import gravatar from 'gravatar'
@@ -28,11 +29,17 @@ const OrganizerAppBar = connect(mapStateToProps, mapDispatchToProps)((props) => 
     <AppBar position="static">
         <Toolbar>
             <IconButton><Avatar src={gravatar.url(props.current_user.email, {s: 32, d: 'retro'})}/></IconButton>
-            <Typography color="inherit" variant="title">Organizer</Typography>
+            <Typography color="inherit" variant="title" className={props.classes.flex} >Organizer</Typography>
             <BusyIndicator />
             <Button onClick={() => props.logout()}>Logout</Button>
         </Toolbar>
     </AppBar>
 ))
 
-export default OrganizerAppBar
+const styles = {
+    flex: {
+        flexGrow: 1
+    }
+}
+
+export default withStyles(styles)(OrganizerAppBar)
