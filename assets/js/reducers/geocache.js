@@ -26,7 +26,7 @@ export default function(state = {}, action = {}) {
     default:
         return {
             cache: {},
-            currentLocation: [0, 0],
+            currentLocation: undefined,
             ...state
         }
     }
