@@ -31,7 +31,10 @@ const People = new Model('people')
 export class MapIndex extends React.Component {
     constructor(props) {
         super(props)
-        this.props.people.refresh()
+    }
+
+    componentDidMount() {
+        this.props.people.fetchAll()
     }
 
     render() {
