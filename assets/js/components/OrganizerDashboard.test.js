@@ -8,7 +8,7 @@ it('should render default state', () => {
         fetchAll: jest.fn()
     }
 
-    shallow(<OrganizerDashboard people={mockModel} broadcasts={mockModel} currentUser={{}} />)
+    shallow(<OrganizerDashboard classes={{}} people={mockModel} broadcasts={mockModel} events={mockModel} currentUser={{}} />)
     expect(mockModel.fetchIfNeeded).toHaveBeenCalledTimes(1)
-    expect(mockModel.fetchAll).toHaveBeenCalledTimes(1)
+    expect(mockModel.fetchAll).toHaveBeenCalledTimes(3)
 })
