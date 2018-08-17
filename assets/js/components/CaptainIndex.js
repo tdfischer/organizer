@@ -182,7 +182,7 @@ export class CaptainIndex extends React.Component {
         console.log(values)
         this.props.peopleFilter.set({
             state: values.filter.state, 
-            current_turf_membership: {turf: values.filter.turf}
+            current_turf: {id: values.filter.turf}
         })
         this.props.people.fetchAll({
             turf_memberships__turf: values.filter.turf,

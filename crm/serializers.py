@@ -57,7 +57,7 @@ class PersonStateSerializer(serializers.ModelSerializer):
 
 class PersonSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer):
     tags = TagListSerializerField()
-    current_turf_membership = TurfMembershipSerializer(read_only=True)
+    current_turf = TurfSerializer(read_only=True)
     turf_memberships = TurfMembershipSerializer(many=True, read_only=True)
     state = serializers.SlugRelatedField(queryset=models.PersonState.objects.all(),
             slug_field='name')
@@ -65,7 +65,7 @@ class PersonSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer)
     class Meta:
         model = models.Person
         fields = ('name',  'id', 'email', 'created', 'url', 'tags',
-        'geo', 'current_turf_membership', 'turf_memberships', 'state')
+        'geo', 'current_turf', 'turf_memberships', 'state')
 
         lookup_field = 'email'
         extra_kwargs = {
