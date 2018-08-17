@@ -63,6 +63,8 @@ class Person(models.Model):
     def save(self, *args, **kwargs):
         if not self.address_id:
             self.address = Address.objects.create()
+        if not self.state_id:
+            self.state = PersonState.objects.get_or_create(name='Default')[0]
         runUpdate = kwargs.pop('_updateGeocache', True)
         super(Person, self).save(*args, **kwargs)
         if runUpdate:
