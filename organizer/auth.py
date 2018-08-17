@@ -5,6 +5,7 @@ import hmac
 from base64 import b64encode, b64decode
 import urllib
 import urlparse
+from crm.models import Person
 
 from django.conf import settings
 
@@ -29,6 +30,10 @@ class DiscourseSSOAuth(BaseAuth):
         return {
             'username': response['username'][0],
             'email': response['email'][0],
+            'name': response['name'][0],
+            'groups': response['groups'][0].split(','),
+            'is_staff': response['admin'][0] == 'true' or response['moderator'][0] == 'true',
+            'is_superuser': response['admin'][0] == 'true',
         }
 
     def auth_complete(self, request, *args, **kwargs):
@@ -36,7 +41,7 @@ class DiscourseSSOAuth(BaseAuth):
         ssoSignature = request.GET.get('sig')
         paramSignature = hmac.new(settings.DISCOURSE_SSO_SECRET, ssoParams, sha256).hexdigest()
 
-        if ssoSignature != paramSignature:
+        if not hmac.compare_digest(str(ssoSignature), str(paramSignature)):
             raise AuthException('Could not verify discourse login')
 
         decodedParams = b64decode(ssoParams)
