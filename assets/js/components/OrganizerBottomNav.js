@@ -35,18 +35,20 @@ const mapDispatchToProps = dispatch => {
     }
 }
 
+const CaptainButtons = () => [
+    <BottomNavigationAction key="people" value="/people" icon={<Icon className="fa fa-users" />} label="People" />,
+    <BottomNavigationAction key="captain" value="/captain" icon={<Icon className="fa fa-bullhorn" />} label="Broadcasts" />
+]
+
 export const OrganizerBottomNav = props => (
     <BottomNavigation
         className="bottom-nav"
         showLabels  
         value={props.path}
         onChange={(_evt, value) => props.push(value)} >
-        <BottomNavigationAction value="/people" icon={<Icon className="fa fa-users" />} label="People" />
         <BottomNavigationAction value="/" icon={<Icon className="fa fa-user-circle" />}  label="Me" />
         <BottomNavigationAction value="/map" icon={<Icon className="fa fa-globe" />} label="Map" />
-        {props.isCaptain ?
-            <BottomNavigationAction value="/captain" icon={<Icon className="fa fa-bullhorn" />} label="Captain" /> : null
-        }
+        {props.isCaptain ? CaptainButtons()  : null }
     </BottomNavigation>
 )
 
