@@ -9,15 +9,22 @@ import { withStyles } from '@material-ui/core/styles'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import gravatar from 'gravatar'
+import _ from 'lodash'
 
 import BusyIndicator from './BusyIndicator'
 import { logout } from '../actions'
 import { getCurrentUser, getLoggedIn } from '../selectors/auth'
+import { Model } from '../store'
+
+const People = new Model('people')
 
 const mapStateToProps = state => {
+    const currentUser = getCurrentUser(state)
+    const currentPerson = People.select(state).filterBy('email', currentUser.email).first()
     return {
         logged_in: getLoggedIn(state),
-        current_user: getCurrentUser(state)
+        current_user: currentUser,
+        currentPerson
     }
 }
 
@@ -29,7 +36,10 @@ const OrganizerAppBar = connect(mapStateToProps, mapDispatchToProps)((props) => 
     <AppBar position="static">
         <Toolbar>
             <IconButton><Avatar src={gravatar.url(props.current_user.email, {s: 32, d: 'retro'})}/></IconButton>
-            <Typography color="inherit" variant="title" className={props.classes.flex} >Organizer</Typography>
+            <div className={props.classes.flex}>
+                <Typography color="inherit" variant="title">{_.get(props.currentPerson, 'name')}</Typography>
+                <Typography color="inherit" variant="subheading">{props.current_user.email}</Typography>
+            </div>
             <BusyIndicator />
             <Button onClick={() => props.logout()}>Logout</Button>
         </Toolbar>
