@@ -33,7 +33,7 @@ const mapDispatchToProps = dispatch => {
 }
 
 const OrganizerAppBar = connect(mapStateToProps, mapDispatchToProps)((props) => (
-    <AppBar position="static">
+    <AppBar style={{position: 'initial'}}>
         <Toolbar>
             <IconButton><Avatar src={gravatar.url(props.current_user.email, {s: 32, d: 'retro'})}/></IconButton>
             <div className={props.classes.flex}>

@@ -1,13 +1,14 @@
 .membership-map {
   overflow: hidden;
   width: 100%;
-  flex: 1;
+  height: 100%;
+  flex: auto;
   display: flex;
   flex-flow: column;
-  margin-bottom: 56px;
 
   .leaflet-container {
-    flex: 1;
-    width: 100%;
+    position: relative;
+    width: inherit;
+    flex: auto;
   }
 }

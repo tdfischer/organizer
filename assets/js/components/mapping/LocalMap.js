@@ -44,7 +44,6 @@ const LocatorControl = connect(() => ({}), mapLocatorDispatchToProps)(LocatorCon
 const LocalMapBase = props => {
     return (
         <Map
-            style={{minHeight: '30rem'}}
             zoom={17}
             center={[0, 0]} >
             <TileLayer

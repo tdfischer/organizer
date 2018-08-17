@@ -5,29 +5,43 @@ $secondary-color: rgba(3,44,54,.9);
   background-color: #fff;
   display: flex;
   flex-flow: column;
-  min-height: 100%;
-  padding-bottom: 56px;
+  max-height: 100%;
+  height: inherit;
+}
+
+.viewport {
+  display: flex;
+  flex: auto;
+  overflow-y: auto;
+}
+
+.viewport .scroll {
+  display: block;
+  flex: auto;
+  width: 100%;
 }
 
 .bottom-nav {
-  position: fixed;
-  bottom: 0;
+  align-self: flex-end;
+  flex: none;
   width: 100%;
 }
 
 body {
-  background: #333 url(../img/bg.png) repeat;
-  font-color: #fff;
+  display: flex;
+  background-color: #fff;
   font-family: "Roboto";
-  height: 100%;
+  height: inherit;
+  flex-flow: column;
   margin: 0;
 }
+
 html {
   height: 100%;
 }
 
 #container {
-  height: 100%;
+  height: inherit;
 }
 
 tr.even {
