@@ -17,7 +17,10 @@ def updatePersonGeo(personID):
     if turf:
         neighborhoodMembership, joinedNeighborhood = TurfMembership.objects.get_or_create(turf=turf,
                 person=person)
-        person.address = resolved
+        try:
+            person.address = resolved
+        except UnicodeDecodeError, e:
+            print "Unicode error", e
         person.lng = resolved.get('lng')
         person.lat = resolved.get('lat')
         person.save(_updateGeocache=False)
