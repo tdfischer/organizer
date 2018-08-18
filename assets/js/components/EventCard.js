@@ -41,13 +41,13 @@ const locationDisplay = (evt, currentLocation) => {
 }
 
 export const EventCard = props => {
-    const eventBearing = bearing(props.currentLocation, props.event.geo) - 45
+    const eventBearing = props.currentLocation ? bearing(props.currentLocation, props.event.geo) - 45 : 0
     const checkInButton = (<Button variant="fab" size="large" className={props.classes.checkInButton} onClick={() => props.onCheckIn(props.event)}><Icon className="fa fa-calendar" /></Button>)
     const checkedInBadge = (<Button variant="fab" size="large" className={props.classes.checkedInBadge}><Icon className="fa fa-calendar-check" /></Button>)
     const eventLocator = (<Button variant="fab" size="large" className={props.classes.eventLocator}><Icon className="fa fa-location-arrow" style={{transform: 'rotate('+eventBearing+'deg)'}}/></Button>)
 
     const haveCheckedIn = props.checkedIn
-    const isNearby = distance(props.currentLocation, props.event.geo, {units: 'miles'}) <= 0.5
+    const isNearby = props.currentLocation ? distance(props.currentLocation, props.event.geo, {units: 'miles'}) <= 0.5 : false
     const canCheckIn = !haveCheckedIn && props.onCheckIn && isNearby
     const cardColor = colorForEvent(props.event)
     const textColor = fontColorContrast(cardColor)
@@ -85,6 +85,10 @@ export const EventCard = props => {
 EventCard.propTypes = {
     event: PropTypes.object,
     currentLocation: PropTypes.object
+}
+
+EventCard.defaultProps = {
+    classes: {}
 }
 
 const mapStateToProps = (state, props) => {
