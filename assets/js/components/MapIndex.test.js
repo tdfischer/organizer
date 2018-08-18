@@ -6,6 +6,6 @@ it('should render default state', () => {
     const mockModel = {
         fetchAll: jest.fn()
     }
-    shallow(<MapIndex people={mockModel} allPeople={{slice: []}}/>)
-    expect(mockModel.fetchAll).toHaveBeenCalledTimes(1)
+    shallow(<MapIndex people={mockModel} events={mockModel} />)
+    expect(mockModel.fetchAll).toHaveBeenCalledTimes(3)
 })
