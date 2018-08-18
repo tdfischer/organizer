@@ -71,7 +71,7 @@ jobs:
       - save_cache:
           paths:
             - ./.hypothesis
-          key: pipenv-{{.Branch}}
+          key: hypothesis-{{.Branch}}
   test-node:
     <<: *defaults
     steps:

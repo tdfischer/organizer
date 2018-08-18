@@ -21,12 +21,12 @@ def decode_response(response):
         values[component['types'][0]] = component['long_name']
     return {
         'raw': response.address,
-        'street_number': values.get('street_number', None),
-        'route': values.get('route', None),
+        'street_number': values.get('street_number', ''),
+        'route': values.get('route', ''),
         'locality': values.get('locality', ''),
-        'postal_code': values.get('postal_code', None),
-        'state': values.get('administrative_area_level_1', None),
-        'country': values.get('country', None),
+        'postal_code': values.get('postal_code', ''),
+        'state': values.get('administrative_area_level_1', ''),
+        'country': values.get('country', ''),
         'neighborhood': values.get('neighborhood', None),
         'lat': response.latitude,
         'lng': response.longitude,

@@ -3,8 +3,9 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { Geocache } from '../../actions'
 import LocateControl from 'leaflet.locatecontrol'
+import BaseMap from './BaseMap'
 
-import { TileLayer, Map, MapControl } from 'react-leaflet'
+import { MapControl } from 'react-leaflet'
 
 class AutoStartLocateControl extends LocateControl {
     constructor(props) {
@@ -41,20 +42,13 @@ const mapLocatorDispatchToProps = dispatch => {
 
 const LocatorControl = connect(() => ({}), mapLocatorDispatchToProps)(LocatorControlBase)
 
-const LocalMapBase = props => {
+const LocalMap = props => {
     return (
-        <Map
-            zoom={17}
-            center={[0, 0]} >
-            <TileLayer
-                url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-                attribution='&copy; OpenStreetMap contributors' />
+        <BaseMap>
             <LocatorControl />
             {props.children}
-        </Map>
+        </BaseMap>
     )
 }
-
-const LocalMap = LocalMapBase
 
 export default LocalMap

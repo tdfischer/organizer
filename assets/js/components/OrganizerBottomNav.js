@@ -3,10 +3,9 @@ import BottomNavigation from '@material-ui/core/BottomNavigation'
 import BottomNavigationAction from '@material-ui/core/BottomNavigationAction'
 import Icon from '@material-ui/core/Icon'
 import { push } from 'connected-react-router'
-import _ from 'lodash'
-import { Model } from '../store'
 import { connect } from 'react-redux'
 import { getCurrentUser } from '../selectors/auth'
+import PropTypes from 'prop-types'
 
 import { library as faLibrary } from '@fortawesome/fontawesome'
 import faUsers from '@fortawesome/fontawesome-free-solid/faUsers'
@@ -16,16 +15,10 @@ import faBullhorn from '@fortawesome/fontawesome-free-solid/faBullhorn'
 
 faLibrary.add(faUsers, faGlobe, faUserCircle, faBullhorn)
 
-const People = new Model('people')
-
 const mapStateToProps = state => {
-    const currentUser = getCurrentUser(state)
-    const currentPerson = People.select(state).filterBy('email', currentUser.email).first()
-    const captainTurfs = _.filter(_.get(currentPerson, 'turf_memberships', []), {is_captain: true})
-    const isCaptain = captainTurfs.length > 0
     return {
         path: state.router.location.pathname,
-        isCaptain
+        currentUser: getCurrentUser(state)
     }
 }
 
@@ -48,8 +41,16 @@ export const OrganizerBottomNav = props => (
         onChange={(_evt, value) => props.push(value)} >
         <BottomNavigationAction value="/" icon={<Icon className="fa fa-user-circle" />}  label="Me" />
         <BottomNavigationAction value="/map" icon={<Icon className="fa fa-globe" />} label="Map" />
-        {props.isCaptain ? CaptainButtons()  : null }
+        {props.currentUser.is_staff ? CaptainButtons()  : null }
     </BottomNavigation>
 )
+
+OrganizerBottomNav.propTypes = {
+    currentUser: PropTypes.object
+}
+
+OrganizerBottomNav.defaultProps = {
+    currentUser: {}
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(OrganizerBottomNav)

@@ -193,8 +193,8 @@ export class CaptainIndex extends React.Component {
     render() {
         const initialValues = {
             filter: {
-                state: _.get(_.head(this.props.allStates), 'name'),
-                turf: _.get(_.head(this.props.captainTurfs), 'turf'),
+                state: _.get(_.head(this.props.allStates), 'name', ''),
+                turf: _.get(_.head(this.props.captainTurfs), 'turf', -1),
             }
         }
         return (

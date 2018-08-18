@@ -8,3 +8,9 @@ coverage
 webpack-stats.json
 yarn-error.log
 test-results
+.coverage
+.hypothesis
+.pytest_cache
+htmlcov
+prof
+stats.json

@@ -1,13 +1,22 @@
 from rest_framework import serializers, relations
 from . import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group, Permission
 from taggit_serializer.serializers import TagListSerializerField, TaggitSerializer
 import address
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
+    groups = serializers.SlugRelatedField(many=True, queryset=Group.objects.all(),
+            slug_field='name')
+    permissions = serializers.SerializerMethodField()
+
+    def get_permissions(self, obj):
+        return map(lambda x: x.name,
+                Permission.objects.filter(group__in=obj.groups.all()))
+
     class Meta:
         model = User
-        fields = ('email', 'id')
+        fields = ('email', 'id', 'is_staff', 'is_superuser', 'groups',
+        'permissions')
 
 
 class LocalitySerializer(serializers.ModelSerializer):
