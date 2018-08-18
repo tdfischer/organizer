@@ -39,7 +39,7 @@ const MessageCard = connect(mapStateToProps, mapDispatchToProps)(withStyles(card
             <Card className={this.props.classes.card}>
                 <CardHeader
                     title={this.props.message.subject}
-                    subheader={'Sent to ' + this.props.message.target_state + ' in ' + _.get(this.props.turf, 'name', 'somewhere') + ' ' + this.props.message.sent_on.fromNow()}
+                    subheader={this.props.message.author + ' sent to ' + this.props.message.target_state + ' in ' + _.get(this.props.turf, 'name', 'somewhere') + ' ' + this.props.message.sent_on.fromNow()}
                     avatar={<Avatar src={gravatar.url(this.props.message.author, {s: 32, d: 'retro'})} />} />
                 <CardContent>{this.props.message.body}</CardContent>
             </Card>

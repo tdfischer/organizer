@@ -2,11 +2,16 @@ import _ from 'lodash'
 import * as Select from '../store/select'
 
 function addSelection(state, action) {
-    return {
-        ...state,
-        selections: {
-            [action.key]: [..._.get(state.selections, action.key, []), action.item]
+    const currentSelections = _.get(state.selections, action.key, [])
+    if (currentSelections.indexOf(action.item) == -1) {
+        return {
+            ...state,
+            selections: {
+                [action.key]: [...currentSelections, action.item]
+            }
         }
+    } else {
+        return state
     }
 }
 

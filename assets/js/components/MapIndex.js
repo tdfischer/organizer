@@ -7,6 +7,7 @@ import HeatmapLayer from 'react-leaflet-heatmap-layer'
 import LocalMap from './mapping/LocalMap'
 import gravatar from 'gravatar'
 import importedComponent from 'react-imported-component'
+import { getCoord } from '@turf/invariant'
 
 import markerIcon from 'leaflet/dist/images/marker-icon.png'
 import markerRetinaIcon from 'leaflet/dist/images/marker-icon-2x.png'
@@ -31,12 +32,15 @@ const People = new Model('people')
 export class MapIndex extends React.Component {
     constructor(props) {
         super(props)
-        this.props.people.refresh()
+    }
+
+    componentDidMount() {
+        this.props.people.fetchAll()
     }
 
     render() {
         const markers = _.map(this.props.allPeople.slice, person => {
-            const position = person.geo
+            const position = getCoord(person.geo)
             return {
                 position: position,
                 popup: person.name,
@@ -67,7 +71,7 @@ export class MapIndex extends React.Component {
 
 const mapStateToProps = (state) => {
     return {
-        allPeople: People.select(state).withGeo()
+        allPeople: People.select(state).hasGeo()
     }
 }
 

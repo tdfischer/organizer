@@ -21,12 +21,16 @@ export const App = props => (
     props.logged_in ? (
         <div className="the-app">
             <OrganizerAppBar />
-            <Switch>
-                <Route exact path="/map" component={MapIndex} />
-                <Route exact path="/people" component={PeopleIndex} />
-                <Route exact path="/captain" component={CaptainIndex} />
-                <Route component={OrganizerDashboard} />
-            </Switch>
+            <div className="viewport">
+                <div className="scroll">
+                    <Switch>
+                        <Route exact path="/map" component={MapIndex} />
+                        <Route exact path="/people" component={PeopleIndex} />
+                        <Route exact path="/captain" component={CaptainIndex} />
+                        <Route component={OrganizerDashboard} />
+                    </Switch>
+                </div>
+            </div>
             <OrganizerBottomNav />
         </div>
     ) : <LoginSplash />

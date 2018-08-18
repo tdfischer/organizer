@@ -4,8 +4,8 @@ import { shallow } from 'enzyme'
 
 it('should render default state', () => {
     const mockModel = {
-        refresh: jest.fn()
+        fetchAll: jest.fn()
     }
     shallow(<MapIndex people={mockModel} allPeople={{slice: []}}/>)
-    expect(mockModel.refresh).toHaveBeenCalledTimes(1)
+    expect(mockModel.fetchAll).toHaveBeenCalledTimes(1)
 })

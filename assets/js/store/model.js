@@ -2,6 +2,7 @@ import { createSelector } from 'reselect'
 import _ from 'lodash'
 import distance from '@turf/distance'
 import { bindActionCreators } from 'redux'
+import { point } from '@turf/helpers'
 
 import { csrftoken } from '../Django'
 import Queue from 'promise-queue'
@@ -65,7 +66,11 @@ export class ModelSelector {
     }
 
     exists(id) {
-        return _.find(this.slice, {id: id}) != undefined
+        return this.get(id) != undefined
+    }
+
+    get(id) {
+        return _.find(this.slice, {id: id})
     }
 
     sortBy(key) {
@@ -80,12 +85,18 @@ export class ModelSelector {
         return new ModelSelector(_.map(this.slice, f))
     }
 
+    hasGeo() {
+        return this.withGeo().filter(m => m.geo)
+    }
+
     withGeo() {
-        return this.filter(m => m.geo && !_.isEmpty(m.geo))
+        return this.map(m => (
+            {...m, geo: (m.geo && m.geo.lat && m.geo.lng) ? point([m.geo.lat, m.geo.lng]) : undefined}
+        ))
     }
 
     nearby(currentLocation, radius = 0) {
-        const modelsWithDistance = _.map(this.withGeo().slice, m => ({
+        const modelsWithDistance = _.map(this.hasGeo().slice, m => ({
             ...m,
             distance: distance(m.geo, currentLocation)
         }))
