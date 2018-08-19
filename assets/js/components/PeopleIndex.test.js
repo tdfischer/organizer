@@ -4,8 +4,8 @@ import { PeopleIndex } from './PeopleIndex'
 
 it('should render default state', () => {
     const mockModel = {
-        refresh: jest.fn()
+        fetchAll: jest.fn()
     }
-    shallow(<PeopleIndex people={mockModel} />)
-    expect(mockModel.refresh).toHaveBeenCalledTimes(1)
+    shallow(<PeopleIndex allStates={[]} selection={{slice:[]}} states={mockModel} people={mockModel} />)
+    expect(mockModel.fetchAll).toHaveBeenCalledTimes(2)
 })
