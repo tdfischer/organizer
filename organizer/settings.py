@@ -58,6 +58,22 @@ INSTALLED_APPS = [
     'events',
 ]
 
+DATETIME_INPUT_FORMATS = (
+    '%Y-%m-%dT%H:%M:%S%z',
+    '%Y-%m-%d %H:%M:%S',     # '2006-10-25 14:30:59'
+    '%Y-%m-%d %H:%M:%S.%f',  # '2006-10-25 14:30:59.000200'
+    '%Y-%m-%d %H:%M',        # '2006-10-25 14:30'
+    '%Y-%m-%d',              # '2006-10-25'
+    '%m/%d/%Y %H:%M:%S',     # '10/25/2006 14:30:59'
+    '%m/%d/%Y %H:%M:%S.%f',  # '10/25/2006 14:30:59.000200'
+    '%m/%d/%Y %H:%M',        # '10/25/2006 14:30'
+    '%m/%d/%Y',              # '10/25/2006'
+    '%m/%d/%y %H:%M:%S',     # '10/25/06 14:30:59'
+    '%m/%d/%y %H:%M:%S.%f',  # '10/25/06 14:30:59.000200'
+    '%m/%d/%y %H:%M',        # '10/25/06 14:30'
+    '%m/%d/%y',              # '10/25/06'
+)
+
 CACHES = {
     'default': {
         'BACKEND': 'redis_cache.RedisCache',
@@ -216,13 +232,19 @@ DEFAULT_CHARSET="utf-8"
 
 GEOCODE_ADAPTOR = 'crm.geocache.GoogleAdaptor'
 
+MAILCHIMP_SECRET_KEY = os.environ.get('MAILCHIMP_SECRET_KEY', None)
+MAILCHIMP_LIST_ID = os.environ.get('MAILCHIMP_LIST_ID', None)
+
 GOOGLE_MAPS_KEY = os.environ.get('GOOGLE_MAPS_KEY', None)
 GOOGLE_API_KEY = GOOGLE_MAPS_KEY
 GOOGLE_SERVICE_ACCOUNT_CREDENTIALS = os.environ.get('GOOGLE_SERVICE_ACCOUNT_CREDENTIALS', None)
+GOOGLE_CALENDAR_IMPORT_ID = os.environ.get('GOOGLE_CALENDAR_IMPORT_ID', None)
 
 AIRTABLE_API_KEY = os.environ.get('AIRTABLE_API_KEY', None)
 AIRTABLE_BASE_ID = os.environ.get('AIRTABLE_BASE_ID', None)
 AIRTABLE_TABLE_NAME = os.environ.get('AIRTABLE_TABLE_NAME', None)
+
+DEFAULT_PERSON_STATE = os.environ.get('DEFAULT_PERSON_STATE', 'Default')
 
 DISCOURSE_BASE_URL = os.environ.get('DISCOURSE_BASE_URL', None)
 DISCOURSE_SSO_SECRET = os.environ.get('DISCOURSE_SSO_SECRET', None)

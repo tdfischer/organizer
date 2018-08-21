@@ -1,28 +1,40 @@
 from django.core.management.base import BaseCommand, CommandError
+from django.conf import settings
 from crm import importing
+from importlib import import_module
+from tqdm import tqdm
 import sys
+from organizer.importing import get_importer_class, collect_importers
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
-        parser.add_argument('source')
-
-    IMPORTERS = {
-        'airtable': lambda: importing.AirtableImporter(),
-        'csv': lambda: importing.CSVImporter(sys.stdin)
-    }
+        parser.add_argument('source', nargs='+')
 
     def handle(self, *args, **options):
-        importer = self.IMPORTERS[options['source']]()
-        newPeople = []
-        updated = []
-        importCount = 0
-        for person, created in importer:
-            importCount += 1
-            sys.stdout.write(str(importCount) + "...\r")
-            if created:
-                newPeople.append(person)
-            else:
-                updated.append(person)
-            sys.stdout.write("\n")
-        print str(len(newPeople)) + " new People"
-        print str(len(updated)) + " updated People"
+        errors = []
+        totals = {}
+        importers = []
+        for source in options['source']:
+            importerCls = get_importer_class(source)
+            if importerCls is None:
+                print "No such importer:", options['source']
+                print "Available importers:", ', '.join(collect_importers().keys())
+                return
+            importers.append((source, importerCls()))
+        with tqdm(importers, desc='sources', unit = ' source') as impIt:
+            for (importerName, importer) in impIt:
+                resource = importer.Meta.resource
+                with tqdm(importer, desc=importerName, unit=' page') as it:
+                    sourceTotals = {}
+                    for dataPage in it:
+                        result = resource.import_data(dataPage, dry_run=False,
+                                raise_errors=True)
+                        for (k, v) in result.totals.iteritems():
+                            sourceTotals[k] = sourceTotals.get(k, 0) + v
+                            totals[k] = totals.get(k, 0) + v
+                        it.set_postfix(sourceTotals)
+                        impIt.set_postfix(totals)
+                        for err in result.row_errors():
+                            errors.append(err)
+        for (row, error) in errors:
+            print "%s: %s"%(row, error[0].error)

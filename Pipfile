@@ -48,6 +48,9 @@ apiclient = "*"
 "oauth2client" = "*"
 google-api-python-client = "*"
 django-address = "*"
+django-import-export = "*"
+python-dateutil = "*"
+tqdm = "*"
 
 [requires]
 python_version = "2.7"

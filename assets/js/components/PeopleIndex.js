@@ -19,16 +19,34 @@ import Snackbar from '@material-ui/core/Snackbar'
 import Badge from '@material-ui/core/Badge'
 import importedComponent from 'react-imported-component'
 import copy from 'copy-to-clipboard'
+import ColorHash from 'color-hash'
 
 import MaterialFormText from './MaterialFormText'
 import DialogOpener from './DialogOpener'
 
 const ImportDialog = importedComponent(() => import('./ImportDialog'))
 
+const hasher = new ColorHash()
+const personHasher = new ColorHash({lightness: 0.8})
+
+const matchAny = (obj, pattern) => {
+    try {
+        const regex = new RegExp(pattern)
+        return !!_.find(_.values(obj), (value) => {
+            if (_.isString(value)) {
+                return value.match(regex)
+            }
+            return matchAny(value, pattern)
+        })
+    } catch (SyntaxError) {
+        // nothing 
+    }
+}
+
 const States = new Model('states')
 const People = new Model('people')
 const PeopleSelector = new Selectable('people')
-const PeopleFilter = new Filterable('people', p => _.get(p.address, 'raw', 'California') + ' ' + p.name + ' ' + p.tags.join(',') + ' ' + p.email + ' ' + p.state, (a, b) => a.match(new RegExp(b || '')))
+const PeopleFilter = new Filterable('people', matchAny)
 
 const mapStateToProps = state => {
     const selection = PeopleSelector.selected(state)
@@ -95,10 +113,12 @@ const Tagger = connect(() => ({}), mapTaggerDispatchToProps)(props => (
 const mapPeopleStateToProps = (state, props) => {
     const selection = PeopleSelector.selected(state)
     const selectedPeople = _.filter(selection.slice, {state: props.state})
+    const allPeople = People.select(state).filterBy('state', props.state).slice
+    const filteredPeople = PeopleFilter.filtered(state, allPeople)
     return {
-        people: People.select(state).filterBy('state', props.state).slice,
         selection,
-        selectedPeople
+        selectedPeople,
+        filteredPeople
     }
 }
 
@@ -113,27 +133,37 @@ const PeopleTable = connect(mapPeopleStateToProps, mapPeopleDispatchToProps)(pro
         <TableHead>
             <TableRow>
                 <TableCell padding="checkbox">
-                    <Checkbox checked={props.selectedPeople.length >= props.people.length} onChange={(_e, newValue) => _.each(props.people, newValue ? props.selector.add : props.selector.remove)} />
+                    <Checkbox checked={props.selectedPeople.length >= props.filteredPeople.length} onChange={(_e, newValue) => _.each(props.filteredPeople, newValue ? props.selector.add : props.selector.remove)} />
                 </TableCell>
                 <TableCell>Name</TableCell>
                 <TableCell>Email</TableCell>
             </TableRow>
         </TableHead>
         <TableBody>
-            {_.map(props.people, person => {
-                const tags = _.map(person.tags, tag => (
-                    <Chip key={tag} className="tag" label={tag} />
-                ))
-                return (
-                    <TableRow key={person.id}>
-                        <TableCell padding="checkbox">
-                            <Checkbox checked={props.selection.contains(person)} onChange={() => props.selector.toggle(person)}/>
+            {_.map(_.groupBy(props.filteredPeople, 'current_turf.name'), (people, turf) => (
+                <React.Fragment key={turf}>
+                    <TableRow style={{backgroundColor: hasher.hex(turf)}}>
+                        <TableCell padding="none">
+                            <Checkbox checked={_.reduce(people, (prev, person) => prev && props.selection.contains(person), true)} onChange={(_e, newValue) => _.each(people, newValue ? props.selector.add : props.selector.remove)}/>
                         </TableCell>
-                        <TableCell>{person.name}{tags}</TableCell>
-                        <TableCell>{person.email}</TableCell>
+                        <TableCell colSpan={2}>{turf}</TableCell>
                     </TableRow>
-                )
-            })}
+                    {_.map(people, person => {
+                        const tags = _.map(person.tags, tag => (
+                            <Chip key={tag} className="tag" label={tag} />
+                        ))
+                        return (
+                            <TableRow style={{backgroundColor: personHasher.hex(turf)}} key={person.id}>
+                                <TableCell padding="checkbox">
+                                    <Checkbox checked={props.selection.contains(person)} onChange={() => props.selector.toggle(person)}/>
+                                </TableCell>
+                                <TableCell>{person.name}{tags}</TableCell>
+                                <TableCell>{person.email}</TableCell>
+                            </TableRow>
+                        )
+                    })}
+                </React.Fragment>
+            ))}
         </TableBody>
     </Table>
 ))

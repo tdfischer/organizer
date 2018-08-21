@@ -6,6 +6,7 @@ from address.models import AddressField
 from crm.models import Person
 from crm import geocache
 import django_rq
+import uuid
 
 def updateEventGeo(eventID):
     event = Event.objects.get(pk=eventID)
@@ -39,4 +40,4 @@ class Event(models.Model):
         django_rq.enqueue(updateEventGeo, self.id)
 
     def __unicode__(self):
-        return "%s (%s) - %s"%(self.name, self.timestamp, len(self.attendees.all()))
+        return "%s (%s)"%(self.name, self.timestamp)
