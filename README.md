@@ -105,15 +105,12 @@ to a neighborhood based on their street address. This should be run fairly
 regularly, but at most once per day.
 
 
-### ``import [importer]``
+### ``import [importer]...``
 
-A bit of a swiss army knife of importing data. Two importers are provided,
-``airtable`` and ``csv``. ``airtable`` will use the relevant configuration
-documented elsewhere in this README to import people. ``csv`` will read a csv
-file from stdin. Expect more importers to be added in the future. If you have an
+A bit of a swiss army knife of importing data. Four importers are provided,
+``mailchimp-people``, ``airtable-people``, ``airtable-attendance``, and
+``google-calendar-events``. Expect more importers to be added in the future. If you have an
 idea for one, open a Github issue or submit a pull request.
-
-The ``airtable`` importer is meant to be ran daily.
 
 ### ``make_superuser``
 
@@ -126,6 +123,57 @@ interface at ``/admin/``.
 Generates some fake data for you to play around with during development.
 Requires that the ``DEBUG`` environment variable not be set, i.e. running in a
 production environment.
+
+## Importing and Exporting
+
+Organizer does not exist in a vaccuum, and neither does your data, although it
+is probably spread across multiple silos. Thats fine! Organizer has an easy to
+use import/export framework, which was designed with an eye towards easily
+adding in other sources.
+
+Four importers are included:
+
+
+### ``google-calendar-events``
+
+Imports events from a Google Calendar. Requires the following configuration
+settings:
+
+* ``GOOGLE_SERVICE_ACCOUNT_CREDENTIALS`` - A large JSON blob containing Google
+  API credentials for an application 'service account'. Can be downloaded after
+  jumping through many hoops on https://console.developers.google.com. Yes, the
+  entire JSON blob goes into this environment variable.
+* ``GOOGLE_CALENDAR_IMPORT_ID`` - The ID of your calendar to import. You can
+  find this in the Google Calendar web interface.
+
+### ``airtable-attendance``
+
+Imports event attendance records from Airtable. Currently inflexible and highly
+specific to East Bay for Everyone; a pull request to allow configuration is much
+appreciated. Uses the following configuration:
+
+* ``AIRTABLE_BASE_ID``
+* ``AIRTABLE_API_KEY``
+* ``AIRTABLE_TABLE_NAME`` - A table that stores a map of record IDs to e-mail
+  addresses. There is currently no mechanism for configuring the table of
+  events, which is 'Events'.
+
+### ``airtable-people```
+
+Imports people records from Airtable. Also highly EBFE specific, but can be
+easily modified for other setups. Uses the following configuration:
+
+* ``AIRTABLE_BASE_ID``
+* ``AIRTABLE_API_KEY``
+* ``AIRTABLE_TABLE_NAME`` - Table from which you will import people
+
+### ``mailchimp-people```
+
+Imports people from Mailchimp. Only uses e-mail address, and the FNAME/LNAME
+fields that come with a default setup. Uses the following configuration:
+
+* ``MAILCHIMP_SECRET_KEY``
+* ``MAILCHIMP_LIST_ID``
 
 ## Development
 

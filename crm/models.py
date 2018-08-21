@@ -5,6 +5,7 @@ from django.db import models
 from django.db.models import Q, Subquery, OuterRef
 from django.utils import timezone
 from django.urls import reverse
+from django.conf import settings
 from address.models import AddressField, Address, Locality
 from taggit.managers import TaggableManager
 from crm import geocache
@@ -43,7 +44,7 @@ class PersonManager(models.Manager):
         return super(PersonManager, self).get_queryset().annotate(current_turf_id=Subquery(myTurfs.values('id')[:1]))
 
 class Person(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, null=True, blank=True, default='')
     email = models.EmailField(max_length=200, unique=True, db_index=True)
     address = AddressField(blank=True)
     created = models.DateTimeField(auto_now_add=True)
@@ -67,7 +68,7 @@ class Person(models.Model):
         if not self.address_id:
             self.address = Address.objects.create()
         if not self.state_id:
-            self.state = PersonState.objects.get_or_create(name='Default')[0]
+            self.state = PersonState.objects.get_or_create(name=settings.DEFAULT_PERSON_STATE)[0]
         runUpdate = kwargs.pop('_updateGeocache', True)
         super(Person, self).save(*args, **kwargs)
         if runUpdate:
