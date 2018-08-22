@@ -10,6 +10,11 @@ import faMapMarker from '@fortawesome/fontawesome-free-solid/faMapMarker'
 import faSpinner from '@fortawesome/fontawesome-free-solid/faSpinner'
 import faLocationArrow from '@fortawesome/fontawesome-free-solid/faLocationArrow'
 
+import Raven from 'raven-js'
+
+Raven.config(window.SENTRY_PUBLIC_DSN).install()
+window.onunhandledrejection = function(e) {Raven.captureException(e.reason)}
+
 faLibrary.add(faMapMarker, faSpinner, faLocationArrow)
 
 if ('serviceWorker' in navigator) {

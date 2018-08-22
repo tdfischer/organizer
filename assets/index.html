@@ -4,13 +4,6 @@
   <meta charset="utf-8" />
   <meta http-equiv="x-ua-compatible" content="ie-edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="https://cdn.ravenjs.com/3.15.0/raven.min.js"></script>
-  <script>
-    if (window.Raven) {
-      window.Raven.config('{% sentry_public_dsn %}').install();
-      window.onunhandledrejection = function(e) {window.Raven.captureException(e.reason);};
-    }
-  </script>
   <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro"
   rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css?family=Rock+Salt"
@@ -25,6 +18,7 @@
   };
   var LOGIN_URL = "{% url 'social:begin' 'slack' %}?next=/";
   var CURRENT_USER = {{user_data|safe}};
+  var SENTRY_PUBLIC_DSN = "{% sentry_public_dsn %}"
   </script>
   <body>
     <div id="container"></div>
