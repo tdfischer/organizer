@@ -27,13 +27,18 @@ class DiscourseSSOAuth(BaseAuth):
         return response['email'][0]
 
     def get_user_details(self, response):
+        flattened = {}
+        for (k, v) in response.iteritems():
+            if len(v) > 0:
+                flattened[k] = v[0]
+
         return {
-            'username': response['username'][0],
-            'email': response['email'][0],
-            'name': response['name'][0],
-            'groups': response['groups'][0].split(','),
-            'is_staff': response['admin'][0] == 'true' or response['moderator'][0] == 'true',
-            'is_superuser': response['admin'][0] == 'true',
+            'username': flattened.get('username'),
+            'email': flattened.get('email'),
+            'name': flattened.get('name'),
+            'groups': flattened.get('groups', '').split(','),
+            'is_staff': flattened.get('admin') == 'true' or flattened.get('moderator') == 'true',
+            'is_superuser': flattened.get('admin') == 'true',
         }
 
     def auth_complete(self, request, *args, **kwargs):
