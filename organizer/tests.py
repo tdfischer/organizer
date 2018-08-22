@@ -7,7 +7,8 @@ from . import auth
 class DiscourseAuthTests(TestCase):
     @override_settings(
         DISCOURSE_BASE_URL='http://discourse-host/session/sso-provider',
-        DISCOURSE_SSO_SECRET='secret'
+        DISCOURSE_SSO_SECRET='secret',
+        AUTHENTICATION_BACKENDS=('organizer.auth.DiscourseSSOAuth',)
     )
     def testLogin(self):
         resp = self.client.get('/login/discourse/')
