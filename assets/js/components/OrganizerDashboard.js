@@ -52,9 +52,12 @@ export class OrganizerDashboard extends React.Component {
     componentDidMount() {
         this.props.people.fetchIfNeeded(this.props.currentUser.email)
         this.props.broadcasts.fetchAll()
+        const eventWindow = {
+            start: moment().add(-1, 'month'),
+            end: moment().add(1, 'month')
+        }
 
-        this.props.events.fetchAll({timestamp__gte: moment().toISOString(), timestamp__lt: moment().add(30, 'days').toISOString()})
-        this.props.events.fetchAll({timestamp__lt: moment().toISOString(), attendees__email: this.props.currentUser.email})
+        this.props.events.fetchAll({timestamp__gte: eventWindow.start.toISOString(), timestamp__lte: eventWindow.end.toISOString()})
         this.doCheckin = this.doCheckin.bind(this)
         navigator.geolocation.getCurrentPosition(this.props.updateCurrentLocationFromBrowserPosition)
     }
@@ -126,7 +129,7 @@ const mapStateToProps = state => {
     const currentLocation = getCurrentLocation(state)
     const relevantEvents = Events.select(state).filter(evt => moment(evt.timestamp).isBetween(eventWindow.start, eventWindow.end))
     const pastEvents = relevantEvents.filter(evt => _.find(evt.attendees, currentUser.email) && moment(evt.timestamp).isBefore())
-    const upcomingEvents = relevantEvents.filter(evt => moment(evt.timestamp).isSameOrAfter()).nearby(currentLocation)
+    const upcomingEvents = relevantEvents.filter(evt => moment(evt.timestamp).isSameOrAfter(moment().add(-1, 'day'))).nearby(currentLocation)
     return {
         currentUser,
         currentPerson,

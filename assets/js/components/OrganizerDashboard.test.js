@@ -10,5 +10,5 @@ it('should render default state', () => {
 
     shallow(<OrganizerDashboard classes={{}} people={mockModel} broadcasts={mockModel} events={mockModel} currentUser={{}} />)
     expect(mockModel.fetchIfNeeded).toHaveBeenCalledTimes(1)
-    expect(mockModel.fetchAll).toHaveBeenCalledTimes(3)
+    expect(mockModel.fetchAll).toHaveBeenCalledTimes(2)
 })
