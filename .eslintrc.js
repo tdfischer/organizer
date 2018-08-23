@@ -48,8 +48,9 @@ module.exports = {
         "no-unused-vars": [
             2, {"args": "all", "argsIgnorePattern": "^_"}
         ],
-        "react/prop-types": ["off"],
+        "react/prop-types": "off",
         "no-debugger": "off",
-        "no-console": "off"
+        "no-console": "off",
+        "import/no-named-as-default-member": "off"
     }
 };
