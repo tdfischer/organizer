@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Route, Switch } from 'react-router-dom'
-import { ConnectedRouter } from 'connected-react-router'
+import { ConnectedRouter } from 'connected-react-router/immutable'
 import importedComponent from 'react-imported-component'
 import { connect } from 'react-redux'
 import { hot } from 'react-hot-loader'

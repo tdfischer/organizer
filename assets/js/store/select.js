@@ -60,7 +60,7 @@ export default class Selectable {
     }
 
     selected(state) {
-        return new SelectionRange(_.get(state.selections.selections, this.key, []))
+        return new SelectionRange(state.getIn(['selections', 'selections', this.key], []))
     }
 
     bindActionCreators(dispatch) {

@@ -47,7 +47,8 @@ export const EventCard = props => {
     const eventLocator = (<Button variant="fab" size="large" className={props.classes.eventLocator}><Icon className="fa fa-location-arrow" style={{transform: 'rotate('+eventBearing+'deg)'}}/></Button>)
 
     const haveCheckedIn = props.checkedIn
-    const isNearby = props.currentLocation ? distance(props.currentLocation, props.event.geo, {units: 'miles'}) <= 0.5 : false
+    const distanceFromHere = distance(props.currentLocation ? props.currentLocation : props.event.geo, props.event.geo, {units: 'miles'})
+    const isNearby = distanceFromHere < 0.5
     const canCheckIn = !haveCheckedIn && props.onCheckIn && isNearby
     const cardColor = colorForEvent(props.event)
     const textColor = fontColorContrast(cardColor)

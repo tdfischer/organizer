@@ -1,54 +1,36 @@
-import _ from 'lodash'
 import * as Select from '../store/select'
+import Immutable from 'immutable'
 
-function addSelection(state, action) {
-    const currentSelections = _.get(state.selections, action.key, [])
-    if (currentSelections.indexOf(action.item) == -1) {
-        return {
-            ...state,
-            selections: {
-                [action.key]: [...currentSelections, action.item]
-            }
-        }
-    } else {
-        return state
-    }
-}
-
-function removeSelection(state, action) {
-    return {
-        ...state,
-        selections: {
-            [action.key]: _.without(_.get(state.selections, action.key, []), action.item)
-        }
-    }
-}
-
-export default function selections(state = {}, action = {}) {
+export default function selections(state = Immutable.Map(), action = {}) {
     switch (action.type) {
     case Select.SET_SELECTION:
-        return {
-            ...state,
+        return state.mergeDeep({
             selections: {
-                [action.key]: action.selection
+                [action.key]: Immutable.Set(action.selection)
             }
-        }
+        })
     case Select.ADD_SELECTION:
-        return addSelection(state, action)
+        return state.updateIn(
+            ['selections', action.key],
+            Immutable.Set(),
+            currentSelection => currentSelection.add(action.item)
+        )
     case Select.REMOVE_SELECTION:
-        return removeSelection(state, action)
+        return state.updateIn(
+            ['selections', action.key],
+            Immutable.Set(),
+            currentSelection => currentSelection.subtract(action.item)
+        )
     case Select.TOGGLE_SELECTION: {
-        const currentlySelected = _.get(state.selections, action.key, []).indexOf(action.item) != -1
-        if (currentlySelected) {
-            return removeSelection(state, action)
-        } else {
-            return addSelection(state, action)
-        }
+        return state.updateIn(
+            ['selections', action.key],
+            Immutable.Set(),
+            currentSelection => currentSelection.substract(action.item)
+        )
     }
     default:
-        return {
+        return Immutable.Map({
             selections: [],
-            ...state
-        }
+        }).mergeDeep(state)
     }
 }

@@ -11,7 +11,7 @@ import _model from './model'
 import _selectable from './select'
 import _filterable from './filter'
 
-import { connectRouter, routerMiddleware } from 'connected-react-router'
+import { connectRouter, routerMiddleware } from 'connected-react-router/immutable'
 import { createBrowserHistory } from 'history'
 import { getCurrentUser } from '../selectors/auth'
 
@@ -20,6 +20,7 @@ export const Selectable = _selectable
 export const Filterable = _filterable
 
 const composer = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
+
 
 export const history = createBrowserHistory()
 

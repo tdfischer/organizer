@@ -17,7 +17,7 @@ faLibrary.add(faUsers, faGlobe, faUserCircle, faBullhorn)
 
 const mapStateToProps = state => {
     return {
-        path: state.router.location.pathname,
+        path: state.getIn(['router', 'location', 'pathname']),
         currentUser: getCurrentUser(state)
     }
 }
