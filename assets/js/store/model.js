@@ -29,13 +29,13 @@ function queuedFetch() {
     })
 }
 
-const getAllModels = state => state.getIn(['model', 'models']).toJS()
+const getAllModels = state => state.getIn(['model', 'models'])
 
 const modelGetter = _.memoize((name) => {
     return createSelector(
         [getAllModels],
         models => {
-            return _.get(models, name, [])
+            return models.get(name, {})
         }
     )
 })
@@ -43,7 +43,7 @@ const modelGetter = _.memoize((name) => {
 export class ModelSelector {
 
     constructor(slice) {
-        this.slice = slice
+        this.slice = slice.toJS()
         this[Symbol.iterator] = function* () {
             yield* this.slice
         }
