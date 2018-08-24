@@ -29,13 +29,13 @@ function queuedFetch() {
     })
 }
 
-const getAllModels = state => state.model.models
+const getAllModels = state => state.getIn(['model', 'models'])
 
 const modelGetter = _.memoize((name) => {
     return createSelector(
         [getAllModels],
         models => {
-            return _.get(models, name, [])
+            return models.get(name, {})
         }
     )
 })
@@ -43,7 +43,7 @@ const modelGetter = _.memoize((name) => {
 export class ModelSelector {
 
     constructor(slice) {
-        this.slice = slice
+        this.slice = slice.toJS()
         this[Symbol.iterator] = function* () {
             yield* this.slice
         }
@@ -98,7 +98,7 @@ export class ModelSelector {
     nearby(currentLocation, radius = 0) {
         const modelsWithDistance = _.map(this.hasGeo().slice, m => ({
             ...m,
-            distance: distance(m.geo, currentLocation)
+            distance: distance(m.geo, currentLocation ? currentLocation : m.geo)
         }))
         const sorted = _.sortBy(modelsWithDistance, [m => m.distance])
         if (radius > 0) {

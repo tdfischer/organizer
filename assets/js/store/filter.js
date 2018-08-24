@@ -17,7 +17,7 @@ export default class Filterable {
     }
 
     filtered(state, values) {
-        const filterConfig = _.get(state.filters.filters, this.key)
+        const filterConfig = state.getIn(['filters', 'filters', this.key])
         return _.filter(values, value => this.matcher(value, filterConfig))
     }
 

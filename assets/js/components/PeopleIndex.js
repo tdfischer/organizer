@@ -140,7 +140,7 @@ const PeopleTable = connect(mapPeopleStateToProps, mapPeopleDispatchToProps)(pro
             </TableRow>
         </TableHead>
         <TableBody>
-            {_.map(_.groupBy(props.filteredPeople, 'current_turf.name'), (people, turf) => (
+            {_.map(_.groupBy(props.filteredPeople, p => _.get(p, 'current_turf.name', '(No Turf)')), (people, turf) => (
                 <React.Fragment key={turf}>
                     <TableRow style={{backgroundColor: hasher.hex(turf)}}>
                         <TableCell padding="none">
@@ -149,6 +149,7 @@ const PeopleTable = connect(mapPeopleStateToProps, mapPeopleDispatchToProps)(pro
                         <TableCell colSpan={2}>{turf}</TableCell>
                     </TableRow>
                     {_.map(people, person => {
+                        console.log(person)
                         const tags = _.map(person.tags, tag => (
                             <Chip key={tag} className="tag" label={tag} />
                         ))

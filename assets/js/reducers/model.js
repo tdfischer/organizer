@@ -1,60 +1,40 @@
 import * as Model from '../store/model'
 import _ from 'lodash'
+import Immutable from 'immutable'
 
-function mergeModels(currentModels, updatedModels) {
-    return _.unionBy(updatedModels, currentModels, 'id')
-}
-
-export default function(state = {}, action = {}) {
+export default function(state = Immutable.Map(), action = {}) {
+    if (!Immutable.isImmutable(state)) {
+        state = Immutable.Map()
+    }
     switch (action.type) {
     case Model.UPDATE_MODEL: {
-        // Extract full list of models from state
-        const currentModels = _.get(state.models, action.name, [])
-        const updatedModels = mergeModels(currentModels, [action.data])
-
-        return {
-            ...state,
+        return state.mergeDeep({
             models: {
-                ...state.models,
-                [action.name]: updatedModels
+                [action.name]: {
+                    [action.id]: action.data
+                }
             }
-        }
+        })
     }
     case Model.SAVING_MODEL:
-        return {
-            ...state,
-            saving: state.saving + 1,
-            modified: true
-        }
+        return state.update('saving', i => i + 1)
     case Model.SAVED_MODEL:
-        return {
-            ...state,
-            saving: state.saving - 1,
-            modified: false 
-        }
+        return state.update('saving', i => i - 1)
     case Model.REQUEST_MODELS:
-        return {
-            ...state,
-            loading: state.loading + 1
-        }
+        return state.update('loading', i => i + 1)
     case Model.RECEIVE_MODELS: {
-        const currentModels = _.get(state.models, action.name, [])
-        return {
-            ...state,
-            loading: state.loading - 1,
+        return state.mergeDeep({
             models: {
-                ...state.models,
-                [action.name]: mergeModels(currentModels, action.models)
+                [action.name]: Immutable.Map(_.fromPairs(_.map(action.models, m => [m.id, m])))
             }
-        }
+        }).update('loading', i => i - 1)
     }
     default:
-        return {
+        return Immutable.Map({
             loading: 0,
             saving: false,
             modified: false,
-            models: {},
-            ...state
-        }
+            models: Immutable.Map({}),
+        }).mergeDeep(state)
     }
 }

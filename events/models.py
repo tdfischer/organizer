@@ -19,9 +19,9 @@ def updateEventGeo(eventID):
 class Event(models.Model):
     name = models.CharField(max_length=200)
     timestamp = models.DateTimeField()
-    attendees = models.ManyToManyField(Person, related_name='events')
+    attendees = models.ManyToManyField(Person, related_name='events', blank=True)
     uid = models.CharField(max_length=200, blank=True)
-    location = AddressField(null=True, default=None)
+    location = AddressField(null=True, default=None, blank=True)
     lat = models.FloatField(null=True, blank=True)
     lng = models.FloatField(null=True, blank=True)
     instance_id = models.CharField(max_length=200, blank=True)
