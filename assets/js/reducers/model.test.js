@@ -16,58 +16,36 @@ it('should append models to an empty store', () => {
     const testModel = new Model('test')
     var testRows = []
     var state = undefined
-    for(var i = 0; i < 100; i++) {
+    for(var i = 0; i < 10; i++) {
         const modelInstance = {id: i}
-        testRows.push(modelInstance)
+        testRows.push([i, modelInstance])
         state = modelReducer(state, updateModel(modelInstance))
     }
-    expect(state)
-      .toMatchObject({models: {test: expect.arrayContaining(testRows)}})
+    expect(state).toEqual(Immutable.Map({
+          models: {
+              test: _.fromPairs(testRows)
+          }
+      }))
 })
 
-it('should update models', () => {
+it('should update models and maintain order', () => {
     const testModel = new Model('test')
-    const testRows = []
     const updatedRows = []
     var state = undefined
-    for(var i = 0; i < 100; i++) {
+    for(var i = 0; i < 10; i++) {
         const modelInstance = {id: i}
-        testRows.push(modelInstance)
-    }
-    state = {models: {test: testRows}}
-
-    for(var i = 0; i < 100; i++) {
-        const modelInstance = {id: i, updated: i % 3}
-        updatedRows.push(modelInstance)
         state = modelReducer(state, updateModel(modelInstance))
     }
 
-    expect(state)
-      .toMatchObject({models: {test: expect.arrayContaining(updatedRows)}})
-})
-
-it('should maintain array order when updating', () => {
-    const testModel = new Model('test')
-    const testRows = []
-    const updatedRows = []
-    var state = undefined
-    for(var i = 0; i < 100; i++) {
-        const modelInstance = {id: i}
-        testRows.push(modelInstance)
-    }
-    state = {models: {test: testRows}}
-
-    for(var i = 0; i < 100; i++) {
+    for(var i = 10; i >= 0; i--) {
         const modelInstance = {id: i, updated: i % 3}
-        updatedRows.push(modelInstance)
+        updatedRows.push([i, modelInstance])
         state = modelReducer(state, updateModel(modelInstance))
     }
 
-    for(var i = 100; i >= 0; i++) {
-        const modelInstance = {id: i, updated: i % 3}
-        state = modelReducer(state, updateModel(modelInstance))
-    }
-
-    expect(state.toJS())
-      .toMatchObject({models: {test: expect.arrayContaining(updatedRows)}})
+    expect(state).toEqual(Immutable.Map({
+        models: {
+            test: _.fromPairs(updatedRows)
+        }
+    }))
 })
