@@ -32,10 +32,15 @@ const store = createStore(
 const persistor = persistStore(store)
 
 export const PersistentApp = (props) => (
-    <Provider store={store}>
-        <PersistGate loading={null} persistor={persistor}>{props.children}</PersistGate>
+    <Provider store={props.store}>
+        <PersistGate loading={null} persistor={props.persistor}>{props.children}</PersistGate>
     </Provider>
 )
+
+PersistentApp.defaultProps = {
+    store: store,
+    persistor: persistor
+}
 
 if (module.hot) {
     module.hot.accept('../reducers', () => {
