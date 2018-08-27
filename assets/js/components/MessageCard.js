@@ -19,7 +19,7 @@ const cardStyles = {
 
 const mapStateToProps = (state, props) => {
     return {
-        turf: Turfs.select(state).filterBy('id', props.message.turf).first()
+        turf: Turfs.immutableSelect(state).get(props.message.turf)
     }
 }
 

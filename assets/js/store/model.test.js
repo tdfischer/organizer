@@ -13,7 +13,7 @@ it('should bind action creators', () => {
     const model = new Model('test')
     const boundCalls = model.bindActionCreators(func)
     _.each(boundCalls, c => c())
-    expect(func).toHaveBeenCalledTimes(12)
+    expect(func).toHaveBeenCalledTimes(11)
 })
 
 it('should update', () => {

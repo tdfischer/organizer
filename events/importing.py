@@ -9,13 +9,14 @@ from oauth2client import client, tools, service_account
 from crm.importing import DatasetImporter, AddressWidget
 from crm.models import Person
 from datetime import timedelta
-from django.utils import timezone
+from django.utils import timezone, dateparse
 from import_export import resources, widgets, fields, instance_loaders
 import tablib
 from address.models import Address
 import dateutil.parser
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+import pytz
 
 SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
 
@@ -35,6 +36,11 @@ class EventResource(resources.ModelResource):
         attribute = 'timestamp',
         widget = TimezoneAwareDateTimeWidget()
     )
+    end_timestamp = fields.Field(
+        column_name = 'end_timestamp',
+        attribute = 'end_timestamp',
+        widget = TimezoneAwareDateTimeWidget()
+    )
     location = fields.Field(
         column_name = 'location',
         attribute = 'location',
@@ -44,7 +50,7 @@ class EventResource(resources.ModelResource):
     def skip_row(self, instance, previous):
         if instance.location is None:
             return True
-        if instance.timestamp is None:
+        if instance.timestamp is None or instance.end_timestamp is None:
             return True
         return super(EventResource, self).skip_row(instance, previous)
 
@@ -53,7 +59,7 @@ class EventResource(resources.ModelResource):
         import_id_fields = ('uid', 'instance_id')
         report_skipped = True
         skip_unchanged = True
-        fields = ('uid', 'instance_id', 'timestamp', 'location')
+        fields = ('uid', 'instance_id', 'timestamp', 'end_timestamp', 'location')
 
 class GoogleCalendarImporter(DatasetImporter):
     class Meta:
@@ -100,10 +106,21 @@ class GoogleCalendarImporter(DatasetImporter):
             if token is None:
                 break
 
+    def grab_datetime(self, data):
+        this_timestamp = dateparse.parse_datetime(data.get('dateTime'))
+        this_timezone = data.get('timeZone')
+        if this_timezone is None or timezone.is_aware(this_timestamp):
+            return this_timestamp.isoformat()
+        else:
+            return timezone.make_aware(this_timestamp,
+                    pytz.timezone(this_timezone)).isoformat()
+
     def next_page(self):
-        dataset = tablib.Dataset(headers=('uid', 'instance_id', 'timestamp', 'name', 'location'))
+        dataset = tablib.Dataset(headers=('uid', 'instance_id', 'timestamp',
+        'end_timestamp', 'name', 'location'))
         for event in self.eventPages.next():
-            timestamp = event.get('start').get('dateTime')
+            timestamp = self.grab_datetime(event.get('start'))
+            end_timestamp = self.grab_datetime(event.get('end'))
             name = event.get('summary')
             location = event.get('location')
             icalUID = event.get('iCalUID')
@@ -111,6 +128,7 @@ class GoogleCalendarImporter(DatasetImporter):
                 icalUID,
                 event.get('id'),
                 timestamp,
+                end_timestamp,
                 name,
                 location
             ))

@@ -18,7 +18,7 @@ export default class Filterable {
 
     filtered(state, values) {
         const filterConfig = state.getIn(['filters', 'filters', this.key])
-        return _.filter(values, value => this.matcher(value, filterConfig))
+        return values.filter(value => this.matcher(value, filterConfig))
     }
 
     bindActionCreators(dispatch) {

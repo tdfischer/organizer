@@ -22,9 +22,9 @@ it('should append models to an empty store', () => {
         state = modelReducer(state, updateModel(modelInstance))
     }
     expect(state).toEqual(Immutable.Map({
-          models: {
-              test: _.fromPairs(testRows)
-          }
+          models: Immutable.Map({
+              test: Immutable.Map(testRows)
+          })
       }))
 })
 
@@ -44,8 +44,8 @@ it('should update models and maintain order', () => {
     }
 
     expect(state).toEqual(Immutable.Map({
-        models: {
-            test: _.fromPairs(updatedRows)
-        }
+        models: Immutable.Map({
+            test: Immutable.Map(Immutable.Map(updatedRows))
+        })
     }))
 })

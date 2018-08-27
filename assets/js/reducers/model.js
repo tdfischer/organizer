@@ -8,13 +8,9 @@ export default function(state = Immutable.Map(), action = {}) {
     }
     switch (action.type) {
     case Model.UPDATE_MODEL: {
-        return state.mergeDeep({
-            models: {
-                [action.name]: {
-                    [action.id]: action.data
-                }
-            }
-        })
+        return state.updateIn(['models', action.name], (models = Immutable.Map()) => (
+            models.set(action.id, action.data)
+        ))
     }
     case Model.SAVING_MODEL:
         return state.update('saving', i => i + 1)
@@ -23,18 +19,16 @@ export default function(state = Immutable.Map(), action = {}) {
     case Model.REQUEST_MODELS:
         return state.update('loading', i => i + 1)
     case Model.RECEIVE_MODELS: {
-        return state.mergeDeep({
-            models: {
-                [action.name]: Immutable.Map(_.fromPairs(_.map(action.models, m => [m.id, m])))
-            }
-        }).update('loading', i => i - 1)
+        return state.updateIn(['models', action.name], (models = Immutable.Map()) => (
+            models.merge(_.fromPairs(_.map(action.models, m => [m.id, m])))
+        )).update('loading', i => i - 1)
     }
     default:
         return Immutable.Map({
             loading: 0,
             saving: false,
             modified: false,
-            models: Immutable.Map({}),
+            models: Immutable.Map(),
         }).mergeDeep(state)
     }
 }

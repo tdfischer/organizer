@@ -51,6 +51,7 @@ module.exports = {
         "react/prop-types": "off",
         "no-debugger": "off",
         "no-console": "off",
-        "import/no-named-as-default-member": "off"
+        "import/no-named-as-default-member": "off",
+        "import/no-named-as-default": "off"
     }
 };

@@ -14,14 +14,14 @@ export const updateCurrentLocationFromBrowserPosition = pos => {
     return updateCurrentLocation([pos.coords.latitude, pos.coords.longitude])
 }
 
-export const updateCurrentLocation = coords => {
+export const updateCurrentLocation = _.throttle(coords => {
     return dispatch => {
         dispatch({
             type: UPDATE_CURRENT_LOCATION,
             geo: coords
         })
     }
-}
+})
 
 export const requestGeocode = address => {
     return {

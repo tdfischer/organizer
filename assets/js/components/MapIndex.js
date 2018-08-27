@@ -1,6 +1,5 @@
 import React from 'react'
 import L from 'leaflet'
-import _ from 'lodash'
 import { connect } from 'react-redux'
 import { Model } from '../store'
 import HeatmapLayer from 'react-leaflet-heatmap-layer'
@@ -8,10 +7,7 @@ import LocalMap from './mapping/LocalMap'
 import gravatar from 'gravatar'
 import importedComponent from 'react-imported-component'
 import { getCoord } from '@turf/invariant'
-import moment from 'moment'
 import { getCurrentUser } from '../selectors/auth'
-import { getCurrentLocation } from '../selectors/geocache'
-import { Marker } from 'react-leaflet'
 
 import 'react-leaflet-markercluster/dist/styles.min.css'
 import './MapIndex.scss'
@@ -19,7 +15,6 @@ import './MapIndex.scss'
 const MarkerClusterGroup = importedComponent(() => import('react-leaflet-markercluster/src/react-leaflet-markercluster'))
 
 const People = new Model('people')
-const Events = new Model('events')
 
 export class MapIndex extends React.Component {
     constructor(props) {
@@ -28,12 +23,10 @@ export class MapIndex extends React.Component {
 
     componentDidMount() {
         this.props.people.fetchAll()
-        this.props.events.fetchAll({timestamp__gte: moment().toISOString(), timestamp__lt: moment().add(30, 'days').toISOString()})
-        this.props.events.fetchAll({timestamp__lt: moment().toISOString(), attendees__email: this.props.currentUser.email})
     }
 
     render() {
-        const markers = _.map(this.props.allPeople, person => {
+        const markers = this.props.allPeople.map(person => {
             const position = getCoord(person.geo)
             return {
                 position: position,
@@ -46,11 +39,7 @@ export class MapIndex extends React.Component {
                     })
                 }
             }
-        })
-
-        const eventMarkers = _.map(this.props.upcomingEvents, evt => (
-            <Marker key={evt.id} position={getCoord(evt.geo)} />
-        ))
+        }).toArray()
 
         return (
             <div className="membership-map">
@@ -61,7 +50,6 @@ export class MapIndex extends React.Component {
                         intensityExtractor={(_p) => 50}
                         points={markers} />
                     <MarkerClusterGroup markers={markers} />
-                    {eventMarkers}
                 </LocalMap>
             </div>
         )
@@ -70,30 +58,23 @@ export class MapIndex extends React.Component {
 
 const mapStateToProps = (state) => {
     const currentUser = getCurrentUser(state)
-    const eventWindow = {
-        start: moment().add(-1, 'month'),
-        end: moment().add(1, 'month')
-    }
-    const currentLocation = getCurrentLocation(state)
-    const relevantEvents = Events.select(state).filter(evt => moment(evt.timestamp).isBetween(eventWindow.start, eventWindow.end))
-    const upcomingEvents = relevantEvents.filter(evt => moment(evt.timestamp).isSameOrAfter()).nearby(currentLocation).slice
+    const allPeople = People.immutableSelect(state)
+        .filter(person=> !!person.geo)
+        .toList()
     return {
-        allPeople: People.select(state).hasGeo().slice,
-        currentUser,
-        upcomingEvents
+        allPeople,
+        currentUser
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        people: People.bindActionCreators(dispatch),
-        events: Events.bindActionCreators(dispatch)
+        people: People.bindActionCreators(dispatch)
     }
 }
 
 MapIndex.defaultProps = {
     allPeople: [],
-    upcomingEvents: [],
     currentUser: {}
 }
 

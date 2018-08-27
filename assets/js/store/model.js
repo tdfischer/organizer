@@ -1,11 +1,17 @@
 import { createSelector } from 'reselect'
 import _ from 'lodash'
-import distance from '@turf/distance'
+import _memoize from 'lodash/memoize'
+import _fromPairs from 'lodash/fromPairs'
+import _map from 'lodash/map'
+import _get from 'lodash/get'
+import _isEmpty from 'lodash/isEmpty'
+import _pickBy from 'lodash/pickBy'
 import { bindActionCreators } from 'redux'
 import { point } from '@turf/helpers'
 
 import { csrftoken } from '../Django'
 import Queue from 'promise-queue'
+import Immutable from 'immutable'
 
 export const REQUEST_MODELS = 'REQUEST_MODELS'
 export const RECEIVE_MODELS = 'RECEIVE_MODELS'
@@ -31,83 +37,14 @@ function queuedFetch() {
 
 const getAllModels = state => state.getIn(['model', 'models'])
 
-const modelGetter = _.memoize((name) => {
+const modelGetter = _memoize((name) => {
     return createSelector(
         [getAllModels],
         models => {
-            return models.get(name, {})
+            return models.get(name, Immutable.Map())
         }
     )
 })
-
-export class ModelSelector {
-
-    constructor(slice) {
-        this.slice = slice.toJS()
-        this[Symbol.iterator] = function* () {
-            yield* this.slice
-        }
-    }
-
-    all() {
-        return this.filter(_.constant(true))
-    }
-
-    filter(filter = _.constant(true)) {
-        return new ModelSelector(_.filter(this.slice, filter))
-    }
-
-    filterBy(key, value) {
-        return this.filter(_.matchesProperty(key, value))
-    }
-
-    first() {
-        return _.head(this.slice)
-    }
-
-    exists(id) {
-        return this.get(id) != undefined
-    }
-
-    get(id) {
-        return _.find(this.slice, {id: id})
-    }
-
-    sortBy(key) {
-        if (key.startsWith('-')) {
-            return new ModelSelector(_.reverse(_.sortBy(this.slice, _.property(key.substr(1)))))
-        } else {
-            return new ModelSelector(_.sortBy(this.slice, _.property(key)))
-        }
-    }
-
-    map(f) {
-        return new ModelSelector(_.map(this.slice, f))
-    }
-
-    hasGeo() {
-        return this.withGeo().filter(m => m.geo)
-    }
-
-    withGeo() {
-        return this.map(m => (
-            {...m, geo: (m.geo && m.geo.lat && m.geo.lng) ? point([m.geo.lat, m.geo.lng]) : undefined}
-        ))
-    }
-
-    nearby(currentLocation, radius = 0) {
-        const modelsWithDistance = _.map(this.hasGeo().slice, m => ({
-            ...m,
-            distance: distance(m.geo, currentLocation ? currentLocation : m.geo)
-        }))
-        const sorted = _.sortBy(modelsWithDistance, [m => m.distance])
-        if (radius > 0) {
-            return new ModelSelector(_.filter(sorted, m => m.distance <= radius))
-        } else {
-            return new ModelSelector(sorted)
-        }
-    }
-}
 
 export default class Model {
     constructor(name, options = {}) {
@@ -115,14 +52,20 @@ export default class Model {
         this.options = options
     }
 
-    select(state) {
-        return new ModelSelector(modelGetter(this.name)(state))
+    immutableSelect(state) {
+        return modelGetter(this.name)(state).toKeyedSeq().map(m => {
+            const geo = (m.geo && m.geo.lat && m.geo.lng) ? point([m.geo.lat, m.geo.lng]) : undefined
+            return {
+                ...m,
+                geo: geo
+            }
+        })
     }
 
     bindActionCreators(dispatch) {
-        const funcNames = ['saving', 'saved', 'save', 'fetchOne', 'fetchIfNeeded', 'refresh', 'fetchAll', 'update', 'create', 'updateAndSave', 'request', 'receive']
-        const funcPairs = _.map(funcNames, name => [name, _.bind(_.get(this, name), this)])
-        const bindable = _.fromPairs(funcPairs)
+        const funcNames = ['saving', 'saved', 'save', 'fetchOne', 'fetchIfNeeded', 'fetchAll', 'update', 'create', 'updateAndSave', 'request', 'receive']
+        const funcPairs = _map(funcNames, name => [name, this[name].bind(this)])
+        const bindable = _fromPairs(funcPairs)
         return bindActionCreators(bindable, dispatch)
     }
 
@@ -142,8 +85,8 @@ export default class Model {
 
     save(id) {
         return (dispatch, getState) => {
-            const selector = new Model(this.name).select(getState())
-            const model = selector.filterBy('id', id).first()
+            const selector = new Model(this.name).immutableSelect(getState())
+            const model = selector.get(id)
             dispatch(this.saving(id))
             const data = {
                 method: 'PUT',
@@ -167,7 +110,7 @@ export default class Model {
 
     fetchIfNeeded(id) {
         return (dispatch, getState) => {
-            if (!this.select(getState()).exists(id)) {
+            if (!this.immutableSelect(getState()).has(id)) {
                 return dispatch(this.fetchOne(id))
             }
         }
@@ -186,20 +129,12 @@ export default class Model {
         }
     }
 
-    refresh() {
-        return (dispatch, getState) => {
-            if (this.select(getState()).all().slice.length == 0) {
-                return dispatch(this.fetchAll())
-            }
-        }
-    }
-
     fetchAll(params = {}) {
         return dispatch => {
             dispatch(this.request())
-            const url = _.get(this.options, 'url', '/api/'+this.name+'/')
-            const urlParams = new URLSearchParams(Object.entries(_.pickBy(params, _.negate(_.isUndefined))))
-            console.groupCollapsed('GET %s page=%s', this.name, _.get(params, 'page', 1))
+            const url = _get(this.options, 'url', '/api/'+this.name+'/')
+            const urlParams = new URLSearchParams(Object.entries(_pickBy(params, p => p != undefined)))
+            console.groupCollapsed('GET %s page=%s', this.name, _get(params, 'page', 1))
             console.log(params)
             console.groupEnd()
             return queuedFetch(url+'?'+urlParams, {credentials: 'include'})
@@ -220,7 +155,7 @@ export default class Model {
     update(id, dataOrCallback) {
         return (dispatch, getState) => {
             if (typeof dataOrCallback == 'function') {
-                const foundItem = this.select(getState()).filterBy('id', id).first()
+                const foundItem = this.immutableSelect(getState()).get(id)
                 return dispatch(this.update(id, dataOrCallback(foundItem)))
             } else {
                 console.groupCollapsed('update %s %s', this.name, id)
@@ -254,7 +189,7 @@ export default class Model {
             return queuedFetch('/api/'+this.name+'/', data)
                 .then(response => response.json())
                 .then(json => {
-                    if (!_.isEmpty(json)) {
+                    if (!_isEmpty(json)) {
                         dispatch(this.update(json.id, json))
                         return Promise.resolve(json.id)
                     }
