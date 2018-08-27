@@ -4,7 +4,7 @@ import CardHeader from '@material-ui/core/CardHeader'
 import CardContent from '@material-ui/core/CardContent'
 import Avatar from '@material-ui/core/Avatar'
 import { connect } from 'react-redux'
-import { Model } from '../store'
+import { Model, withModelData } from '../store'
 import { withStyles } from '@material-ui/core/styles'
 import _ from 'lodash'
 import gravatar from 'gravatar'
@@ -29,22 +29,20 @@ const mapDispatchToProps = dispatch => {
     }
 }
 
-const MessageCard = connect(mapStateToProps, mapDispatchToProps)(withStyles(cardStyles)(class MessageCard extends React.Component {
-    componentDidMount() {
-        this.props.turfs.fetchIfNeeded(this.props.message.turf)
+const mapPropsToModels = props => {
+    return {
+        turfs: props.message.turf
     }
+}
 
-    render() {
-        return (
-            <Card className={this.props.classes.card}>
-                <CardHeader
-                    title={this.props.message.subject}
-                    subheader={this.props.message.author + ' sent to ' + this.props.message.target_state + ' in ' + _.get(this.props.turf, 'name', 'somewhere') + ' ' + this.props.message.sent_on.fromNow()}
-                    avatar={<Avatar src={gravatar.url(this.props.message.author, {s: 32, d: 'retro'})} />} />
-                <CardContent>{this.props.message.body}</CardContent>
-            </Card>
-        )
-    }
-}))
+const MessageCard = connect(mapStateToProps, mapDispatchToProps)(withModelData(mapPropsToModels)(withStyles(cardStyles)( props => (
+    <Card className={props.classes.card}>
+        <CardHeader
+            title={props.message.subject}
+            subheader={props.message.author + ' sent to ' + props.message.target_state + ' in ' + _.get(props.turf, 'name', 'somewhere') + ' ' + props.message.sent_on.fromNow()}
+            avatar={<Avatar src={gravatar.url(props.message.author, {s: 32, d: 'retro'})} />} />
+        <CardContent>{props.message.body}</CardContent>
+    </Card>
+))))
 
 export default MessageCard

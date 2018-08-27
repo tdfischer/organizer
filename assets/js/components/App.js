@@ -1,15 +1,9 @@
 import React from 'react'
-import PropTypes from 'prop-types'
-import { Route, Switch } from 'react-router-dom'
-import { ConnectedRouter } from 'connected-react-router/immutable'
 import importedComponent from 'react-imported-component'
 import { connect } from 'react-redux'
 import { hot } from 'react-hot-loader'
-import { history } from '../store'
 
 import { getLoggedIn } from '../selectors/auth'
-import OrganizerAppBar from './OrganizerAppBar'
-import OrganizerBottomNav from './OrganizerBottomNav'
 import { withStyles } from '@material-ui/core/styles'
 import Raven from 'raven-js'
 import { library as faLibrary } from '@fortawesome/fontawesome'
@@ -19,10 +13,9 @@ import Button from '@material-ui/core/Button'
 faLibrary.add(faTimes)
 
 const LoginSplash = importedComponent(() => import('./LoginSplash'))
-const MapIndex = importedComponent(() => import('./MapIndex'))
-const OrganizerDashboard = importedComponent(() => import('./OrganizerDashboard'))
-const PeopleIndex = importedComponent(() => import('./PeopleIndex'))
-const CaptainIndex = importedComponent(() => import('./CaptainIndex'))
+const AppRoutes = importedComponent(() => import('./AppRoutes'))
+const OrganizerAppBar = importedComponent(() => import('./OrganizerAppBar'))
+const OrganizerBottomNav = importedComponent(() => import('./OrganizerBottomNav'))
 
 class ErrorWrapperBase extends React.Component {
     constructor(props) {
@@ -78,12 +71,7 @@ export const App = props => (
             <OrganizerAppBar />
             <div className="viewport">
                 <div className="scroll">
-                    <Switch>
-                        <Route exact path="/map" component={MapIndex} />
-                        <Route exact path="/people" component={PeopleIndex} />
-                        <Route exact path="/captain" component={CaptainIndex} />
-                        <Route component={OrganizerDashboard} />
-                    </Switch>
+                    <AppRoutes />
                 </div>
             </div>
             <OrganizerBottomNav />
@@ -99,17 +87,7 @@ const mapStateToProps = state => {
 }
 
 const RouterApp = (props) => (
-    <ConnectedRouter history={props.history}>
-        <ErrorWrapper><App {...props} /></ErrorWrapper>
-    </ConnectedRouter>
+    <ErrorWrapper><App {...props} /></ErrorWrapper>
 )
-
-RouterApp.propTypes = {
-    history: PropTypes.object
-}
-
-RouterApp.defaultProps = {
-    history: history
-}
 
 export default hot(module)(connect(mapStateToProps)(RouterApp))

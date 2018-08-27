@@ -24,7 +24,7 @@ const MarkerMap = importedComponent(() => import('./mapping/MarkerMap'))
 
 import { getCurrentLocation } from '../selectors/geocache'
 import { getCurrentUser } from '../selectors/auth'
-import { Model } from '../store'
+import { Model, withModelData } from '../store'
 
 faLibrary.add(faCalendar, faCalendarCheck)
 
@@ -120,23 +120,6 @@ EventCard.defaultProps = {
     classes: {}
 }
 
-const fetchModel = (modelName, propName) => WrappedComponent => {
-    return class Fetcher extends React.Component {
-        constructor(props) {
-            super(props)
-            this.model = new Model(modelName)
-        }
-
-        componentDidMount() {
-            this.model.fetchIfNeeded(this.props[propName])
-        }
-
-        render() {
-            return <WrappedComponent {...this.props} />
-        }
-    }
-}
-
 const mapStateToProps = (state, props) => {
     const currentUser = getCurrentUser(state)
     const evt = Events.immutableSelect(state).get(props.event_id.toString())
@@ -164,4 +147,10 @@ const styles = {
     }
 }
 
-export default withStyles(styles)(connect(mapStateToProps)(fetchModel('events', 'event_id')(EventCard)))
+const mapPropsToModels = props => {
+    return {
+        events: props.event_id.toString()
+    }
+}
+
+export default withStyles(styles)(connect(mapStateToProps)(withModelData(mapPropsToModels)(EventCard)))

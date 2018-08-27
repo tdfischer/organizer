@@ -3,12 +3,13 @@ import { compose, createStore, applyMiddleware } from 'redux'
 import organizerApp from '../reducers'
 import thunkMiddleware from 'redux-thunk'
 import { persistStore } from 'redux-persist'
-import { Provider } from 'react-redux'
+import { connect, Provider } from 'react-redux'
 import createRavenMiddleware from 'raven-for-redux'
 import Raven from 'raven-js'
 import _model from './model'
 import _selectable from './select'
 import _filterable from './filter'
+import _ from 'lodash'
 
 import { connectRouter, routerMiddleware } from 'connected-react-router/immutable'
 import { createBrowserHistory } from 'history'
@@ -19,7 +20,6 @@ export const Selectable = _selectable
 export const Filterable = _filterable
 
 const composer = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
-
 
 export const history = createBrowserHistory()
 
@@ -38,6 +38,25 @@ export const PersistentApp = (props) => (
 
 PersistentApp.defaultProps = {
     store: store,
+}
+
+export const withModelData = mapModelToFetch => WrappedComponent => {
+    return connect()(class Fetcher extends React.PureComponent {
+        componentDidMount() {
+            _.each(mapModelToFetch(this.props), (params, modelName) => {
+                const model = new Model(modelName)
+                if (_.isObject(params)) {
+                    this.props.dispatch(model.fetchAll(params))
+                } else {
+                    this.props.dispatch(model.fetchIfNeeded(params))
+                }
+            })
+        }
+
+        render() {
+            return <WrappedComponent {...this.props} />
+        }
+    })
 }
 
 if (module.hot) {

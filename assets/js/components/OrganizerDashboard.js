@@ -20,7 +20,7 @@ import { getCurrentUser } from '../selectors/auth'
 import MessageCard from './MessageCard'
 import { getCurrentLocation } from '../selectors/geocache'
 import { Geocache } from '../actions'
-import { Model } from '../store'
+import { Model, withModelData } from '../store'
 import RawDataExpansionPanel from './RawDataExpansionPanel'
 import EventCard from './EventCard'
 
@@ -51,14 +51,6 @@ const NoEvents = withStyles(noEventsStyles)(props => (
 
 export class OrganizerDashboard extends React.Component {
     componentDidMount() {
-        this.props.people.fetchIfNeeded(this.props.currentUser.email)
-        this.props.broadcasts.fetchAll()
-        const eventWindow = {
-            start: moment().add(-1, 'month'),
-            end: moment().add(1, 'month')
-        }
-
-        this.props.events.fetchAll({timestamp__gte: eventWindow.start.toISOString(), timestamp__lte: eventWindow.end.toISOString()})
         this.doCheckin = this.doCheckin.bind(this)
         navigator.geolocation.getCurrentPosition(this.props.updateCurrentLocationFromBrowserPosition)
     }
@@ -179,4 +171,19 @@ const styles = {
     },
 }
 
-export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(OrganizerDashboard))
+const mapPropsToModels = props => {
+    const eventWindow = {
+        start: moment().add(-1, 'month'),
+        end: moment().add(1, 'month')
+    }
+    return {
+        people: props.currentUser.email,
+        broadcasts: {},
+        events: {
+            timestamp__gte: eventWindow.start.toISOString(),
+            timestamp__lte: eventWindow.end.toISOString()
+        }
+    }
+}
+
+export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(withModelData(mapPropsToModels)(OrganizerDashboard)))
