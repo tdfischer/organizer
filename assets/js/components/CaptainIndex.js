@@ -33,7 +33,7 @@ const States = new Model('states')
 const mapStateToProps = state => {
     const currentUser = getCurrentUser(state)
     const currentPerson = People.immutableSelect(state).get(currentUser.email)
-    const captainTurfs = _.filter(_.get(currentPerson, 'turf_memberships', []), {is_captain: true})
+    const captainTurfs = _.get(currentPerson, 'turf_memberships', [])
     return {
         currentUser,
         currentPerson,
@@ -77,7 +77,7 @@ const MessageList = connect(messageListStateToProps)(props => (
 const destinationStateToProps = state => {
     const currentUser = getCurrentUser(state)
     const currentPerson = People.immutableSelect(state).get(currentUser.email)
-    const turfs = _.filter(_.get(currentPerson, 'turf_memberships', []), {is_captain: true})
+    const turfs = _.get(currentPerson, 'turf_memberships', [])
     const people = PeopleFilter.filtered(state, People.immutableSelect(state)).toList().toJS()
     const states = States.immutableSelect(state).toList().toJS()
     return {
