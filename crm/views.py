@@ -12,3 +12,6 @@ def index(request, *args, **kwargs):
 
 def service_worker(request, *args, **kwargs):
     return render(request, 'service-worker.js', content_type='text/javascript')
+
+def robots(request, *args, **kwargs):
+    return render(request, 'robots.txt')

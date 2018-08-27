@@ -77,7 +77,7 @@ class AllowPUTAsCreateMixin(object):
                 raise
 
 class PersonViewSet(AllowPUTAsCreateMixin, IntrospectiveViewSet):
-    queryset = models.Person.objects.all()
+    queryset = models.Person.objects.all().order_by('email')
     serializer_class = serializers.PersonSerializer
     permission_classes = (IsAuthenticated,)
     lookup_field = 'email'
