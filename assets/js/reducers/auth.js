@@ -16,7 +16,7 @@ export default function(state = Immutable.Map(), action={}) {
         return Immutable.Map({
             loading: false,
             user: defaultUser,
-        }).mergeDeep(state)
+        }).merge(state)
     }
     }
 }
