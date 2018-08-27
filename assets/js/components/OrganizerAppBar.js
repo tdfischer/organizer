@@ -20,7 +20,7 @@ const People = new Model('people')
 
 const mapStateToProps = state => {
     const currentUser = getCurrentUser(state)
-    const currentPerson = People.select(state).filterBy('email', currentUser.email).first()
+    const currentPerson = People.immutableSelect(state).get(currentUser.email)
     return {
         logged_in: getLoggedIn(state),
         current_user: currentUser,

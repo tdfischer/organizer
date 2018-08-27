@@ -19,7 +19,7 @@ class EventSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = models.Event
-        fields = ('id', 'url', 'timestamp', 'uid', 'location', 'instance_id',
+        fields = ('id', 'url', 'timestamp', 'end_timestamp', 'uid', 'location', 'instance_id',
                 'attendees', 'name', 'geo')
         extra_kwargs = {
             'geo': {'read_only': True}

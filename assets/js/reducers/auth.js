@@ -4,7 +4,7 @@ import * as Actions from '../actions'
 export default function(state = Immutable.Map(), action={}) {
     switch (action.type) {
     case Actions.RECEIVE_USER:
-        return state.mergeDeep({
+        return state.merge({
             loading: false,
             user: action.user
         })
@@ -15,7 +15,7 @@ export default function(state = Immutable.Map(), action={}) {
         const defaultUser = hasInline ? window.CURRENT_USER : {}
         return Immutable.Map({
             loading: false,
-            user: Immutable.fromJS(defaultUser),
+            user: defaultUser,
         }).mergeDeep(state)
     }
     }

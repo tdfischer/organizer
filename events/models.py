@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 from address.models import AddressField
+from django.utils import timezone
 from crm.models import Person
 from crm import geocache
 import django_rq
@@ -19,6 +20,7 @@ def updateEventGeo(eventID):
 class Event(models.Model):
     name = models.CharField(max_length=200)
     timestamp = models.DateTimeField()
+    end_timestamp = models.DateTimeField()
     attendees = models.ManyToManyField(Person, related_name='events', blank=True)
     uid = models.CharField(max_length=200, blank=True)
     location = AddressField(null=True, default=None, blank=True)

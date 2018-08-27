@@ -32,7 +32,7 @@ const States = new Model('states')
 
 const mapStateToProps = state => {
     const currentUser = getCurrentUser(state)
-    const currentPerson = People.select(state).filterBy('email', currentUser.email).first()
+    const currentPerson = People.immutableSelect(state).get(currentUser.email)
     const captainTurfs = _.filter(_.get(currentPerson, 'turf_memberships', []), {is_captain: true})
     return {
         currentUser,
@@ -58,10 +58,9 @@ const destinationStyles = {
 
 const messageListStateToProps = (state, _props) => {
     return {
-        messages: Broadcasts.select(state)
-            .all()
+        messages: Broadcasts.immutableSelect(state)
             .map(f => ({...f, sent_on: moment(f.sent_on)}))
-            .sortBy('-sent_on').slice
+            .sort((a, b) => a.sent_on > b.sent_on).toList().toJS()
     }
 }
 
@@ -77,11 +76,10 @@ const MessageList = connect(messageListStateToProps)(props => (
 
 const destinationStateToProps = state => {
     const currentUser = getCurrentUser(state)
-    const currentPerson = People.select(state).filterBy('email', currentUser.email).first()
-    console.log(currentPerson)
+    const currentPerson = People.immutableSelect(state).get(currentUser.email)
     const turfs = _.filter(_.get(currentPerson, 'turf_memberships', []), {is_captain: true})
-    const people = PeopleFilter.filtered(state, People.select(state).slice)
-    const states = States.select(state).all().slice
+    const people = PeopleFilter.filtered(state, People.immutableSelect(state)).toList().toJS()
+    const states = States.immutableSelect(state).toList().toJS()
     return {
         turfs,
         people,
@@ -153,12 +151,6 @@ export class CaptainIndex extends React.Component {
         this.props.broadcasts.fetchAll({author: this.props.currentUser.id})
     }
 
-    componentDidUpdate(oldProps) {
-        if (!_.isMatch(oldProps.currentUser, this.props.currentUser)) {
-            this.props.broadcasts.fetchAll({author: this.props.currentUser.id})
-        }
-    }
-
     onSubmit(values) {
         this.props.broadcasts.create({
             subject: values.subject,
@@ -179,7 +171,6 @@ export class CaptainIndex extends React.Component {
     }
 
     updateFilter(values) {
-        console.log(values)
         this.props.peopleFilter.set({
             state: values.filter.state, 
             current_turf: {id: values.filter.turf}

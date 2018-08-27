@@ -12,16 +12,17 @@ import { withStyles } from '@material-ui/core/styles'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import faCalendar from '@fortawesome/fontawesome-free-solid/faCalendar'
 import { library as faLibrary } from '@fortawesome/fontawesome'
+import distance from '@turf/distance'
 
 faLibrary.add(faCalendar)
 
-import EventCard from './EventCard'
 import { getCurrentUser } from '../selectors/auth'
 import MessageCard from './MessageCard'
 import { getCurrentLocation } from '../selectors/geocache'
 import { Geocache } from '../actions'
 import { Model } from '../store'
 import RawDataExpansionPanel from './RawDataExpansionPanel'
+import EventCard from './EventCard'
 
 const Events = new Model('events')
 const People = new Model('people')
@@ -73,22 +74,22 @@ export class OrganizerDashboard extends React.Component {
     }
 
     render() {
-        const upcomingEvents = _.map(this.props.upcomingEvents, evt => (
+        const upcomingEvents = this.props.upcomingEvents.map(evt => (
             <Grid key={evt.id} item>
                 <EventCard event_id={evt.id} onCheckIn={this.doCheckin} />
             </Grid>
         ))
-        const pastEvents = _.map(this.props.pastEvents, evt => (
+        const previousEvents = this.props.previousEvents.map(evt => (
             <Grid key={evt.id} item>
                 <EventCard event_id={evt.id} />
             </Grid>
         ))
-        const eventDisplay = (upcomingEvents.length > 0) ? upcomingEvents : <NoEvents />
+        const eventDisplay = (!upcomingEvents.isEmpty()) ? upcomingEvents.toArray() : <NoEvents />
         const recentBroadcast = _.head(this.props.myBroadcasts)
         return (
             <Grid className={this.props.classes.root} container direction="column" alignItems="stretch" spacing={8}>
                 <Grid item>
-                    <Grid container direction="column" alignItems="stretch" spacing={8}>
+                    <Grid container direction="column" justify="space-evenly" alignItems="stretch" spacing={8}>
                         {recentBroadcast ? <MessageCard message={recentBroadcast} /> : null}
                         <Grid item>
                             <Typography variant="title">Nearby and Upcoming Events</Typography>
@@ -103,7 +104,7 @@ export class OrganizerDashboard extends React.Component {
                         </ExpansionPanelSummary>
                         <ExpansionPanelDetails>
                             <Grid direction="column" alignItems="stretch" container spacing={8}>
-                                {pastEvents.length ? pastEvents : <NoEvents />}
+                                {previousEvents}
                                 {_.map(_.tail(this.props.myBroadcasts), m => (
                                     <MessageCard message={m} />
                                 ))}
@@ -119,26 +120,43 @@ export class OrganizerDashboard extends React.Component {
     }
 }
 
+function isWithinWindow(start, end) {
+    const eventWindow = {
+        start: start,
+        end: end
+    }
+    return evt => (
+        evt.timestamp.isSameOrBefore(eventWindow.end) &&
+        evt.end_timestamp.isSameOrAfter(eventWindow.start)
+    )
+}
+
 const mapStateToProps = state => {
     const currentUser = getCurrentUser(state)
-    const currentPerson = People.select(state).filterBy('email', currentUser.email).first()
-    const eventWindow = {
-        start: moment().add(-1, 'month'),
-        end: moment().add(1, 'month')
-    }
+    const currentPerson = People.immutableSelect(state).get(currentUser.email)
     const currentLocation = getCurrentLocation(state)
-    const relevantEvents = Events.select(state).filter(evt => moment(evt.timestamp).isBetween(eventWindow.start, eventWindow.end))
-    const pastEvents = relevantEvents.filter(evt => _.find(evt.attendees, currentUser.email) && moment(evt.timestamp).isBefore())
-    const upcomingEvents = relevantEvents.filter(evt => moment(evt.timestamp).isSameOrAfter(moment().add(-1, 'day'))).nearby(currentLocation)
+    const relevantEvents = Events.immutableSelect(state)
+        .filter(evt => !!evt.geo)
+        .map(evt => ({...evt, distance: distance(currentLocation ? currentLocation : evt.geo, evt.geo), end_timestamp: moment(evt.end_timestamp), timestamp: moment(evt.timestamp)}))
+        .filter(isWithinWindow(moment().add(-1, 'month'), moment().add(1, 'month')))
+        .sort((a, b) => a.distance > b.distance).cacheResult().toIndexedSeq()
+    const upcomingEvents = relevantEvents
+        .filter(isWithinWindow(moment().add(-1, 'hour'), moment().add(1, 'month')))
+    const previousEvents = relevantEvents
+        .filter(isWithinWindow(moment().add(-1, 'month'), moment().add(-1, 'hour')))
+        .reverse()
+
+    const myBroadcasts = Broadcasts.immutableSelect(state)
+        .filter(_.matchesProperty('turf', _.get(currentPerson, 'current_turf.id')))
+        .map(b => ({...b, sent_on: moment(b.sent_on)}))
+        .sort((a, b) => a.sent_on > b.sent_on)
+        .reverse()
     return {
         currentUser,
         currentPerson,
-        myBroadcasts: Broadcasts.select(state)
-            .filterBy('turf', _.get(currentPerson, 'current_turf.id'))
-            .map(f => ({...f, sent_on: moment(f.sent_on)}))
-            .sortBy('-sent_on').slice,
-        pastEvents: pastEvents.slice,
-        upcomingEvents: upcomingEvents.slice,
+        myBroadcasts: myBroadcasts.toArray(),
+        upcomingEvents,
+        previousEvents
     }
 }
 

@@ -3,7 +3,6 @@ import { compose, createStore, applyMiddleware } from 'redux'
 import organizerApp from '../reducers'
 import thunkMiddleware from 'redux-thunk'
 import { persistStore } from 'redux-persist'
-import { PersistGate } from 'redux-persist/integration/react'
 import { Provider } from 'react-redux'
 import createRavenMiddleware from 'raven-for-redux'
 import Raven from 'raven-js'
@@ -24,22 +23,21 @@ const composer = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
 export const history = createBrowserHistory()
 
-const store = createStore(
+export const store = createStore(
     connectRouter(history)(organizerApp),
     composer(applyMiddleware(createRavenMiddleware(Raven, {getUserContext: getCurrentUser} ), thunkMiddleware, routerMiddleware(history)))
 )
 
-const persistor = persistStore(store)
+export const persistor = persistStore(store)
 
 export const PersistentApp = (props) => (
     <Provider store={props.store}>
-        <PersistGate loading={null} persistor={props.persistor}>{props.children}</PersistGate>
+        {props.children}
     </Provider>
 )
 
 PersistentApp.defaultProps = {
     store: store,
-    persistor: persistor
 }
 
 if (module.hot) {

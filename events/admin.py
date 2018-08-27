@@ -6,7 +6,7 @@ from . import models
 
 class EventAdmin(admin.ModelAdmin):
     list_display = [
-        'name', 'timestamp', 'attendee_count'
+        'name', 'timestamp', 'end_timestamp', 'attendee_count'
     ]
 
     def attendee_count(self, obj):
