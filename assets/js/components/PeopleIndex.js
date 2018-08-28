@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Selectable , Filterable, Model } from '../store'
+import { Selectable , Filterable, Model, withModelData } from '../store'
 import _ from 'lodash'
 import { Form } from 'informed'
 import TextField from '@material-ui/core/TextField'
@@ -44,7 +44,6 @@ const mapStateToProps = state => {
     const selection = PeopleSelector.immutableSelected(state)
     const stateCounts = selection.groupBy(email => allPeople.get(email).state).map(v => v.size)
     return {
-        allPeople,
         allStates,
         stateCounts,
         selection,
@@ -117,11 +116,6 @@ export class PeopleIndex extends Component {
         copy(this.props.selection.join(', '))
     }
 
-    componentDidMount() {
-        this.props.people.fetchAll()
-        this.props.states.fetchAll()
-    }
-
     render() {
         const props = this.props
         return (
@@ -165,4 +159,11 @@ export class PeopleIndex extends Component {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(PeopleIndex)
+const mapPropsToModels = _props => {
+    return {
+        people: {},
+        states: {}
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(withModelData(mapPropsToModels)(PeopleIndex))

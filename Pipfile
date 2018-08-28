@@ -26,7 +26,7 @@ pytz = "==2017.2"
 requests = "*"
 six = "==1.10.0"
 webencodings = "==0.5.1"
-whitenoise = "==3.3.0"
+whitenoise = {version = "*", extras = ["brotli"]}
 "psycopg2" = "*"
 gunicorn = "*"
 "mailchimp3" = "*"

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Form, withFormState } from 'informed'
-import { Filterable, Model } from '../store'
+import { Filterable, Model, withModelData } from '../store'
 import _ from 'lodash'
 import gravatar from 'gravatar'
 import { connect } from 'react-redux'
@@ -33,7 +33,7 @@ const States = new Model('states')
 const mapStateToProps = state => {
     const currentUser = getCurrentUser(state)
     const currentPerson = People.immutableSelect(state).get(currentUser.email)
-    const captainTurfs = _.filter(_.get(currentPerson, 'turf_memberships', []), {is_captain: true})
+    const captainTurfs = _.get(currentPerson, 'turf_memberships', [])
     return {
         currentUser,
         currentPerson,
@@ -77,7 +77,7 @@ const MessageList = connect(messageListStateToProps)(props => (
 const destinationStateToProps = state => {
     const currentUser = getCurrentUser(state)
     const currentPerson = People.immutableSelect(state).get(currentUser.email)
-    const turfs = _.filter(_.get(currentPerson, 'turf_memberships', []), {is_captain: true})
+    const turfs = _.get(currentPerson, 'turf_memberships', [])
     const people = PeopleFilter.filtered(state, People.immutableSelect(state)).toList().toJS()
     const states = States.immutableSelect(state).toList().toJS()
     return {
@@ -87,7 +87,16 @@ const destinationStateToProps = state => {
     }
 }
 
-const DestinationEditor = connect(destinationStateToProps)(withStyles(destinationStyles)(withFormState((props => {
+const mapDestinationPropsToModels = props => {
+    return {
+        people: {
+            turf_memberships__turf: _.get(props.formState.values, props.field + '.turf'),
+            state__name: _.get(props.formState.values, props.field + '.state')
+        }
+    }
+}
+
+const DestinationEditor = connect(destinationStateToProps)(withStyles(destinationStyles)(withFormState((withModelData(mapDestinationPropsToModels)(props => {
     const selectedTurf = _.get(props.formState.values, props.field + '.turf')
     const turf = _.find(props.turfs, _.matchesProperty('turf', selectedTurf))
     const turfName = _.get(turf, 'name')
@@ -136,19 +145,13 @@ const DestinationEditor = connect(destinationStateToProps)(withStyles(destinatio
             </ExpansionPanelDetails>
         </ExpansionPanel>
     )
-}))))
+})))))
 
 export class CaptainIndex extends React.Component {
     constructor(props) {
         super(props)
         this.onSubmit = this.onSubmit.bind(this)
         this.updateFilter = _.debounce(this.updateFilter.bind(this), 500)
-    }
-
-    componentDidMount() {
-        this.props.people.fetchIfNeeded(this.props.currentUser.email)
-        this.props.states.fetchAll()
-        this.props.broadcasts.fetchAll({author: this.props.currentUser.id})
     }
 
     onSubmit(values) {
@@ -174,10 +177,6 @@ export class CaptainIndex extends React.Component {
         this.props.peopleFilter.set({
             state: values.filter.state, 
             current_turf: {id: values.filter.turf}
-        })
-        this.props.people.fetchAll({
-            turf_memberships__turf: values.filter.turf,
-            state__name: values.filter.state
         })
     }
 
@@ -219,4 +218,12 @@ const styles = {
     },
 }
 
-export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(CaptainIndex))
+const mapPropsToModels = props => {
+    return {
+        people: props.currentUser.email,
+        states: {},
+        broadcasts: {author: props.currentUser.id}
+    }
+}
+
+export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(withModelData(mapPropsToModels)(CaptainIndex)))

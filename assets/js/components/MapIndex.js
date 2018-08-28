@@ -1,7 +1,7 @@
 import React from 'react'
 import L from 'leaflet'
 import { connect } from 'react-redux'
-import { Model } from '../store'
+import { Model, withModelData } from '../store'
 import HeatmapLayer from 'react-leaflet-heatmap-layer'
 import LocalMap from './mapping/LocalMap'
 import gravatar from 'gravatar'
@@ -16,44 +16,34 @@ const MarkerClusterGroup = importedComponent(() => import('react-leaflet-markerc
 
 const People = new Model('people')
 
-export class MapIndex extends React.Component {
-    constructor(props) {
-        super(props)
-    }
-
-    componentDidMount() {
-        this.props.people.fetchAll()
-    }
-
-    render() {
-        const markers = this.props.allPeople.map(person => {
-            const position = getCoord(person.geo)
-            return {
-                position: position,
-                popup: person.name,
-                tooltip: person.name,
-                options: {
-                    icon: L.icon({
-                        iconUrl: gravatar.url(person.email, {s: 32, d: 'retro'}),
-                        iconAnchor: [16, 16]
-                    })
-                }
+export const MapIndex = props => {
+    const markers = props.allPeople.map(person => {
+        const position = getCoord(person.geo)
+        return {
+            position: position,
+            popup: person.name,
+            tooltip: person.name,
+            options: {
+                icon: L.icon({
+                    iconUrl: gravatar.url(person.email, {s: 32, d: 'retro'}),
+                    iconAnchor: [16, 16]
+                })
             }
-        }).toArray()
+        }
+    }).toArray()
 
-        return (
-            <div className="membership-map">
-                <LocalMap>
-                    <HeatmapLayer
-                        latitudeExtractor={(p) => p.position[0]}
-                        longitudeExtractor={(p) => p.position[1]}
-                        intensityExtractor={(_p) => 50}
-                        points={markers} />
-                    <MarkerClusterGroup markers={markers} />
-                </LocalMap>
-            </div>
-        )
-    }
+    return (
+        <div className="membership-map">
+            <LocalMap>
+                <HeatmapLayer
+                    latitudeExtractor={(p) => p.position[0]}
+                    longitudeExtractor={(p) => p.position[1]}
+                    intensityExtractor={(_p) => 50}
+                    points={markers} />
+                <MarkerClusterGroup markers={markers} />
+            </LocalMap>
+        </div>
+    )
 }
 
 const mapStateToProps = (state) => {
@@ -78,4 +68,10 @@ MapIndex.defaultProps = {
     currentUser: {}
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(MapIndex)
+const mapModelToFetch = _props => {
+    return {
+        people: {}
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(withModelData(mapModelToFetch)(MapIndex))
