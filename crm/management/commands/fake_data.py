@@ -9,21 +9,29 @@ import uuid
 
 from crm import models
 from events.models import Event
+fake = Faker()
 
 class Command(BaseCommand):
     def create_model(self, Model, count, fakers):
         ret = []
         for i in range(0, count):
             args = {}
-            for argName,genFunc in fakers.iteritems():
-                args[argName] = genFunc()
+            fakedItemsIter = iter([])
+            if callable(fakers):
+                fakedItemsIter = fakers().iteritems()
+            else:
+                fakedItemsIter = fakers.iteritems()
+            for argName,genFunc in fakedItemsIter:
+                if callable(genFunc):
+                    args[argName] = genFunc()
+                else:
+                    args[argName] = genFunc
             ret.append(Model.objects.create(**args))
         return ret
 
     def handle(self, *args, **options):
         if not settings.DEBUG:
                 raise EnvironmentError("I won't allow you to run fake_data without setting the DEBUG environment variable.")
-        fake = Faker()
         states = self.create_model(models.PersonState, 4, {
             'name': fake.word
         })
@@ -45,11 +53,16 @@ class Command(BaseCommand):
             models.TurfMembership.objects.create(person=person,
                     turf=random.choice(turfs))
 
-        self.create_model(Event, 20, {
-            'name': fake.catch_phrase,
-            'location': fake.address,
-            'lat': lambda: random.randfloat(-121, -123),
-            'lng': lambda: random.randfloat(36, 38),
-            'timestamp': lambda: timezone.now() + timedelta(hours=random.randint(-72, 72)),
-            'uid': fake.uuid4
-        })
+        self.create_model(Event, 20, fakeEventData)
+
+def fakeEventData():
+    start = timezone.now() + timedelta(hours=random.randint(-72, 72))
+    return {
+        'name': fake.catch_phrase(),
+        'location': fake.address(),
+        'lat': random.triangular(37, 38),
+        'lng': random.triangular(-123, -122),
+        'timestamp': start,
+        'end_timestamp': start + timedelta(hours=1),
+        'uid': fake.uuid4
+    }
