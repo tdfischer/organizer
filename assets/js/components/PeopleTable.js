@@ -12,20 +12,51 @@ import TableHead from '@material-ui/core/TableHead'
 import Checkbox from '@material-ui/core/Checkbox'
 import ColorHash from 'color-hash'
 
-import { Model, Filterable, Selectable } from '../store'
+import { Model, Filterable, Selectable, withModelData } from '../store'
 
-const matchAny = (obj, pattern) => {
-    try {
-        const regex = new RegExp(pattern)
-        return !!_.find(_.values(obj), (value) => {
-            if (_.isString(value)) {
-                return value.match(regex)
-            }
-            return matchAny(value, pattern)
-        })
-    } catch (SyntaxError) {
-        // nothing 
+const matchOrContains = (needle, haystack) => {
+    if (typeof(haystack) == 'string') {
+        return haystack.match(needle)
+    } else if (haystack instanceof Array) {
+        return _.reduce(haystack, (acc, stack) => acc || matchOrContains(needle, stack), false)
+    } else {
+        return false
     }
+}
+
+const isEqual = (needle, haystack) => {
+    if (typeof(haystack) == 'string') {
+        return haystack == needle
+    } else if (haystack instanceof Array) {
+        return haystack.indexOf(needle) != -1
+    } else {
+        return false
+    }
+}
+
+const makeComparator = ({property, op, value}) => {
+    if (property == undefined) {
+        return () => true
+    }
+    switch (op) {
+    case 'contains':
+        return (row) => matchOrContains(value, _.get(row, property))
+    case 'is':
+        return (row) => isEqual(value, _.get(row, property))
+    case undefined:
+        return () => true
+    default:
+        throw Error('Unknown operator ' + op)
+    }
+}
+
+const makePatternMatcher = _.memoize(patterns => {
+    const comparators = _.map(patterns, makeComparator)
+    return obj => _.reduce(comparators, (acc, comparator) => acc && comparator(obj), true)
+}, patterns => _.flatMap(patterns, p => [p.property, p.op, p.value]).join('.'))
+
+const matchPattern = (obj, patterns) => {
+    return makePatternMatcher(patterns)(obj)
 }
 
 const hasher = new ColorHash()
@@ -33,7 +64,7 @@ const personHasher = new ColorHash({lightness: 0.8})
 
 const People = new Model('people')
 const PeopleSelector = new Selectable('people')
-const PeopleFilter = new Filterable('people', matchAny)
+const PeopleFilter = new Filterable('people', matchPattern)
 
 const TagList = props => (
     _.map(props.tags, tag => <Chip key={tag} className="tag" label={tag} />)
@@ -94,10 +125,10 @@ export const PeopleTable = props => (
     </Table>
 )
 
-const mapStateToProps = (state, props) => {
+const mapStateToProps = (state, _props) => {
     // Select all people with this state
     const allPeople = People.immutableSelect(state)
-    const myPeople = allPeople.filter(_.matchesProperty('state', props.state))
+    const myPeople = PeopleFilter.filtered(state, allPeople).cacheResult()
 
     // Grab list of selected IDs
     const selection = PeopleSelector.immutableSelected(state).filter(myPeople.has).toList()
@@ -121,7 +152,12 @@ const mapDispatchToProps = dispatch => {
 
 PeopleTable.propTypes = {
     filteredPeople: ImmutablePropTypes.seq.isRequired,
-    state: PropTypes.string.isRequired
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(PeopleTable)
+const mapPropsToModels = _props => {
+    return {
+        people: {}
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(withModelData(mapPropsToModels)(PeopleTable))
