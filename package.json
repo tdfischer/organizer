@@ -80,6 +80,7 @@
     "react-places-autocomplete": "^7.1.1",
     "react-redux": "^5.0.5",
     "react-router-dom": "^4.2.2",
+    "react-virtualized": "^9.20.1",
     "redux": "^4.0.0",
     "redux-immutable": "^4.0.0",
     "redux-mock-store": "^1.5.3",

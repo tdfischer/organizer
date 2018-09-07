@@ -85,7 +85,7 @@ const ErrorWrapper = withStyles(errorStyles)(ErrorWrapperBase)
 export const App = _props => (
     <div className="the-app">
         <OrganizerAppBar />
-        <div className="viewport">
+        <div className="viewport" id="viewport">
             <div className="scroll">
                 <AppRoutes />
             </div>
