@@ -1,11 +1,4 @@
 import { createSelector } from 'reselect'
-import _ from 'lodash'
-import _memoize from 'lodash/memoize'
-import _fromPairs from 'lodash/fromPairs'
-import _map from 'lodash/map'
-import _get from 'lodash/get'
-import _isEmpty from 'lodash/isEmpty'
-import _pickBy from 'lodash/pickBy'
 import { bindActionCreators } from 'redux'
 import { point } from '@turf/helpers'
 import { getCoord } from '@turf/invariant'
@@ -38,14 +31,14 @@ function queuedFetch() {
 
 const getAllModels = state => state.getIn(['model', 'models'])
 
-const modelGetter = _memoize((name) => {
+const modelGetter = (name) => {
     return createSelector(
         [getAllModels],
         models => {
             return models.get(name, Immutable.Map())
         }
     )
-})
+}
 
 export default class Model {
     constructor(name, options = {}) {
@@ -59,8 +52,8 @@ export default class Model {
 
     bindActionCreators(dispatch) {
         const funcNames = ['saving', 'saved', 'save', 'fetchOne', 'fetchIfNeeded', 'fetchAll', 'update', 'create', 'updateAndSave', 'request', 'receive']
-        const funcPairs = _map(funcNames, name => [name, this[name].bind(this)])
-        const bindable = _fromPairs(funcPairs)
+        var bindable = {}
+        funcNames.forEach(name => bindable[name] = this[name].bind(this))
         return bindActionCreators(bindable, dispatch)
     }
 
@@ -118,7 +111,7 @@ export default class Model {
             return queuedFetch('/api/'+this.name+'/'+id+'/', {credentials: 'include'})
                 .then(response => response.json())
                 .then(json => {
-                    if (!_.isEmpty(json))
+                    if (Object.keys(json).length > 0)
                         return dispatch(this.receive([json]))
                 })
         }
@@ -127,9 +120,11 @@ export default class Model {
     fetchAll(params = {}) {
         return dispatch => {
             dispatch(this.request())
-            const url = _get(this.options, 'url', '/api/'+this.name+'/')
-            const urlParams = new URLSearchParams(Object.entries(_pickBy(params, p => p != undefined)))
-            console.groupCollapsed('GET %s page=%s', this.name, _get(params, 'page', 1))
+            const url = this.options.url || '/api/'+this.name+'/'
+            const cleanParams = []
+            Object.entries(params).forEach(([k, v]) => {if (v != undefined) cleanParams.push([k, v])})
+            const urlParams = new URLSearchParams(cleanParams)
+            console.groupCollapsed('GET %s page=%s', this.name, params.page || 1)
             console.log(params)
             console.groupEnd()
             return queuedFetch(url+'?'+urlParams, {credentials: 'include'})
@@ -207,7 +202,7 @@ export default class Model {
             return queuedFetch('/api/'+this.name+'/', data)
                 .then(response => response.json())
                 .then(json => {
-                    if (!_isEmpty(json)) {
+                    if (Object.keys(json).length > 0) {
                         dispatch(this.update(json.id, json))
                         return Promise.resolve(json.id)
                     }

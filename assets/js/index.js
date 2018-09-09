@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom'
 import '../scss/app.scss'
 
 import App from './components/App'
-import { PersistentApp } from './store'
 
 import Raven from 'raven-js'
 
@@ -21,8 +20,6 @@ if ('serviceWorker' in navigator) {
 }
 
 ReactDOM.render(
-    <PersistentApp>
-        <App />
-    </PersistentApp>,
+    <App />,
     document.getElementById('container')
 )

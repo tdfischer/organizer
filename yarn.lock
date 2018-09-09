@@ -1548,10 +1548,6 @@ balanced-match@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/balanced-match/-/balanced-match-1.0.0.tgz#89b4d199ab2bee49de164ea02b89ce462d71b767"
 
-base-64@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/base-64/-/base-64-0.1.0.tgz#780a99c84e7d600260361511c4877613bf24f6bb"
-
 base64-js@0.0.8:
   version "0.0.8"
   resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-0.0.8.tgz#1101e9544f4a76b1bc3b26d452ca96d7a35e7978"
@@ -6464,13 +6460,6 @@ lcid@^1.0.0:
   dependencies:
     invert-kv "^1.0.0"
 
-leaflet-geosearch@^2.6.0:
-  version "2.7.0"
-  resolved "https://registry.yarnpkg.com/leaflet-geosearch/-/leaflet-geosearch-2.7.0.tgz#0f7b319486ea344b00639b84b338b4087bf6b839"
-  dependencies:
-    lodash.debounce "^4.0.8"
-    nodent-runtime "^3.0.4"
-
 leaflet.locatecontrol@^0.62.0:
   version "0.62.0"
   resolved "https://registry.yarnpkg.com/leaflet.locatecontrol/-/leaflet.locatecontrol-0.62.0.tgz#cf0c65170a87f2ed4b1a59e3307b773cd268d27d"
@@ -7508,10 +7497,6 @@ node-sass@^4.9.0:
 node-status-codes@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/node-status-codes/-/node-status-codes-1.0.0.tgz#5ae5541d024645d32a58fcddc9ceecea7ae3ac2f"
-
-nodent-runtime@^3.0.4:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/nodent-runtime/-/nodent-runtime-3.2.1.tgz#9e2755d85e39f764288f0d4752ebcfe3e541e00e"
 
 nomnom@^1.8.1:
   version "1.8.1"

@@ -1,21 +1,38 @@
 import React from 'react'
 import importedComponent from 'react-imported-component'
-import { connect } from 'react-redux'
 import { hot } from 'react-hot-loader'
 
-import { getLoggedIn } from '../selectors/auth'
 import { withStyles } from '@material-ui/core/styles'
 import Raven from 'raven-js'
 import { library as faLibrary } from '@fortawesome/fontawesome'
 import faTimes from '@fortawesome/fontawesome-free-solid/faTimes'
-import Button from '@material-ui/core/Button'
+import AppBar from '@material-ui/core/AppBar'
+import Toolbar from '@material-ui/core/Toolbar'
+import BottomNavigation from '@material-ui/core/BottomNavigation'
+import BottomNavigationAction from '@material-ui/core/BottomNavigationAction'
+import CircularProgress from '@material-ui/core/CircularProgress'
 
 faLibrary.add(faTimes)
 
-const LoginSplash = importedComponent(() => import('./LoginSplash'))
+const EmptyAppBar = _props => (
+    <AppBar style={{position: 'initial'}}>
+        <Toolbar><CircularProgress /> Organizer</Toolbar>
+    </AppBar>
+)
+const EmptyBottomBar = _props => (
+    <BottomNavigation
+        className="bottom-nav">
+        <BottomNavigationAction value="/" icon={<i className="fa fa-user-circle" />}  label="Organizer" />
+    </BottomNavigation>
+)
+const Button = importedComponent(() => import('@material-ui/core/Button'))
 const AppRoutes = importedComponent(() => import('./AppRoutes'))
-const OrganizerAppBar = importedComponent(() => import('./OrganizerAppBar'))
-const OrganizerBottomNav = importedComponent(() => import('./OrganizerBottomNav'))
+const OrganizerAppBar = importedComponent(() => import('./OrganizerAppBar'), {
+    LoadingComponent: EmptyAppBar
+})
+const OrganizerBottomNav = importedComponent(() => import('./OrganizerBottomNav'), {
+    LoadingComponent: EmptyBottomBar
+})
 
 class ErrorWrapperBase extends React.Component {
     constructor(props) {
@@ -65,29 +82,21 @@ const errorStyles = {
 
 const ErrorWrapper = withStyles(errorStyles)(ErrorWrapperBase)
 
-export const App = props => (
-    props.logged_in ? (
-        <div className="the-app">
-            <OrganizerAppBar />
-            <div className="viewport">
-                <div className="scroll">
-                    <AppRoutes />
-                </div>
+export const App = _props => (
+    <div className="the-app">
+        <OrganizerAppBar />
+        <div className="viewport">
+            <div className="scroll">
+                <AppRoutes />
             </div>
-            <OrganizerBottomNav />
         </div>
-    ) : <LoginSplash />
+        <OrganizerBottomNav />
+    </div>
 )
 
-
-const mapStateToProps = state => {
-    return {
-        logged_in: getLoggedIn(state)
-    }
-}
 
 const RouterApp = (props) => (
     <ErrorWrapper><App {...props} /></ErrorWrapper>
 )
 
-export default hot(module)(connect(mapStateToProps)(RouterApp))
+export default hot(module)(RouterApp)

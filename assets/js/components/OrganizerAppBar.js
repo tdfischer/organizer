@@ -9,7 +9,7 @@ import { withStyles } from '@material-ui/core/styles'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import gravatar from 'gravatar'
-import _ from 'lodash'
+import { withProvider } from '../store'
 
 import BusyIndicator from './BusyIndicator'
 import { logout } from '../actions'
@@ -32,19 +32,25 @@ const mapDispatchToProps = dispatch => {
     return bindActionCreators({logout}, dispatch)
 }
 
-const OrganizerAppBar = connect(mapStateToProps, mapDispatchToProps)((props) => (
+const OrganizerAppBar = (props) => (
     <AppBar style={{position: 'initial'}}>
         <Toolbar>
             <IconButton><Avatar src={gravatar.url(props.current_user.email, {s: 32, d: 'retro'})}/></IconButton>
             <div className={props.classes.flex}>
-                <Typography color="inherit" variant="title">{_.get(props.currentPerson, 'name')}</Typography>
+                <Typography color="inherit" variant="title">{props.currentPerson.name || ''}</Typography>
                 <Typography color="inherit" variant="subheading">{props.current_user.email}</Typography>
             </div>
             <BusyIndicator />
             <Button onClick={() => props.logout()}>Logout</Button>
         </Toolbar>
     </AppBar>
-))
+)
+
+OrganizerAppBar.defaultProps = {
+    currentPerson: {},
+    current_user: {},
+    logged_in: false
+}
 
 const styles = {
     flex: {
@@ -52,4 +58,4 @@ const styles = {
     }
 }
 
-export default withStyles(styles)(OrganizerAppBar)
+export default withProvider(withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(OrganizerAppBar)))

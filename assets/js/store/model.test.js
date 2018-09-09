@@ -1,4 +1,3 @@
-import _ from 'lodash'
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 import fetchMock from 'fetch-mock'
@@ -8,11 +7,15 @@ import organizerApp from '../reducers'
 
 const mockStore = configureMockStore([thunk])
 
+beforeEach(() => {
+    fetchMock.restore()
+})
+
 it('should bind action creators', () => {
     const func = jest.fn()
     const model = new Model('test')
     const boundCalls = model.bindActionCreators(func)
-    _.each(boundCalls, c => c())
+    Object.values(boundCalls).forEach(c => c())
     expect(func).toHaveBeenCalledTimes(11)
 })
 

@@ -2,7 +2,6 @@ import React from 'react'
 import Button from '@material-ui/core/Button'
 import Divider from '@material-ui/core/Divider'
 import Paper from '@material-ui/core/Paper'
-import _ from 'lodash'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { library as faLibrary } from '@fortawesome/fontawesome'
 import faDiscourse from '@fortawesome/fontawesome-free-brands/faDiscourse'
@@ -20,7 +19,7 @@ export const LoginSplash = (_props) => (
         <p><EBFESymbol style={{width: 'auto', 'height': '4rem'}}/></p>
         <p>Please sign in with your EBFE account to continue.</p>
         <p />
-        {_.map(_.toPairs(window.LOGIN_URLS), ([name, url]) => (
+        {Object.entries(window.LOGIN_URLS || []).map(([name, url]) => (
             <p key={name}><Button
                 variant="contained"
                 href={url}>

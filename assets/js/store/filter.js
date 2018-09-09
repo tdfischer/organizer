@@ -1,5 +1,3 @@
-import _ from 'lodash'
-
 export const SET_FILTER = 'SET_FILTER'
 
 export const setFilter = (key, filter) => {
@@ -10,8 +8,10 @@ export const setFilter = (key, filter) => {
     }
 }
 
+const isEqual = (a, b) => a == b
+
 export default class Filterable {
-    constructor(key, matcher = _.isMatch) {
+    constructor(key, matcher = isEqual) {
         this.key = key
         this.matcher = matcher
     }

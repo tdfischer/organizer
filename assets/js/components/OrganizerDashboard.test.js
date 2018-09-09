@@ -4,5 +4,5 @@ import { OrganizerDashboard } from './OrganizerDashboard'
 import Immutable from 'immutable'
 
 it('should render default state', () => {
-    shallow(<OrganizerDashboard classes={{}} upcomingEvents={Immutable.Map()} previousEvents={Immutable.Map()} currentUser={{}} />)
+    shallow(<OrganizerDashboard myBroadcasts={Immutable.List()} classes={{}} upcomingEvents={Immutable.Map()} previousEvents={Immutable.Map()} currentUser={{}} />)
 })
