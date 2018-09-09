@@ -9,12 +9,12 @@ import { withStyles } from '@material-ui/core/styles'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import gravatar from 'gravatar'
-import { withProvider } from '../store'
+import { withProvider } from '../../store'
 
 import BusyIndicator from './BusyIndicator'
-import { logout } from '../actions'
-import { getCurrentUser, getLoggedIn } from '../selectors/auth'
-import { Model } from '../store'
+import { logout } from '../../actions'
+import { getCurrentUser, getLoggedIn } from '../../selectors/auth'
+import { Model } from '../../store'
 
 const People = new Model('people')
 

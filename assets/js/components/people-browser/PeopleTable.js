@@ -10,7 +10,7 @@ import { WindowScroller, Column, Table } from 'react-virtualized'
 
 import 'react-virtualized/styles.css'
 
-import { Model, Filterable, Selectable, withModelData } from '../store'
+import { Model, Filterable, Selectable, withModelData } from '../../store'
 
 const matchOrContains = (needle, haystack) => {
     if (typeof(haystack) == 'string') {

@@ -9,8 +9,8 @@ import { getCoord } from '@turf/invariant'
 
 import EventCard from './EventCard'
 import NoEvents from './NoEvents'
-import { getCurrentLocation } from '../selectors/geocache'
-import { Model, withModelData } from '../store'
+import { getCurrentLocation } from '../../selectors/geocache'
+import { Model, withModelData } from '../../store'
 
 const Events = new Model('events')
 

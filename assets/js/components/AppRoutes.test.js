@@ -1,6 +1,6 @@
 import React from 'react'
 import { AppRoutes } from './AppRoutes'
-import LoginSplash  from './LoginSplash'
+import LoginSplash  from './chrome/LoginSplash'
 import { withProvider } from '../store'
 import { mount } from 'enzyme'
 

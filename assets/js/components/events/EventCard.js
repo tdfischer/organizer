@@ -23,11 +23,11 @@ import faLocationArrow from '@fortawesome/fontawesome-free-solid/faLocationArrow
 import importedComponent from 'react-imported-component'
 import gravatar from 'gravatar'
 
-const MarkerMap = importedComponent(() => import('./mapping/MarkerMap'))
+const MarkerMap = importedComponent(() => import('../mapping/MarkerMap'))
 
-import { getCurrentLocation } from '../selectors/geocache'
-import { getCurrentUser } from '../selectors/auth'
-import { Model, withModelData } from '../store'
+import { getCurrentLocation } from '../../selectors/geocache'
+import { getCurrentUser } from '../../selectors/auth'
+import { Model, withModelData } from '../../store'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 faLibrary.add(faCalendar, faCalendarCheck, faLocationArrow)

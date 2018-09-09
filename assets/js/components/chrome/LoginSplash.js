@@ -10,7 +10,7 @@ import faGithub from '@fortawesome/fontawesome-free-brands/faGithub'
 
 import './LoginSplash.scss'
 
-import EBFESymbol from 'svg-react-loader!../../img/symbol.svg'
+import EBFESymbol from 'svg-react-loader!../../../img/symbol.svg'
 
 faLibrary.add(faDiscourse, faSlack, faGithub)
 

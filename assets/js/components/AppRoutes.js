@@ -17,7 +17,7 @@ const OrganizerDashboard = importedComponent(() => import('./OrganizerDashboard'
 })
 const PeopleIndex = importedComponent(() => import('./PeopleIndex'))
 const CaptainIndex = importedComponent(() => import('./CaptainIndex'))
-export const LoginSplash = importedComponent(() => import('./LoginSplash'), {
+export const LoginSplash = importedComponent(() => import('./chrome/LoginSplash'), {
     LoadingComponent: LoadingDisplay
 })
 

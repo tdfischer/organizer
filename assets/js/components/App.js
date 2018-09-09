@@ -27,10 +27,10 @@ const EmptyBottomBar = _props => (
 )
 const Button = importedComponent(() => import('@material-ui/core/Button'))
 const AppRoutes = importedComponent(() => import('./AppRoutes'))
-const OrganizerAppBar = importedComponent(() => import('./OrganizerAppBar'), {
+const OrganizerAppBar = importedComponent(() => import('./chrome/OrganizerAppBar'), {
     LoadingComponent: EmptyAppBar
 })
-const OrganizerBottomNav = importedComponent(() => import('./OrganizerBottomNav'), {
+const OrganizerBottomNav = importedComponent(() => import('./chrome/OrganizerBottomNav'), {
     LoadingComponent: EmptyBottomBar
 })
 
