@@ -8,6 +8,7 @@ import _isEmpty from 'lodash/isEmpty'
 import _pickBy from 'lodash/pickBy'
 import { bindActionCreators } from 'redux'
 import { point } from '@turf/helpers'
+import { getCoord } from '@turf/invariant'
 
 import { csrftoken } from '../Django'
 import Queue from 'promise-queue'
@@ -53,13 +54,7 @@ export default class Model {
     }
 
     immutableSelect(state) {
-        return modelGetter(this.name)(state).toKeyedSeq().map(m => {
-            const geo = (m.geo && m.geo.lat && m.geo.lng) ? point([m.geo.lat, m.geo.lng]) : undefined
-            return {
-                ...m,
-                geo: geo
-            }
-        })
+        return modelGetter(this.name)(state).toKeyedSeq().map(m => this.deserializeGeo(m))
     }
 
     bindActionCreators(dispatch) {
@@ -164,11 +159,34 @@ export default class Model {
                 dispatch({
                     type: UPDATE_MODEL,
                     id: id,
-                    data: dataOrCallback,
+                    data: this.serializeGeo(dataOrCallback),
                     name: this.name
                 })
                 return Promise.resolve()
             }
+        }
+    }
+
+    serializeGeo(data) {
+        if (data.geo) {
+            const coords = getCoord(data.geo)
+            return {
+                ...data,
+                geo: {
+                    lat: coords[0],
+                    lng: coords[1]
+                }
+            }
+        }
+        return data
+    }
+
+    deserializeGeo(data) {
+        const geo = data.geo
+        const parsed = (geo) ? point([geo.lat, geo.lng]) : undefined
+        return {
+            ...data,
+            geo: parsed
         }
     }
 

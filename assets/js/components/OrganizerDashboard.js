@@ -9,45 +9,17 @@ import { bindActionCreators } from 'redux'
 import _ from 'lodash'
 import moment from 'moment'
 import { withStyles } from '@material-ui/core/styles'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import faCalendar from '@fortawesome/fontawesome-free-solid/faCalendar'
-import { library as faLibrary } from '@fortawesome/fontawesome'
-import distance from '@turf/distance'
 
-faLibrary.add(faCalendar)
-
-import { getCurrentUser } from '../selectors/auth'
 import MessageCard from './MessageCard'
-import { getCurrentLocation } from '../selectors/geocache'
+import { getCurrentUser } from '../selectors/auth'
 import { Geocache } from '../actions'
 import { Model, withModelData } from '../store'
 import RawDataExpansionPanel from './RawDataExpansionPanel'
-import EventCard from './EventCard'
+import EventList from './EventList'
 
-const Events = new Model('events')
 const People = new Model('people')
+const Events = new Model('events')
 const Broadcasts = new Model('broadcasts')
-
-const noEventsStyles = {
-    root: {
-        backgroundColor: '#ddd',
-        color: '#aaa',
-        textAlign: 'center',
-        padding: '3rem'
-    },
-    icon: {
-        height: '4rem',
-        width: 'auto'
-    }
-}
-
-const NoEvents = withStyles(noEventsStyles)(props => (
-    <div className={props.classes.root}>
-        <FontAwesomeIcon icon={['fa', 'calendar']}  className={props.classes.icon} />
-        <p>No events.</p>
-        <p><em>Go make some trouble.</em></p>
-    </div>
-))
 
 export class OrganizerDashboard extends React.Component {
     componentDidMount() {
@@ -60,33 +32,19 @@ export class OrganizerDashboard extends React.Component {
             ...evt,
             attendees: [
                 ...evt.attendees, 
-                this.props.currentPerson.email
+                this.props.currentUser.email
             ]
         })
     }
 
     render() {
-        const upcomingEvents = this.props.upcomingEvents.map(evt => (
-            <Grid key={evt.id} item>
-                <EventCard event_id={evt.id} onCheckIn={this.doCheckin} />
-            </Grid>
-        ))
-        const previousEvents = this.props.previousEvents.map(evt => (
-            <Grid key={evt.id} item>
-                <EventCard event_id={evt.id} />
-            </Grid>
-        ))
-        const eventDisplay = (!upcomingEvents.isEmpty()) ? upcomingEvents.toArray() : <NoEvents />
         const recentBroadcast = _.head(this.props.myBroadcasts)
         return (
             <Grid className={this.props.classes.root} container direction="column" alignItems="stretch" spacing={8}>
                 <Grid item>
                     <Grid container direction="column" justify="space-evenly" alignItems="stretch" spacing={8}>
                         {recentBroadcast ? <MessageCard message={recentBroadcast} /> : null}
-                        <Grid item>
-                            <Typography variant="title">Nearby and Upcoming Events</Typography>
-                        </Grid>
-                        {eventDisplay}
+                        <EventList start={moment()} end={moment().add(1, 'month')} onCheckin={this.onCheckin} />
                     </Grid>
                 </Grid>
                 <Grid item>
@@ -96,7 +54,7 @@ export class OrganizerDashboard extends React.Component {
                         </ExpansionPanelSummary>
                         <ExpansionPanelDetails>
                             <Grid direction="column" alignItems="stretch" container spacing={8}>
-                                {previousEvents}
+                                <EventList start={moment().add(-1, 'month')} end={moment()} onCheckin={this.onCheckin} />
                                 {_.map(_.tail(this.props.myBroadcasts), m => (
                                     <MessageCard message={m} />
                                 ))}
@@ -112,49 +70,25 @@ export class OrganizerDashboard extends React.Component {
     }
 }
 
-function isWithinWindow(start, end) {
-    const eventWindow = {
-        start: start,
-        end: end
-    }
-    return evt => (
-        evt.timestamp.isSameOrBefore(eventWindow.end) &&
-        evt.end_timestamp.isSameOrAfter(eventWindow.start)
-    )
-}
-
 const mapStateToProps = state => {
     const currentUser = getCurrentUser(state)
     const currentPerson = People.immutableSelect(state).get(currentUser.email)
-    const currentLocation = getCurrentLocation(state)
-    const relevantEvents = Events.immutableSelect(state)
-        .filter(evt => !!evt.geo)
-        .map(evt => ({...evt, distance: distance(currentLocation ? currentLocation : evt.geo, evt.geo), end_timestamp: moment(evt.end_timestamp), timestamp: moment(evt.timestamp)}))
-        .filter(isWithinWindow(moment().add(-1, 'month'), moment().add(1, 'month')))
-        .sort((a, b) => a.distance > b.distance).cacheResult().toIndexedSeq()
-    const upcomingEvents = relevantEvents
-        .filter(isWithinWindow(moment().add(-1, 'hour'), moment().add(1, 'month')))
-    const previousEvents = relevantEvents
-        .filter(isWithinWindow(moment().add(-1, 'month'), moment().add(-1, 'hour')))
-        .reverse()
 
     const myBroadcasts = Broadcasts.immutableSelect(state)
         .filter(_.matchesProperty('turf', _.get(currentPerson, 'current_turf.id')))
         .map(b => ({...b, sent_on: moment(b.sent_on)}))
         .sort((a, b) => a.sent_on > b.sent_on)
         .reverse()
+
     return {
         currentUser,
         currentPerson,
         myBroadcasts: myBroadcasts.toArray(),
-        upcomingEvents,
-        previousEvents
     }
 }
 
 const mapDispatchToProps = dispatch => {
     return {
-        people: People.bindActionCreators(dispatch),
         broadcasts: Broadcasts.bindActionCreators(dispatch),
         events: Events.bindActionCreators(dispatch),
         ...bindActionCreators({
@@ -172,17 +106,9 @@ const styles = {
 }
 
 const mapPropsToModels = props => {
-    const eventWindow = {
-        start: moment().add(-1, 'month'),
-        end: moment().add(1, 'month')
-    }
     return {
         people: props.currentUser.email,
         broadcasts: {},
-        events: {
-            timestamp__gte: eventWindow.start.toISOString(),
-            timestamp__lte: eventWindow.end.toISOString()
-        }
     }
 }
 

@@ -17,14 +17,8 @@ faLibrary.add(faDiscourse, faSlack, faGithub)
 
 export const LoginSplash = (_props) => (
     <Paper className="app-splash">
-        <h1>East Bay for Everyone <div className="pop">Organizer</div></h1>
-        <p>The housing shortage is not an unintended policy failure. The Bay Area
-      has a housing shortage because of decades of voting and organizing against
-      housing. The solution is to organize for housing.</p>
-        <p>East Bay for Everyone Organizer helps people organize for housing.</p>
-        <Divider />
         <p><EBFESymbol style={{width: 'auto', 'height': '4rem'}}/></p>
-        <p>Please sign in to continue.</p>
+        <p>Please sign in with your EBFE account to continue.</p>
         <p />
         {_.map(_.toPairs(window.LOGIN_URLS), ([name, url]) => (
             <p key={name}><Button
@@ -34,6 +28,13 @@ export const LoginSplash = (_props) => (
                 <FontAwesomeIcon icon={['fab', name]} style={{height: '2rem', width: 'auto'}}/>
             </Button></p>
         ))}
+        <p><em><a href="https://eastbayforeveryone.org/join">Not a member?</a></em></p>
+        <Divider />
+        <h1>East Bay for Everyone <div className="pop">Organizer</div></h1>
+        <p>The housing shortage is not an unintended policy failure. The Bay Area
+      has a housing shortage because of decades of voting and organizing against
+      housing. The solution is to organize for housing.</p>
+        <p>East Bay for Everyone Organizer helps people organize for housing.</p>
         <p className="github-link"><a href="https://github.com/tdfischer/organizer/"><FontAwesomeIcon icon={['fab', 'github']} /></a></p>
     </Paper>
 )
