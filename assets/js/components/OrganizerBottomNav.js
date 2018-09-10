@@ -3,9 +3,10 @@ import BottomNavigation from '@material-ui/core/BottomNavigation'
 import BottomNavigationAction from '@material-ui/core/BottomNavigationAction'
 import Icon from '@material-ui/core/Icon'
 import { push } from 'connected-react-router'
-import { connect } from 'react-redux'
+import { connect} from 'react-redux'
 import { getCurrentUser } from '../selectors/auth'
 import PropTypes from 'prop-types'
+import { withProvider } from '../store'
 
 import { library as faLibrary } from '@fortawesome/fontawesome'
 import faUsers from '@fortawesome/fontawesome-free-solid/faUsers'
@@ -53,4 +54,4 @@ OrganizerBottomNav.defaultProps = {
     currentUser: {}
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(OrganizerBottomNav)
+export default withProvider(connect(mapStateToProps, mapDispatchToProps)(OrganizerBottomNav))

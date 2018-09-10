@@ -9,7 +9,6 @@ import Raven from 'raven-js'
 import _model from './model'
 import _selectable from './select'
 import _filterable from './filter'
-import _ from 'lodash'
 
 import { connectRouter, routerMiddleware } from 'connected-react-router/immutable'
 import { createBrowserHistory } from 'history'
@@ -28,24 +27,24 @@ export const store = createStore(
     composer(applyMiddleware(createRavenMiddleware(Raven, {getUserContext: getCurrentUser} ), thunkMiddleware, routerMiddleware(history)))
 )
 
-export const persistor = persistStore(store)
-
-export const PersistentApp = (props) => (
-    <Provider store={props.store}>
-        {props.children}
-    </Provider>
-)
-
-PersistentApp.defaultProps = {
-    store: store,
+export const withProvider = Component => {
+    return function wrapped(props) {
+        return (
+            <Provider store={store}>
+                <Component {...props} />
+            </Provider>
+        )
+    }
 }
+
+export const persistor = persistStore(store)
 
 export const withModelData = mapModelToFetch => WrappedComponent => {
     return connect()(class Fetcher extends React.PureComponent {
         componentDidMount() {
-            _.each(mapModelToFetch(this.props), (params, modelName) => {
+            Object.entries(mapModelToFetch(this.props)).forEach(([modelName, params]) => {
                 const model = new Model(modelName)
-                if (_.isObject(params)) {
+                if (typeof(params) == 'object') {
                     this.props.dispatch(model.fetchAll(params))
                 } else {
                     this.props.dispatch(model.fetchIfNeeded(params))

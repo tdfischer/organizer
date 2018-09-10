@@ -6,7 +6,6 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails'
 import Grid from '@material-ui/core/Grid'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import _ from 'lodash'
 import moment from 'moment'
 import { withStyles } from '@material-ui/core/styles'
 
@@ -38,7 +37,7 @@ export class OrganizerDashboard extends React.Component {
     }
 
     render() {
-        const recentBroadcast = _.head(this.props.myBroadcasts)
+        const recentBroadcast = this.props.myBroadcasts.first()
         return (
             <Grid className={this.props.classes.root} container direction="column" alignItems="stretch" spacing={8}>
                 <Grid item>
@@ -55,9 +54,9 @@ export class OrganizerDashboard extends React.Component {
                         <ExpansionPanelDetails>
                             <Grid direction="column" alignItems="stretch" container spacing={8}>
                                 <EventList start={moment().add(-1, 'month')} end={moment()} onCheckin={this.onCheckin} />
-                                {_.map(_.tail(this.props.myBroadcasts), m => (
-                                    <MessageCard message={m} />
-                                ))}
+                                {this.props.myBroadcasts.skip(1).map(m => (
+                                    <MessageCard key={m} message={m} />
+                                )).toArray()}
                             </Grid>
                         </ExpansionPanelDetails>
                     </ExpansionPanel>
@@ -75,7 +74,7 @@ const mapStateToProps = state => {
     const currentPerson = People.immutableSelect(state).get(currentUser.email)
 
     const myBroadcasts = Broadcasts.immutableSelect(state)
-        .filter(_.matchesProperty('turf', _.get(currentPerson, 'current_turf.id')))
+        .filter(p => p.turf == currentPerson.current_turf.id)
         .map(b => ({...b, sent_on: moment(b.sent_on)}))
         .sort((a, b) => a.sent_on > b.sent_on)
         .reverse()
@@ -83,7 +82,7 @@ const mapStateToProps = state => {
     return {
         currentUser,
         currentPerson,
-        myBroadcasts: myBroadcasts.toArray(),
+        myBroadcasts
     }
 }
 

@@ -6,7 +6,6 @@ import Avatar from '@material-ui/core/Avatar'
 import { connect } from 'react-redux'
 import { Model, withModelData } from '../store'
 import { withStyles } from '@material-ui/core/styles'
-import _ from 'lodash'
 import gravatar from 'gravatar'
 
 const Turfs = new Model('turfs')
@@ -39,7 +38,7 @@ const MessageCard = connect(mapStateToProps, mapDispatchToProps)(withModelData(m
     <Card className={props.classes.card}>
         <CardHeader
             title={props.message.subject}
-            subheader={props.message.author + ' sent to ' + props.message.target_state + ' in ' + _.get(props.turf, 'name', 'somewhere') + ' ' + props.message.sent_on.fromNow()}
+            subheader={props.message.author + ' sent to ' + props.message.target_state + ' in ' + (props.turf.name || 'somewhere') + ' ' + props.message.sent_on.fromNow()}
             avatar={<Avatar src={gravatar.url(props.message.author, {s: 32, d: 'retro'})} />} />
         <CardContent>{props.message.body}</CardContent>
     </Card>

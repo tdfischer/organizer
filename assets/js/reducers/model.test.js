@@ -1,6 +1,5 @@
 import modelReducer from './model'
 import Model from '../store/model'
-import _ from 'lodash'
 import Immutable from 'immutable'
 
 function updateModel(data) {
