@@ -49,3 +49,11 @@ it('should create data', () => {
           expect(store.getActions()[0]).toEqual({data: {id: id}, id: id, type: UPDATE_MODEL, name: 'test'})
       })
 })
+
+it('should decode geo data properly', () => {
+    const model = new Model('test')
+    expect(model.deserializeGeo({})).toBeUndefined()
+    expect(model.deserializeGeo({lat: undefined, lng: 0})).toBeUndefined()
+    expect(model.deserializeGeo({lat: 0, lng: undefined})).toBeUndefined()
+    expect(model.deserializeGeo({lat: 0, lng: 0})).not.toBeUndefined()
+})
