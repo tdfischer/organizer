@@ -1,53 +1,30 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Selectable , Filterable, Model, withModelData } from '../store'
+import { Selectable , Filterable, Model } from '../store'
 import _ from 'lodash'
 import { Form } from 'informed'
-import TextField from '@material-ui/core/TextField'
 import Button from '@material-ui/core/Button'
 import Grid from '@material-ui/core/Grid'
-import Tabs from '@material-ui/core/Tabs'
-import Tab from '@material-ui/core/Tab'
 import Snackbar from '@material-ui/core/Snackbar'
-import Badge from '@material-ui/core/Badge'
 import importedComponent from 'react-imported-component'
 import copy from 'copy-to-clipboard'
 
 import MaterialFormText from './MaterialFormText'
 import DialogOpener from './DialogOpener'
 import PeopleTable from './PeopleTable'
+import Search from './people-browser/Search'
 
 const ImportDialog = importedComponent(() => import('./ImportDialog'))
-
-const matchAny = (obj, pattern) => {
-    try {
-        const regex = new RegExp(pattern)
-        return !!_.find(_.values(obj), (value) => {
-            if (_.isString(value)) {
-                return value.match(regex)
-            }
-            return matchAny(value, pattern)
-        })
-    } catch (SyntaxError) {
-        // nothing 
-    }
-}
 
 const States = new Model('states')
 const People = new Model('people')
 const PeopleSelector = new Selectable('people')
-const PeopleFilter = new Filterable('people', matchAny)
+const PeopleFilter = new Filterable('people')
 
 const mapStateToProps = state => {
-    const allStates = States.immutableSelect(state).toList()
-    const allPeople = People.immutableSelect(state)
     const selection = PeopleSelector.immutableSelected(state)
-    const stateCounts = selection.groupBy(email => allPeople.get(email).state).map(v => v.size)
     return {
-        allStates,
-        stateCounts,
         selection,
-        filtered: PeopleFilter.filtered(state, People.immutableSelect(state).toList()),
     }
 }
 
@@ -133,37 +110,15 @@ export class PeopleIndex extends Component {
                         </DialogOpener>
                         <Button color="primary" onClick={this.onCopy}>Copy E-mails</Button>
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={9}>
                         <Tagger />
                     </Grid>
-                    <Grid item xs={3}>
-                        <TextField label="Search" onChange={e => props.filter.set(e.target.value)} />
-                    </Grid>
                 </Grid>
-                {(!props.allStates.isEmpty()) ? (
-                    <React.Fragment>
-                        <Tabs fullWidth onChange={(_e, v) => this.setState({currentState: v})} value={this.state.currentState}>
-                            {props.allStates.map(state => (
-                                <Tab key={state.id} label={
-                                    props.stateCounts.get(state.name)
-                                        ? (<Badge color="primary" badgeContent={props.stateCounts.get(state.name)} >{state.name}</Badge>)
-                                        : state.name
-                                } />
-                            )).toArray()}
-                        </Tabs>
-                        <PeopleTable state={props.allStates.get(this.state.currentState).name} />
-                    </React.Fragment>
-                ) : null}
+                <Grid container><Grid item xs><Search filter={props.filter} /></Grid></Grid>
+                <PeopleTable />
             </React.Fragment>
         )
     }
 }
 
-const mapPropsToModels = _props => {
-    return {
-        people: {},
-        states: {}
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(withModelData(mapPropsToModels)(PeopleIndex))
+export default connect(mapStateToProps, mapDispatchToProps)(PeopleIndex)
