@@ -23,12 +23,10 @@ const matchOrContains = (needle, haystack) => {
 }
 
 const isEqual = (needle, haystack) => {
-    if (typeof(haystack) == 'string') {
-        return haystack == needle
-    } else if (haystack instanceof Array) {
+    if (haystack instanceof Array) {
         return haystack.indexOf(needle) != -1
     } else {
-        return false
+        return needle == haystack
     }
 }
 
