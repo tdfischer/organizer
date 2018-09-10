@@ -47,7 +47,7 @@ export default class Model {
     }
 
     immutableSelect(state) {
-        return modelGetter(this.name)(state).toKeyedSeq().map(m => this.deserializeGeo(m))
+        return modelGetter(this.name)(state).toKeyedSeq().map(m => ({...m, geo: this.deserializeGeo(m.geo)}))
     }
 
     bindActionCreators(dispatch) {
@@ -176,13 +176,8 @@ export default class Model {
         return data
     }
 
-    deserializeGeo(data) {
-        const geo = data.geo
-        const parsed = (geo) ? point([geo.lat, geo.lng]) : undefined
-        return {
-            ...data,
-            geo: parsed
-        }
+    deserializeGeo(geo) {
+        return (geo && geo.lat != undefined && geo.lng != undefined) ? point([geo.lat, geo.lng]) : undefined
     }
 
     create(modelData) {

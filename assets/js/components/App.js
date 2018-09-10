@@ -27,10 +27,10 @@ const EmptyBottomBar = _props => (
 )
 const Button = importedComponent(() => import('@material-ui/core/Button'))
 const AppRoutes = importedComponent(() => import('./AppRoutes'))
-const OrganizerAppBar = importedComponent(() => import('./OrganizerAppBar'), {
+const OrganizerAppBar = importedComponent(() => import('./chrome/OrganizerAppBar'), {
     LoadingComponent: EmptyAppBar
 })
-const OrganizerBottomNav = importedComponent(() => import('./OrganizerBottomNav'), {
+const OrganizerBottomNav = importedComponent(() => import('./chrome/OrganizerBottomNav'), {
     LoadingComponent: EmptyBottomBar
 })
 
@@ -85,7 +85,7 @@ const ErrorWrapper = withStyles(errorStyles)(ErrorWrapperBase)
 export const App = _props => (
     <div className="the-app">
         <OrganizerAppBar />
-        <div className="viewport">
+        <div className="viewport" id="viewport">
             <div className="scroll">
                 <AppRoutes />
             </div>

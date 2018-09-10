@@ -11,7 +11,7 @@ import copy from 'copy-to-clipboard'
 
 import MaterialFormText from './MaterialFormText'
 import DialogOpener from './DialogOpener'
-import PeopleTable from './PeopleTable'
+import PeopleTable from './people-browser/PeopleTable'
 import Search from './people-browser/Search'
 
 const ImportDialog = importedComponent(() => import('./ImportDialog'))

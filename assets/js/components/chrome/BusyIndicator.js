@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import CircularProgress from '@material-ui/core/CircularProgress'
-import { getSaving, getLoading } from '../selectors'
+import { getSaving, getLoading } from '../../selectors'
 
 const mapStateToProps = state => {
     return {

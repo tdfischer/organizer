@@ -14,7 +14,7 @@ import { getCurrentUser } from '../selectors/auth'
 import { Geocache } from '../actions'
 import { Model, withModelData } from '../store'
 import RawDataExpansionPanel from './RawDataExpansionPanel'
-import EventList from './EventList'
+import EventList from './events/EventList'
 
 const People = new Model('people')
 const Events = new Model('events')
