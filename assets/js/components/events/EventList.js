@@ -92,7 +92,7 @@ function getWalktimeBreakpoint(minutes) {
 }
 
 function groupByWalktime(evt) {
-    return getWalktimeBreakpoint(evt.distance / 87)[0]
+    return getWalktimeBreakpoint((evt.distance * 1000) / 84)[0]
 }
 
 function walktimeToDescription(minutes) {
