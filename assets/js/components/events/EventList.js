@@ -5,7 +5,6 @@ import moment from 'moment'
 import distance from '@turf/distance'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { getCoord } from '@turf/invariant'
 
 import EventCard from './EventCard'
 import NoEvents from './NoEvents'
@@ -103,7 +102,7 @@ const mapStateToProps = (state, props) => {
     const currentLocation = getCurrentLocation(state)
 
     const relevantEvents = Events.immutableSelect(state)
-        .filter(evt => (getCoord(evt.geo)[0] != undefined))
+        .filter(evt => evt.geo != undefined)
         .map(evt => ({...evt, distance: distance(currentLocation ? currentLocation : evt.geo, evt.geo), end_timestamp: moment(evt.end_timestamp), timestamp: moment(evt.timestamp)}))
         .filter(isWithinWindow(props.start, props.end)).cacheResult().toIndexedSeq()
         .sort((a, b)=> a.timestamp.diff(b.timestamp)).cacheResult().toIndexedSeq()
