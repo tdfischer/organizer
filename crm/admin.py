@@ -62,7 +62,7 @@ class StateFilter(admin.SimpleListFilter):
 class PersonAdmin(admin.ModelAdmin):
     search_fields = [
         'name', 'email', 'address__raw', 'address__locality__name',
-        'current_turf__name', 'state__name'
+        'current_turf__name', 'state__name', 'phone'
     ]
 
     list_filter = [
@@ -72,7 +72,7 @@ class PersonAdmin(admin.ModelAdmin):
     ]
 
     list_display = [
-        'name', 'email', 'city', 'current_turf', 'state', 'valid_geo'
+        'name', 'email', 'phone', 'city', 'current_turf', 'state', 'valid_geo'
     ]
 
     select_related = ['state', 'address__locality']
