@@ -87,8 +87,7 @@ class PersonSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer)
     def update(self, instance, validated_data):
         if 'address' in validated_data:
             instance.address = validated_data.pop('address')
-        instance.save()
-        return instance
+        return super(PersonSerializer, self).update(instance, validated_data)
 
     def create(self, validated_data):
         valid_address = validated_data.pop('address', None)
