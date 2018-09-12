@@ -64,7 +64,7 @@ function parsePaste({input}) {
     const headers = _.head(sheet)
     const rows = _.tail(sheet)
 
-    const tagKeys = _.filter(headers, key => key.startsWith('tag_'))
+    const tagKeys = _.filter(headers, key => key.startsWith('tag:'))
     const tags = _.map(tagKeys, key => {
         return key.substr(4)
     })
