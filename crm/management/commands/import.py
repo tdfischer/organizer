@@ -5,12 +5,19 @@ from importlib import import_module
 from tqdm import tqdm
 import sys
 from organizer.importing import get_importer_class, collect_importers
+import logging
+
+log = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('source', nargs='+')
+        parser.add_argument('--debug', default=False, action='store_true')
 
     def handle(self, *args, **options):
+        if options['debug']:
+            logging.basicConfig(level=logging.DEBUG)
+
         errors = []
         totals = {}
         importers = []
@@ -27,6 +34,7 @@ class Command(BaseCommand):
                 with tqdm(importer, desc=importerName, unit=' page') as it:
                     sourceTotals = {}
                     for dataPage in it:
+                        log.debug('Importing %s rows...', len(dataPage))
                         result = resource.import_data(dataPage, dry_run=False,
                                 raise_errors=True)
                         for (k, v) in result.totals.iteritems():
@@ -37,4 +45,4 @@ class Command(BaseCommand):
                         for err in result.row_errors():
                             errors.append(err)
         for (row, error) in errors:
-            print "%s: %s"%(row, error[0].error)
+            log.error("Row %s: %s", row, error[0].error)

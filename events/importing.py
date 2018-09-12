@@ -17,6 +17,7 @@ import dateutil.parser
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 import pytz
+import logging
 
 SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
 
@@ -59,7 +60,7 @@ class EventResource(resources.ModelResource):
         import_id_fields = ('uid', 'instance_id')
         report_skipped = True
         skip_unchanged = True
-        fields = ('uid', 'instance_id', 'timestamp', 'end_timestamp', 'location')
+        fields = ('uid', 'name', 'instance_id', 'timestamp', 'end_timestamp', 'location')
 
 class GoogleCalendarImporter(DatasetImporter):
     class Meta:
@@ -67,6 +68,7 @@ class GoogleCalendarImporter(DatasetImporter):
 
     def __init__(self):
         super(GoogleCalendarImporter, self).__init__()
+        self.log = logging.getLogger(__name__ + '.google')
 
     def init(self):
         self.eventPages = iter(self.get_google_events())
@@ -91,6 +93,7 @@ class GoogleCalendarImporter(DatasetImporter):
             service = build('calendar', 'v3', http=creds.authorize(Http()))
 
             # Call the Calendar API
+            self.log.debug('Starting page!')
             events_result = service.events().list(
                     calendarId=settings.GOOGLE_CALENDAR_IMPORT_ID,
                     singleEvents=True,
@@ -101,9 +104,12 @@ class GoogleCalendarImporter(DatasetImporter):
                     timeMax=(timezone.now() + timedelta(days=365*5)).isoformat(),
                     timeMin=(timezone.now() - timedelta(days=30)).isoformat(),
                     orderBy='startTime').execute()
+            self.log.debug('Fetched %s items', len(events_result.get('items',
+                [])))
             yield events_result.get('items', [])
             token = events_result.get('nextPageToken')
             if token is None:
+                self.log.debug('End of events!')
                 break
 
     def grab_datetime(self, data):
@@ -124,6 +130,8 @@ class GoogleCalendarImporter(DatasetImporter):
             name = event.get('summary')
             location = event.get('location')
             icalUID = event.get('iCalUID')
+            self.log.debug('Found event %r', (icalUID, event.get('id'), timestamp,
+                end_timestamp, name, location))
             dataset.append((
                 icalUID,
                 event.get('id'),
