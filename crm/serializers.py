@@ -74,11 +74,12 @@ class PersonSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer)
     class Meta:
         model = models.Person
         fields = ('name',  'id', 'email', 'created', 'url', 'tags',
-        'geo', 'current_turf', 'turf_memberships', 'state')
+        'geo', 'current_turf', 'turf_memberships', 'state', 'phone')
 
         lookup_field = 'email'
         extra_kwargs = {
                 'url': {'lookup_field': 'email'},
                 'id': {'source': 'email', 'read_only': True},
-                'geo': {'read_only': True}
+                'geo': {'read_only': True},
+                'phone': {'write_only': True},
         }
