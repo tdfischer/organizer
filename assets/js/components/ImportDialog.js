@@ -22,18 +22,20 @@ import SheetClip from 'sheetclip'
 
 const sheetclip = new SheetClip()
 
-const columnNames = {
-    name: ['name', 'full name'],
-    email: ['email', 'e-mail', 'email address'],
-    phone: ['phone', 'phone number'],
-    address: ['address', 'street address'],
-    state: ['state'],
+function fetchValidFields() {
+    return fetch('/api/people/', {method: 'OPTIONS'})
+        .then(resp => resp.json())
+        .then(resp => Object.entries(resp.actions.POST)
+            .filter(([_fieldName, fieldProps]) => fieldProps.read_only == false)
+            .map(([fieldName, fieldProps]) => [fieldName, [fieldName, ...fieldProps.aliases]])
+            .reduce((prev, next) => ({...prev, [next[0]]: next[1]}), {})
+        )
 }
 
-function guessHeaderMap(columns) {
+function guessHeaderMap(columns, knownColumns) {
     return _.fromPairs(_.map(columns, c => {
         const normalized = c.toLowerCase()
-        const commonName = _.findKey(columnNames, alternatives => alternatives.indexOf(normalized) >= 0)
+        const commonName = _.findKey(knownColumns, alternatives => alternatives.indexOf(normalized) >= 0)
         if (commonName) {
             return [c, commonName]
         } else {
@@ -48,7 +50,7 @@ function mapRows(rows, headerMap, tags) {
 
     return _.map(compactRows, row => {
 
-        const mappedObject = _.mapKeys(row, (_v, k) => _.get(headerMap, k, k))
+        const mappedObject = _.pickBy(_.mapKeys(row, (_v, k) => _.get(headerMap, k, k)), v => v != undefined)
 
         return {
             ...mappedObject,
@@ -59,17 +61,17 @@ function mapRows(rows, headerMap, tags) {
 
 }
 
-function parsePaste({input}) {
+function parsePaste({input}, knownHeaders) {
     const sheet = sheetclip.parse(input)
     const headers = _.head(sheet)
-    const rows = _.tail(sheet)
+    const rows = _.tail(sheet).map(row => row.map(column => column == '' ? undefined : column))
 
     const tagKeys = _.filter(headers, key => key.startsWith('tag:'))
     const tags = _.map(tagKeys, key => {
         return key.substr(4)
     })
 
-    const headerMap = guessHeaderMap(_.difference(headers, tagKeys))
+    const headerMap = guessHeaderMap(_.difference(headers, tagKeys), knownHeaders)
 
     const jsonRows = _.map(rows, row => _.zipObject(headers, row))
 
@@ -86,10 +88,16 @@ class ImportDialog extends React.Component {
         this.state = {
             stage: 0,
             parsed: {headerMap: {}},
-            mapped: []
+            mapped: [],
+            validFields: {}
         }
         this.next = this.next.bind(this)
         this.previous = this.previous.bind(this)
+    }
+
+    componentDidMount() {
+        fetchValidFields()
+            .then(fields => this.setState({validFields: fields}))
     }
 
     reset() {
@@ -99,7 +107,7 @@ class ImportDialog extends React.Component {
     next() {
         switch(this.state.stage) {
         case 0:
-            this.setState({parsed: parsePaste(this.pasteForm.formContext.formState.values), stage: 1})
+            this.setState({parsed: parsePaste(this.pasteForm.formContext.formState.values, this.state.validFields), stage: 1})
             break
         case 1:
             this.setState({stage: 2, mapped: mapRows(this.state.parsed.rows, this.state.parsed.headerMap, this.state.parsed.tags)})
@@ -134,11 +142,13 @@ class ImportDialog extends React.Component {
                             <em>What headers can I use?</em>
                             <p>All headers are case insensitive. The following lists acceptable values:</p>
                         </DialogContentText>
-                        <ul>
-                            <li>Name: Can be any variant of &quot;Name&quot;, &quot;Full Name&quot;</li>
-                            <li>Email: Can be any variant of &quot;Email&quot;, &quot;e-mail&quot; &quot;Email Address&quot;</li>
-                            <li>Tags: To tag people, include a column that starts with &quot;tag_&quot;. eg &quot;tag_Came to meeting&quot; tags each person in the spreadsheet with &quot;Came to meeting&quot;</li>
-                        </ul>
+                        <table>
+                            <tr><th>Column</th><th>Aliases</th></tr>
+                            {Object.entries(this.state.validFields).map(([k, v]) => (
+                                <tr key={k}><td>{k}</td><td>{v.join(', ')}</td></tr>
+                            ))}
+                            <tr><td>Tags</td><td>To tag people, include a column that starts with &quot;tag:&quot;. eg &quot;tag:Came to meeting&quot; tags each person in the spreadsheet with &quot;Came to meeting&quot;</td></tr>
+                        </table>
                     </DialogContent>
                 </Form>
             )
@@ -157,7 +167,7 @@ class ImportDialog extends React.Component {
                             value={dst}
                             onChange={evt => this.setState({parsed: {...this.state.parsed, headerMap: {...this.state.parsed.headerMap, [src]: evt.target.value}}})}>
                             <MenuItem value=''><em>None</em></MenuItem>
-                            {_.map(_.keys(columnNames), name => <MenuItem key={name} value={name}>{name}</MenuItem>)}
+                            {_.map(_.keys(this.state.validFields), name => <MenuItem key={name} value={name}>{name}</MenuItem>)}
                         </Select>
                         <FormHelperText>{_.join(samples[src], ', ')}</FormHelperText>
                     </FormControl>
@@ -187,13 +197,14 @@ class ImportDialog extends React.Component {
                         <p>The following data will be imported:</p>
                         <table>
                             <thead>
-                                <tr><th>Name</th><th>E-mail</th><th>Phone number</th><th>Street address</th><th>State</th></tr>
+                                <tr>
+                                    {Object.keys(this.state.validFields).map(header => <th key={header}>{header}</th>)}
+                                </tr>
                             </thead>
                             <tbody>
-                                {_.map(this.state.mapped, (row, idx) => (
-                                    <tr className={idx % 2 ? 'even' : 'odd'}>
-                                        <td>{row.name} {_.map(row.tags, t => <Chip label={t} key={t} />)}</td><td>{row.email}</td>
-                                        <td>{row.phone}</td><td>{row.address}</td><td>{row.state}</td>
+                                {this.state.mapped.map((row, idx) => (
+                                    <tr key={idx} className={idx % 2 ? 'even' : 'odd'}>
+                                        {Object.keys(this.state.validFields).map(header => <td key={header}>{header == 'tags' ? row[header].map(tag => <Chip key={tag} label={tag} />) : row[header]}</td>)}
                                     </tr>
                                 ))}
                             </tbody>
