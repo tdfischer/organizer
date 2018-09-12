@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 from mock import create_autospec, MagicMock, patch
 from hypothesis.extra.django import TestCase
 from hypothesis.extra.django.models import models as djangoModels
-from django.test import override_settings
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.utils import timezone
@@ -15,7 +14,7 @@ from hypothesis.strategies import characters, just, sampled_from, emails, floats
 import string
 from geopy.location import Location
 from geopy.point import Point
-from . import geocache, models
+from . import geocache, models, exporting
 from rest_framework.test import APITestCase
 import pytest
 from address.models import Address
@@ -253,3 +252,16 @@ def testCreatePersonWithTag(api_client, settings, person, newTag):
     resp = assertValidResponse(api_client.put('/api/people/'+person['email']+'/', 
             person, format='json'), 200).data
     assert resp['tags'] == person['tags']
+
+@pytest.mark.django_db
+def testExportPersonToMailchimp(person, settings):
+    settings.MAILCHIMP_SECRET_KEY = '0' * 32
+    settings.MAILCHIMP_LIST_ID = 'list-id'
+    with patch('mailchimp3.entities.listmembers.ListMembers.create_or_update') as patched:
+        exporter = exporting.MailchimpExporter()
+        assert len(exporter) == 1
+        page = iter(exporter).next()
+        assert page.dict[0]['email'] == person.email
+        exporter.export_page(page)
+        patched.assert_called_with('list-id', '55502f40dc8b7c769880b10874abc9d0',
+                dict(email_address=person.email, status_if_new='subscribed'))
