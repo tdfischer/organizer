@@ -72,6 +72,15 @@ def defaultStates(draw):
     return models.PersonState.objects.get_or_create(name='Default')[0]
 
 @composite
+def peopleArgs(draw):
+    return dict(
+        name=draw(nonblanks()),
+        email=draw(emails().filter(lambda x: len(x) < 100 and '/' not in x)),
+        address=None,
+        state=draw(defaultStates())
+    )
+
+@composite
 def people(draw):
     return models.Person.objects.create(
         name=draw(nonblanks()),
@@ -254,4 +263,18 @@ class ApiTests(APITestCase, TestCase):
         note("Submit %r"%(resp,))
         resp = self.assertValidResponse(self.client.put(quotedUrl, 
                 resp, format='json')).data
+        self.assertEqual(resp['tags'], [newTag])
+
+    @skipAuth
+    @mockRedis
+    @given(peopleArgs(), nonblanks())
+    def testCreatePersonWithTag(self, person, newTag):
+        note('Email %s'%person['email'])
+        person['tags'] = [newTag]
+        person['state'] = person['state'].name
+        del person['address']
+        note("Submit %r"%(person,))
+        resp = self.assertValidResponse(self.client.post('/api/people/', 
+                person, format='json'), 201).data
+        note('Result %r'%(resp,))
         self.assertEqual(resp['tags'], [newTag])
