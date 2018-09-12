@@ -5,14 +5,13 @@ import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary'
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails'
 import Grid from '@material-ui/core/Grid'
 import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
 import moment from 'moment'
 import { withStyles } from '@material-ui/core/styles'
 
 import MessageCard from './MessageCard'
 import { getCurrentUser } from '../selectors/auth'
-import { Geocache } from '../actions'
 import { Model, withModelData } from '../store'
+import { withCurrentLocation } from '../actions/geocache'
 import RawDataExpansionPanel from './RawDataExpansionPanel'
 import EventList from './events/EventList'
 
@@ -23,7 +22,6 @@ const Broadcasts = new Model('broadcasts')
 export class OrganizerDashboard extends React.Component {
     componentDidMount() {
         this.doCheckin = this.doCheckin.bind(this)
-        navigator.geolocation.getCurrentPosition(this.props.updateCurrentLocationFromBrowserPosition)
     }
 
     doCheckin(evt) {
@@ -90,9 +88,6 @@ const mapDispatchToProps = dispatch => {
     return {
         broadcasts: Broadcasts.bindActionCreators(dispatch),
         events: Events.bindActionCreators(dispatch),
-        ...bindActionCreators({
-            updateCurrentLocationFromBrowserPosition: Geocache.updateCurrentLocationFromBrowserPosition
-        }, dispatch)
     }
 }
 
@@ -111,4 +106,4 @@ const mapPropsToModels = props => {
     }
 }
 
-export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(withModelData(mapPropsToModels)(OrganizerDashboard)))
+export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(withModelData(mapPropsToModels)(withCurrentLocation(OrganizerDashboard))))

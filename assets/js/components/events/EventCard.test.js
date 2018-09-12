@@ -93,6 +93,28 @@ describe('CheckInButton', () => {
         expect(props.onCheckIn).toHaveBeenCalledTimes(1)
     })
 
+    it('should allow you to check in when you have no location but can otherwise check in', () => {
+        const props = {
+            event: {
+                geo: point([0, 0]),
+                timestamp: moment(),
+                end_timestamp: moment().add(1, 'hour'),
+                attendees: []
+            },
+            currentUser: {
+                email: ''
+            },
+            classes: {},
+            checkedIn: false,
+            currentLocation: undefined,
+            onCheckIn: jest.fn()
+        }
+        const rendered = shallow(<CheckInButton {...props} />)
+        const button = rendered.find(Button).first()
+        button.simulate('click')
+        expect(props.onCheckIn).toHaveBeenCalledTimes(1)
+    })
+
     it('should say something after youve checked in', () => {
         const props = {
             event: {

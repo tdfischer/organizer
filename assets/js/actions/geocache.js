@@ -1,3 +1,6 @@
+import React from 'react'
+import { connect } from 'react-redux'
+
 export const UPDATE_CURRENT_LOCATION = 'UPDATE_CURRENT_LOCATION'
 
 export const updateCurrentLocationFromBrowserPosition = pos => {
@@ -12,3 +15,24 @@ export const updateCurrentLocation = coords => {
         })
     }
 }
+
+export const withCurrentLocation = WrappedComponent => {
+    return connect()(class Locator extends React.PureComponent {
+        componentDidMount() {
+            this.watchID = navigator.geolocation.watchPosition(this.updatePosition.bind(this), () => undefined, {enableHighAccuracy: true})
+        }
+
+        componentWillUnmount() {
+            navigator.geolocation.clearWatch(this.watchID)
+        }
+
+        updatePosition(position) {
+            this.props.dispatch(updateCurrentLocationFromBrowserPosition(position))
+        }
+
+        render() {
+            return <WrappedComponent {...this.props} />
+        }
+    })
+}
+
