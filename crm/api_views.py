@@ -6,6 +6,8 @@ import logging
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.metadata import SimpleMetadata
+from rest_framework.serializers import HiddenField
 from django.template import loader, engines
 from django.db.models import Q, Count, Subquery, OuterRef
 from django.contrib.auth import logout
@@ -76,10 +78,20 @@ class AllowPUTAsCreateMixin(object):
                 # return a 404 response.
                 raise
 
+class AliasableMetadata(SimpleMetadata):
+    def get_serializer_info(self, serializer):
+        aliases = getattr(serializer.Meta, 'field_aliases', {})
+        ret = super(AliasableMetadata, self).get_serializer_info(serializer)
+        for field_name, field in serializer.fields.items():
+            if not isinstance(field, HiddenField):
+                ret[field_name]['aliases'] = aliases.get(field_name, [])
+        return ret
+
 class PersonViewSet(AllowPUTAsCreateMixin, IntrospectiveViewSet):
     queryset = models.Person.objects.all().order_by('email')
     serializer_class = serializers.PersonSerializer
     permission_classes = (IsAuthenticated,)
+    metadata_class = AliasableMetadata
     lookup_field = 'email'
     lookup_value_regex = '[^/]+'
 
