@@ -24,7 +24,8 @@ const sheetclip = new SheetClip()
 
 const columnNames = {
     name: ['name', 'full name'],
-    email: ['email', 'e-mail', 'email address']
+    email: ['email', 'e-mail', 'email address'],
+    phone: ['phone', 'phone number'],
 }
 
 function guessHeaderMap(columns) {
@@ -184,12 +185,13 @@ class ImportDialog extends React.Component {
                         <p>The following data will be imported:</p>
                         <table>
                             <thead>
-                                <tr><th>Name</th><th>E-mail</th></tr>
+                                <tr><th>Name</th><th>E-mail</th><th>Phone number</th></tr>
                             </thead>
                             <tbody>
                                 {_.map(this.state.mapped, (row, idx) => (
                                     <tr className={idx % 2 ? 'even' : 'odd'}>
                                         <td>{row.name} {_.map(row.tags, t => <Chip label={t} key={t} />)}</td><td>{row.email}</td>
+                                        <td>{row.phone}</td>
                                     </tr>
                                 ))}
                             </tbody>
