@@ -29,6 +29,13 @@ class AddressSerializer(serializers.ModelSerializer):
         model = address.models.Address
         fields = ('raw', 'street_number', 'route', 'locality')
 
+    def to_internal_value(self, data):
+        if type(data) is dict:
+            return super(AddressSerializer, self).to_internal_value(data)
+        else:
+            return super(AddressSerializer, self).to_internal_value({'raw':
+                data})
+
 class TurfSerializer(serializers.HyperlinkedModelSerializer):
     locality = LocalitySerializer()
 
@@ -69,12 +76,27 @@ class PersonSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer)
     current_turf = TurfSerializer(read_only=True)
     turf_memberships = TurfMembershipSerializer(many=True, read_only=True)
     state = serializers.SlugRelatedField(queryset=models.PersonState.objects.all(),
-            slug_field='name')
+            slug_field='name', required=False)
+    address = AddressSerializer(write_only=True, required=False)
+
+    def to_internal_value(self, data):
+        if 'state' in data:
+            models.PersonState.objects.get_or_create(name=data.get('state'))
+        return super(PersonSerializer, self).to_internal_value(data)
+
+    def update(self, instance, validated_data):
+        if 'address' in validated_data:
+            instance.address = validated_data.pop('address')
+        return super(PersonSerializer, self).update(instance, validated_data)
+
+    def create(self, validated_data):
+        valid_address = validated_data.pop('address', None)
+        return models.Person.objects.create(address=valid_address, **validated_data)
 
     class Meta:
         model = models.Person
         fields = ('name',  'id', 'email', 'created', 'url', 'tags',
-        'geo', 'current_turf', 'turf_memberships', 'state', 'phone')
+        'geo', 'current_turf', 'turf_memberships', 'state', 'address', 'phone')
 
         lookup_field = 'email'
         extra_kwargs = {
