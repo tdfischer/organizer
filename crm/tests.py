@@ -73,12 +73,25 @@ def defaultStates(draw):
 
 @composite
 def peopleArgs(draw):
-    return dict(
-        name=draw(nonblanks()),
-        email=draw(emails().filter(lambda x: len(x) < 100 and '/' not in x)),
-        address=None,
-        state=draw(defaultStates())
-    )
+    return draw(one_of(
+        fixed_dictionaries(dict(
+            name=one_of(just(None), text()),
+            email=emails().filter(lambda x: len(x) < 100 and '/' not in x),
+            address=one_of(just(None), text()),
+            state=one_of(just(None), text())
+        )),
+        fixed_dictionaries(dict(
+            name=one_of(just(None), text()),
+            email=emails().filter(lambda x: len(x) < 100 and '/' not in x),
+            state=one_of(just(None), text())
+        )),
+        fixed_dictionaries(dict(
+            name=one_of(just(None), text()),
+            email=emails().filter(lambda x: len(x) < 100 and '/' not in x),
+        )),
+        fixed_dictionaries(dict(
+            email=emails().filter(lambda x: len(x) < 100 and '/' not in x),
+        ))))
 
 @composite
 def people(draw):
@@ -267,14 +280,22 @@ class ApiTests(APITestCase, TestCase):
 
     @skipAuth
     @mockRedis
+    @override_settings(DEFAULT_PERSON_STATE='Default')
     @given(peopleArgs(), nonblanks())
     def testCreatePersonWithTag(self, person, newTag):
         note('Email %s'%person['email'])
         person['tags'] = [newTag]
-        person['state'] = person['state'].name
-        del person['address']
         note("Submit %r"%(person,))
         resp = self.assertValidResponse(self.client.post('/api/people/', 
                 person, format='json'), 201).data
         note('Result %r'%(resp,))
-        self.assertEqual(resp['tags'], [newTag])
+        personName = person.get('name', None)
+        if personName is not None:
+            personName = personName.strip()
+        personState = person.get('state', None)
+        if personState is None or personState == '':
+            personState = 'Default'
+        self.assertEqual(resp['tags'], person['tags'])
+        self.assertEqual(resp['email'], person['email'])
+        self.assertEqual(resp['name'], personName)
+        self.assertEqual(resp['state'], personState)
