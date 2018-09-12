@@ -71,6 +71,11 @@ class PersonSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer)
     state = serializers.SlugRelatedField(queryset=models.PersonState.objects.all(),
             slug_field='name')
 
+    def to_internal_value(self, data):
+        if 'state' in data:
+            models.PersonState.objects.get_or_create(name=data.get('state'))
+        return super(PersonSerializer, self).to_internal_value(data)
+
     class Meta:
         model = models.Person
         fields = ('name',  'id', 'email', 'created', 'url', 'tags',
