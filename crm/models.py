@@ -10,26 +10,13 @@ from address.models import AddressField, Address, Locality
 from taggit.managers import TaggableManager
 from crm import geocache
 import django_rq
+import logging
+
+log = logging.getLogger(__name__)
 
 def updatePersonGeo(personID):
     person = Person.objects.get(pk=personID)
-    resolved = geocache.geocode(person.address.raw)
-    turf = geocache.turfForAddress(person.address.raw)
-    if turf:
-        neighborhoodMembership, joinedNeighborhood = TurfMembership.objects.get_or_create(turf=turf,
-                person=person)
-        try:
-            person.address = resolved
-        except UnicodeDecodeError, e:
-            print "Unicode error", e
-        person.lng = resolved.get('lng')
-        person.lat = resolved.get('lat')
-        person.save(_updateGeocache=False)
-        return True
-    else:
-        #FIXME: log failure to find turf
-        return False
-
+    return person.update_geo()
 
 class PersonState(models.Model):
     name = models.CharField(max_length=200, unique=True)
@@ -61,6 +48,27 @@ class Person(models.Model):
     @property
     def geo(self):
         return {'lat': self.lat, 'lng': self.lng}
+
+    def update_geo(self):
+        resolved = geocache.geocode(self.address.raw)
+        turf = geocache.turfForAddress(self.address.raw)
+        if turf:
+            neighborhoodMembership, joinedNeighborhood = TurfMembership.objects.get_or_create(turf=turf,
+                    person=self)
+            try:
+                self.address = resolved
+            except UnicodeDecodeError, e:
+                log.exception("Unicode error", e)
+            except Address.MultipleObjectsReturned, e:
+                # FIXME: We should never get here; hypotheis, like life, finds a way
+                log.exception("Address bug", e)
+            self.lng = resolved.get('lng')
+            self.lat = resolved.get('lat')
+            self.save(_updateGeocache=False)
+            return True
+        else:
+            #FIXME: log failure to find turf
+            return False
 
     def queue_geocache_update(self):
         django_rq.enqueue(updatePersonGeo, self.id)

@@ -25,6 +25,8 @@ def send_queued_broadcast(broadcast):
     generated_email = email_template.render({
         'broadcast': broadcast,
     })
+    logging.info('Broadcasting to %s %s emails in %s', len(targets),
+            broadcast.target_state, broadcast.turf)
     for t in targets:
         email_obj = EmailMessage(
                 subject=broadcast.subject,
