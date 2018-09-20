@@ -1,5 +1,6 @@
 import os
 from social_core.backends.base import BaseAuth
+from social_core.backends.oauth import BaseOAuth2
 from social_core.exceptions import AuthException
 from hashlib import sha256
 import hmac
@@ -11,6 +12,22 @@ from django.conf import settings
 from django.contrib.auth.models import User
 
 from django.conf import settings
+
+class TypeformAuth(BaseOAuth2):
+    name = 'typeform'
+    AUTHORIZATION_URL = 'https://api.typeform.com/oauth/authorize'
+    ACCESS_TOKEN_URL = 'https://api.typeform.com/oauth/token'
+    SCOPE_SEPARATOR = ','
+
+    def get_user_details(self, response):
+        return {'username': response.get('alias'),
+                'email': response.get('email')}
+
+    def user_data(self, access_token, *args, **kwargs):
+        url = 'https://api.typeform.com/me?' + urllib.urlencode({
+            'access_token': access_token
+        })
+        return self.get_json(url)
 
 class DiscourseSSOAuth(BaseAuth):
     name = 'discourse'

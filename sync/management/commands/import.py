@@ -1,17 +1,18 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
-from crm import importing
 from importlib import import_module
 from tqdm import tqdm
 import sys
 from organizer.importing import get_importer_class, collect_importers
+from sync import models
 import logging
+from django.utils import timezone
 
 log = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
-        parser.add_argument('source', nargs='+')
+        parser.add_argument('target', nargs='*')
         parser.add_argument('--debug', default=False, action='store_true')
         parser.add_argument('--dry-run', default=False, action='store_true')
 
@@ -25,17 +26,17 @@ class Command(BaseCommand):
         errors = []
         totals = {}
         importers = []
-        for source in options['source']:
-            importerCls = get_importer_class(source)
-            if importerCls is None:
-                print "No such importer:", source
-                print "Available importers:", ', '.join(collect_importers().keys())
-                return
-            importers.append((source, importerCls()))
+        if len(options['target']) == 0:
+            for target in models.ImportSource.objects.filter(enabled=True):
+                importers.append((target, target.make_importer()))
+        else:
+            for targetName in options['target']:
+                target = models.ImportSource.objects.get(name=targetName)
+                importers.append((target, target.make_importer()))
         with tqdm(importers, desc='sources', unit = ' source') as impIt:
-            for (importerName, importer) in impIt:
+            for (target, importer) in impIt:
                 resource = importer.Meta.resource
-                with tqdm(importer, desc=importerName, unit=' page') as it:
+                with tqdm(importer, desc=target.name, unit=' page') as it:
                     sourceTotals = {}
                     for dataPage in it:
                         log.debug('Importing %s rows...', len(dataPage))
@@ -48,5 +49,7 @@ class Command(BaseCommand):
                         impIt.set_postfix(totals)
                         for err in result.row_errors():
                             errors.append(err)
+                    target.lastRun = timezone.now()
+                    target.save()
         for (row, error) in errors:
             log.error("Row %s: %s", row, error[0].error)

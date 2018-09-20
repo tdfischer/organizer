@@ -147,6 +147,7 @@ def testPermissions(api_client, person):
 @pytest.mark.skip_auth
 @pytest.mark.django_db
 @given(emails().filter(lambda e: '/' not in e))
+@hypothesisSettings(deadline=None)
 def testValidEmailURLs(api_client, email):
     """Test that all permutations of an email address generate a proper url"""
     url = reverse('person-detail', kwargs={'email': email})

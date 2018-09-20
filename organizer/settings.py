@@ -113,6 +113,7 @@ INSTALLED_APPS = [
     'django_rq',
     'import_export',
     'taggit',
+    'taggit_helpers',
     'taggit_serializer',
     'mptt',
     'crm',
@@ -120,7 +121,8 @@ INSTALLED_APPS = [
     'events',
     'donations',
     'filtering',
-    'geocodable'
+    'geocodable',
+    'sync'
 ]
 
 #Force SSL if debug is disabled
@@ -320,17 +322,10 @@ MAILCHIMP_LIST_ID = os.environ.get('MAILCHIMP_LIST_ID', None)
 GOOGLE_MAPS_KEY = os.environ.get('GOOGLE_MAPS_KEY', None)
 GOOGLE_API_KEY = GOOGLE_MAPS_KEY
 GOOGLE_SERVICE_ACCOUNT_CREDENTIALS = os.environ.get('GOOGLE_SERVICE_ACCOUNT_CREDENTIALS', None)
-GOOGLE_CALENDAR_IMPORT_ID = os.environ.get('GOOGLE_CALENDAR_IMPORT_ID', None)
 
 STRIPE_KEY = os.environ.get('STRIPE_KEY', None)
 
 AIRTABLE_API_KEY = os.environ.get('AIRTABLE_API_KEY', None)
-AIRTABLE_BASE_ID = os.environ.get('AIRTABLE_BASE_ID', None)
-AIRTABLE_TABLE_NAME = os.environ.get('AIRTABLE_TABLE_NAME', None)
-
-AIRTABLE_EMAIL_COLUMN = os.environ.get('AIRTABLE_EMAIL_COLUMN', 'Email')
-AIRTABLE_NAME_COLUMN = os.environ.get('AIRTABLE_NAME_COLUMN', 'Name')
-AIRTABLE_ADDRESS_COLUMN = os.environ.get('AIRTABLE_ADDRESS_COLUMN', 'Full Address')
 
 DISCOURSE_BASE_URL = os.environ.get('DISCOURSE_BASE_URL', None)
 DISCOURSE_SSO_SECRET = os.environ.get('DISCOURSE_SSO_SECRET', None)
@@ -358,3 +353,5 @@ if SOCIAL_AUTH_SLACK_KEY is not None:
     if SOCIAL_AUTH_SLACK_TEAM is None:
         raise EnvironmentError("You must set a slack team/workspace ID to enable slack logins. I will not allow this to be open to all workspaces.")
     AUTHENTICATION_BACKENDS += ('social_core.backends.slack.SlackOAuth2',)
+
+TYPEFORM_ACCESS_TOKEN = os.environ.get('TYPEFORM_ACCESS_TOKEN', None)

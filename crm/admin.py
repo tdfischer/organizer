@@ -25,6 +25,7 @@ from django.conf import settings
 from geocodable.models import Location, LocationType
 from organizer.admin import admin_site, OrganizerModelAdmin
 import StringIO
+from taggit_helpers.admin import TaggitListFilter
 
 def onboard_people(modeladmin, request, queryset):
     for person in queryset:
@@ -88,12 +89,12 @@ class PersonAdmin(ImportExportModelAdmin, OrganizerModelAdmin):
     resource_class = importing.PersonResource
     search_fields = [
         'name', 'email', 'location__raw', 'location__location__name',
-        'phone'
+        'phone','tags__name'
     ]
 
     fieldsets = (
         (None, {
-            'fields': (('name', 'email'), ('phone', 'location'))
+            'fields': (('name', 'email'), ('phone', 'location'), ('tags',))
         }),
         ('Membership', {
             'fields': ('attendance_record', 'donation_record',
@@ -165,6 +166,7 @@ class PersonAdmin(ImportExportModelAdmin, OrganizerModelAdmin):
     list_filter = (
         NamedFilterFilter,
         CityFilter,
+        TaggitListFilter
     )
 
     actions = (
@@ -174,9 +176,15 @@ class PersonAdmin(ImportExportModelAdmin, OrganizerModelAdmin):
         onboard_people
     )
 
+    def tag_list(self, obj):
+        return ', '.join(obj.tags.names())
+
+    def get_queryset(self, request):
+        return super(PersonAdmin, self).get_queryset(request).prefetch_related('tags')
+
     list_display = [
         'email', 'name', 'phone', 'city', 'valid_geo',
-        'onboarded', 'is_captain'
+        'onboarded', 'is_captain', 'tag_list'
     ]
 
     select_related = ['location__location']

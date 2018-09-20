@@ -1,5 +1,4 @@
 from django.conf import settings
-from airtable import Airtable
 from events.models import Event
 from googleapiclient.discovery import build
 from httplib2 import Http
@@ -17,6 +16,8 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 import pytz
 import logging
+import requests
+from django import forms
 
 SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
 
@@ -61,16 +62,33 @@ class EventResource(resources.ModelResource):
         skip_unchanged = True
         fields = ('uid', 'name', 'instance_id', 'timestamp', 'end_timestamp', 'location')
 
+class GoogleCalendarImportForm(forms.Form):
+    calendar_id = forms.ChoiceField()
+
 class GoogleCalendarImporter(DatasetImporter):
     class Meta:
         resource = EventResource()
 
-    def __init__(self):
-        super(GoogleCalendarImporter, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(GoogleCalendarImporter, self).__init__(*args, **kwargs)
         self.log = logging.getLogger(__name__ + '.google')
 
     def init(self):
         self.eventPages = iter(self.get_google_events())
+
+    def options_form(self, *args, **kwargs):
+        form = GoogleCalendarImportForm(*args, **kwargs)
+        creds = self.get_creds()
+        service = build('calendar', 'v3', http=creds.authorize(Http()))
+        calendars = service.calendarList().list().execute()
+        keyfileDict = json.loads(settings.GOOGLE_SERVICE_ACCOUNT_CREDENTIALS)
+        authEmail = keyfileDict['client_email']
+        form.fields['calendar_id'].help_text = "Not seeing a calendar? Share it with %s"%authEmail
+        calendarChoices = []
+        for calendar in calendars['items']:
+            calendarChoices.append((calendar['id'], calendar['summary']))
+        form.fields['calendar_id'].choices = calendarChoices
+        return form
 
     def get_creds(self):
         #FIXME: Error out if credentials aren't set, and load google app engine
@@ -94,7 +112,7 @@ class GoogleCalendarImporter(DatasetImporter):
             # Call the Calendar API
             self.log.debug('Starting page!')
             events_result = service.events().list(
-                    calendarId=settings.GOOGLE_CALENDAR_IMPORT_ID,
+                    calendarId=self.configuration['calendar_id'],
                     singleEvents=True,
                     pageToken=token,
                     maxResults=100,
@@ -168,7 +186,8 @@ class AppendingField(fields.Field):
 
 class EventAttendanceResource(resources.ModelResource):
     email = AppendingField(column_name='email', attribute='attendees',
-            widget=widgets.ManyToManyWidget(Person, ',', 'email'))
+            widget=widgets.ManyToManyWidget(Person, ',', 'email'),
+            saves_null_values=False)
     event_uid = fields.Field(column_name='event_uid', attribute='uid',
             widget=widgets.CharWidget(), saves_null_values=False)
     event_instance_id = fields.Field(column_name='event_instance_id',
@@ -186,45 +205,6 @@ class EventAttendanceResource(resources.ModelResource):
         import_id_fields = ('event_uid', 'event_instance_id')
         fields = ('uid', 'instance_id', 'attendees')
 
-class AirtableAttendanceImporter(DatasetImporter):
-    class Meta:
-        resource = EventAttendanceResource()
-
-    def __init__(self):
-        super(AirtableAttendanceImporter, self).__init__()
-
-    def init(self):
-        membersTable = Airtable(
-                settings.AIRTABLE_BASE_ID,
-                settings.AIRTABLE_TABLE_NAME,
-                api_key=settings.AIRTABLE_API_KEY)
-        eventsTable = Airtable(
-                settings.AIRTABLE_BASE_ID,
-                'Events',
-                api_key=settings.AIRTABLE_API_KEY)
-        self.eventPages = iter(eventsTable.get_iter(fields=['Name', 'Date/Time', 'Google Calendar ID', 'Volunteers']))
-        members = iter(membersTable.get_all(fields=['Email', 'Name']))
-
-        self.emailForAirtableId = {}
-
-        for member in members:
-            self.emailForAirtableId[member['id']] = member['fields'].get('Email')
-
-
-    def next_page(self):
-        dataset = tablib.Dataset(headers=('email', 'event_uid', 'event_instance_id'))
-        for event in self.eventPages.next():
-            #FIXME: These field names are hardcoded
-            if 'Volunteers' in event['fields']:
-                for attendee in event['fields']['Volunteers']:
-                    dataset.append((
-                        self.emailForAirtableId.get(attendee),
-                        None, # FIXME: Support GUID column
-                        event['fields'].get('Google Calendar ID')
-                    ))
-        return dataset
-
 importers = {
     'google-calendar-events': GoogleCalendarImporter,
-    'airtable-attendance': AirtableAttendanceImporter
 }

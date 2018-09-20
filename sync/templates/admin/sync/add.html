@@ -1,0 +1,9 @@
+{% extends "admin/change_form.html" %}
+{% block content %}
+<p>Available backends:</p>
+<ul>
+{% for backend in backends %}
+<li><a href="{% url 'admin:sync_configure_and_add' backend %}">{{backend}}</a></li>
+{% endfor %}
+</ul>
+{% endblock %}
