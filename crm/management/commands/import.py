@@ -13,10 +13,14 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('source', nargs='+')
         parser.add_argument('--debug', default=False, action='store_true')
+        parser.add_argument('--dry-run', default=False, action='store_true')
 
     def handle(self, *args, **options):
         if options['debug']:
             logging.basicConfig(level=logging.DEBUG)
+
+
+        dryRun = options['dry_run']
 
         errors = []
         totals = {}
@@ -35,7 +39,7 @@ class Command(BaseCommand):
                     sourceTotals = {}
                     for dataPage in it:
                         log.debug('Importing %s rows...', len(dataPage))
-                        result = resource.import_data(dataPage, dry_run=False,
+                        result = resource.import_data(dataPage, dry_run=dryRun,
                                 raise_errors=True)
                         for (k, v) in result.totals.iteritems():
                             sourceTotals[k] = sourceTotals.get(k, 0) + v
