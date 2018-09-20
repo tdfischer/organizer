@@ -28,7 +28,7 @@ class Command(BaseCommand):
         for source in options['source']:
             importerCls = get_importer_class(source)
             if importerCls is None:
-                print "No such importer:", options['source']
+                print "No such importer:", source
                 print "Available importers:", ', '.join(collect_importers().keys())
                 return
             importers.append((source, importerCls()))
