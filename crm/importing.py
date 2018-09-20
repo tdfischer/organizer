@@ -11,11 +11,23 @@ from address.models import Address
 from organizer.importing import DatasetImporter, AddressWidget
 from mailchimp3 import MailChimp
 
+
+class PersonStateWidget(widgets.Widget):
+    def clean(self, value, row, *args, **kwargs):
+        if value is None:
+            return None
+        return models.PersonState.objects.get_or_create(name=value)[0]
+
+    def render(self, value, obj=None):
+        if value is None:
+            return None
+        return value.name
+
 class PersonResource(resources.ModelResource):
     state = fields.Field(
         column_name = 'state',
         attribute = 'state',
-        widget=widgets.ForeignKeyWidget(models.PersonState, 'name'),
+        widget=PersonStateWidget(),
         saves_null_values = False
     )
     address = fields.Field(
