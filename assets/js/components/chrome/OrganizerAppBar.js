@@ -76,7 +76,7 @@ export const OrganizerAppBar = (props) => (
             </DialogOpener>
             <div className={props.classes.flex}>
                 <Typography color="inherit" variant="title">{props.currentPerson.name || ''}</Typography>
-                <Typography color="inherit" variant="subheading">{props.current_user.email}</Typography>
+                <Typography color="inherit" variant="subheading">{props.current_user.email} - {props.currentPerson.twelve_month_event_count} events</Typography>
             </div>
             <BusyIndicator />
         </Toolbar>

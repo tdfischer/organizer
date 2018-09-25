@@ -3,6 +3,8 @@ from . import models
 from django.contrib.auth.models import User, Group, Permission
 from taggit_serializer.serializers import TagListSerializerField, TaggitSerializer
 import address
+from django.utils import timezone
+from datetime import timedelta
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     groups = serializers.SlugRelatedField(many=True, queryset=Group.objects.all(),
@@ -78,6 +80,11 @@ class PersonSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer)
     state = serializers.SlugRelatedField(queryset=models.PersonState.objects.all(),
             slug_field='name', required=False)
     address = AddressSerializer(write_only=True, required=False)
+    twelve_month_event_count = serializers.SerializerMethodField()
+
+    def get_twelve_month_event_count(self, obj):
+        oneYearAgo = timezone.now() + timedelta(days=-365)
+        return obj.events.filter(end_timestamp__gte=oneYearAgo).count()
 
     def to_internal_value(self, data):
         if 'state' in data:
@@ -96,7 +103,8 @@ class PersonSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer)
     class Meta:
         model = models.Person
         fields = ('name',  'id', 'email', 'created', 'url', 'tags',
-        'geo', 'current_turf', 'turf_memberships', 'state', 'address', 'phone')
+        'geo', 'current_turf', 'turf_memberships', 'state', 'address', 'phone',
+        'twelve_month_event_count')
 
         lookup_field = 'email'
         extra_kwargs = {
