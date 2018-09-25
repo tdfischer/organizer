@@ -3,7 +3,8 @@ import BottomNavigation from '@material-ui/core/BottomNavigation'
 import BottomNavigationAction from '@material-ui/core/BottomNavigationAction'
 import Icon from '@material-ui/core/Icon'
 import { push } from 'connected-react-router'
-import { connect} from 'react-redux'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 import { getCurrentUser } from '../../selectors/auth'
 import PropTypes from 'prop-types'
 import { withProvider } from '../../store'
@@ -24,9 +25,7 @@ const mapStateToProps = state => {
 }
 
 const mapDispatchToProps = dispatch => {
-    return {
-        push: path => dispatch(push(path))
-    }
+    return bindActionCreators({push})
 }
 
 const CaptainButtons = () => [
