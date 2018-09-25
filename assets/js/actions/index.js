@@ -5,9 +5,9 @@ export const RECEIVE_USER = 'RECEIVE_USER'
 
 export const logout = () => {
     return dispatch => {
-        fetch('/api/users/logout/').then(() => (
-            dispatch(receiveUser({}))
-        ))
+        return fetch('/api/users/logout/').then(() =>
+            Promise.resolve(dispatch(receiveUser({})))
+        )
     }
 }
 

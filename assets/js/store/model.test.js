@@ -3,7 +3,6 @@ import thunk from 'redux-thunk'
 import fetchMock from 'fetch-mock'
 
 import Model, { UPDATE_MODEL, REQUEST_MODELS, RECEIVE_MODELS } from './model'
-import organizerApp from '../reducers'
 
 const mockStore = configureMockStore([thunk])
 
