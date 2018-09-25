@@ -4,7 +4,11 @@ export const Geocache = _geocache
 export const RECEIVE_USER = 'RECEIVE_USER'
 
 export const logout = () => {
-    return receiveUser({})
+    return dispatch => {
+        fetch('/api/users/logout/').then(() => (
+            dispatch(receiveUser({}))
+        ))
+    }
 }
 
 export const receiveUser = (u) => {
