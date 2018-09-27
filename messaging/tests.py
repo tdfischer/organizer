@@ -1,78 +1,67 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from hypothesis.extra.django import TestCase
-from hypothesis import given, note
-from hypothesis.extra.django.models import models as djangoModels
-from hypothesis.strategies import text, composite, lists, just, tuples
 from models import Broadcast, send_queued_broadcast
-from crm.models import Turf, PersonState, TurfMembership
-from crm.tests import mockRedis, mockedQueue, people, defaultStates, nonblanks
+from crm.models import Person, Turf, PersonState, TurfMembership
 from django.contrib.auth.models import User
 from address.models import Locality, State, Country
-from rest_framework.test import APITestCase
 from mock import MagicMock
+import pytest
 
-locality = djangoModels(Locality, state=djangoModels(State,
-    country=djangoModels(Country)))
-
-broadcasts = djangoModels(PersonState).flatmap(
-    lambda state: locality.flatmap(
-        lambda locality: tuples(
-            djangoModels(Broadcast,
-                turf=djangoModels(Turf, locality=just(locality)),
-                author=djangoModels(User),
-                target_state=defaultStates(),
-            ),
-            lists(people(), min_size=1, max_size=1)
-        )
+@pytest.fixture
+def locality():
+    return Locality.objects.create(
+        name='Locality',
+        state=State.objects.create(name='State',
+            country=Country.objects.create(name='Country'))
     )
-)
 
-class BroadcastTests(APITestCase, TestCase):
-    @mockRedis
-    @given(djangoModels(User), djangoModels(PersonState), djangoModels(Turf,
-        locality=locality), nonblanks(), nonblanks())
-    def testQueueOnSave(self, author, state, turf, subject, body):
-        with mockedQueue() as queue:
-            broadcast = Broadcast.objects.create(author=author, turf=turf, subject=subject,
-                    body=body, target_state=state)
-            queue.return_value.enqueue.assert_called_once_with(send_queued_broadcast,
-                    broadcast)
+@pytest.fixture
+def turf(locality):
+    return Turf.objects.create(name='Turf', locality=locality)
 
-    @mockRedis
-    @given(djangoModels(User), djangoModels(PersonState), djangoModels(Turf,
-        locality=locality), nonblanks(), nonblanks())
-    def testAPI(self, author, state, turf, subject, body):
-        with mockedQueue() as queue:
-            data = {
-                'subject': subject,
-                'body': body,
-                'turf': turf.id,
-                'target_state': state.name
-            }
-            self.client.force_authenticate(user=author)
-            resp = self.client.post('/api/broadcasts/', data)
-            note("Response %r"%(resp.data))
-            self.assertEqual(resp.status_code, 201)
+@pytest.fixture
+def people(redis_queue, default_personstate):
+    return list([Person.objects.create(email="%s@example.com"%(i),
+        state=default_personstate) for i in range(0, 10)])
 
-            broadcast = Broadcast.objects.get(pk=resp.data['id'])
-            queue.return_value.enqueue.assert_called_once_with(send_queued_broadcast,
-                    broadcast)
-            self.assertEqual(broadcast.author, author)
+@pytest.mark.django_db
+def testAPI(redis_queue, api_client, test_user, default_personstate, turf):
+    """Test that submitting a broadcast via the API queues it for processing"""
+    data = {
+        'subject': 'Subject',
+        'body': 'Body',
+        'turf': turf.id,
+        'target_state': default_personstate.name
+    }
+    api_client.force_authenticate(user=test_user)
+    resp = api_client.post('/api/broadcasts/', data)
+    print "Response %r"%(resp.data)
+    assert resp.status_code == 201
 
-    @mockRedis
-    @given(broadcasts)
-    def testSendBroadcast(self, broadcastsAndPeople):
-        broadcast, people = broadcastsAndPeople
-        for person in people:
-            TurfMembership.objects.create(turf=broadcast.turf, person=person)
-        with mockedQueue() as queue:
-            send_queued_broadcast(broadcast)
-            queue.return_value.enqueue.assert_called_once()
-            note(queue.return_value.enqueue.call_args)
-            args, _ = queue.return_value.enqueue.call_args
-            queuedFunc, args = (args[0], args[1:])
-            messageMock = MagicMock()
-            queuedFunc(messageMock)
-            messageMock.send.assert_called_once()
+    broadcast = Broadcast.objects.get(pk=resp.data['id'])
+    redis_queue.enqueue.assert_called_once_with(send_queued_broadcast,
+            broadcast)
+    assert broadcast.author == test_user
+
+@pytest.mark.django_db
+def testSendBroadcast(redis_queue, test_user, turf, default_personstate, people):
+    """Test that sending a queued broadcast queues up and later sends emails to each person"""
+    redis_queue.reset_mock()
+    broadcast = Broadcast.objects.create(author=test_user, turf=turf,
+            subject='Subject',
+            body='Body', target_state=default_personstate)
+    redis_queue.enqueue.assert_called_once_with(send_queued_broadcast,
+            broadcast)
+    for person in people:
+        TurfMembership.objects.create(turf=broadcast.turf, person=person)
+    redis_queue.reset_mock()
+    send_queued_broadcast(broadcast)
+    assert len(redis_queue.enqueue.mock_calls) == len(people)
+    for (person, (args, kwargs)) in zip(people,
+            redis_queue.enqueue.call_args_list):
+        queuedFunc, message = (args[0], args[1])
+        assert message.to[0] == person.email
+        messageMock = MagicMock()
+        queuedFunc(messageMock)
+        messageMock.send.assert_called_once()

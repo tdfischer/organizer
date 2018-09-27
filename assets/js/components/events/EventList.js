@@ -28,7 +28,7 @@ export const EventList = props => {
                 <h2 key={'walk-'+walkTime+weekDelta}>{WALKTIME_BREAKPOINTS.getValue(walkTime)}</h2>
             )
             return [walkHeader, ...events.map(evt => (
-                <EventCard className={props.classes.eventCard} key={evt.id} event_id={evt.id} onCheckIn={props.onCheckin} />
+                <EventCard className={props.classes.eventCard} key={evt.id} event_id={evt.id} onCheckIn={props.onCheckIn} />
             ))]
         })]
     })

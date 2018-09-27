@@ -78,8 +78,8 @@ class PersonSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer)
     current_turf = TurfSerializer(read_only=True)
     turf_memberships = TurfMembershipSerializer(many=True, read_only=True)
     state = serializers.SlugRelatedField(queryset=models.PersonState.objects.all(),
-            slug_field='name', required=False)
-    address = AddressSerializer(write_only=True, required=False)
+            slug_field='name', allow_null=True, required=False)
+    address = AddressSerializer(write_only=True, allow_null=True, required=False)
     twelve_month_event_count = serializers.SerializerMethodField()
 
     def get_twelve_month_event_count(self, obj):
@@ -87,8 +87,10 @@ class PersonSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer)
         return obj.events.filter(end_timestamp__gte=oneYearAgo).count()
 
     def to_internal_value(self, data):
-        if 'state' in data:
+        if 'state' in data and data['state'] is not None and len(data['state']) > 0:
             models.PersonState.objects.get_or_create(name=data.get('state'))
+        if 'address' in data and (data['address'] is None or len(data['address']) == 0):
+            del data['address']
         return super(PersonSerializer, self).to_internal_value(data)
 
     def update(self, instance, validated_data):
@@ -109,6 +111,7 @@ class PersonSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer)
         lookup_field = 'email'
         extra_kwargs = {
                 'url': {'lookup_field': 'email'},
+                'name': {'required': False, 'allow_null': True},
                 'id': {'source': 'email', 'read_only': True},
                 'geo': {'read_only': True},
                 'phone': {'write_only': True},

@@ -14,6 +14,43 @@ import os
 import raven
 import dj_database_url
 
+
+LOG_REQUEST_ID_HEADER = 'HTTP_X_REQUEST_ID'
+LOG_REQUESTS = True
+
+LOGGING = {
+    "version": 1,
+    "filters": {
+        "request_id": {
+            "()": "request_id.logging.RequestIdFilter"
+        }
+    },
+    "formatters": {
+        "console": {
+            "format": "%(asctime)s - %(levelname)-5s [%(name)s] request_id=%(request_id)s %(message)s",
+            "datefmt": "%H:%M:%S"
+        }
+    },
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "filters": ["request_id"],
+            "class": "logging.StreamHandler",
+            "formatter": "console"
+        }
+    },
+    "root": {
+        "level": os.getenv('LOG_LEVEL', 'INFO'),
+        "handlers": ["console"]
+    },
+    "loggers": {
+        "django": {
+            "level": os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            "propagate": True
+        }
+    }
+}
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -95,6 +132,7 @@ MARKDOWNIFY_WHITELIST_TAGS = [
 ]
 
 MIDDLEWARE = [
+    'request_id.middleware.RequestIdMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

@@ -41,7 +41,7 @@ export class OrganizerDashboard extends React.Component {
                 <Grid item>
                     <Grid container direction="column" justify="space-evenly" alignItems="stretch" spacing={8}>
                         {recentBroadcast ? <MessageCard message={recentBroadcast} /> : null}
-                        <EventList start={moment()} end={moment().add(1, 'month')} onCheckin={this.onCheckin} />
+                        <EventList start={moment()} end={moment().add(1, 'month')} onCheckIn={this.doCheckin} />
                     </Grid>
                 </Grid>
                 <Grid item>
@@ -51,7 +51,7 @@ export class OrganizerDashboard extends React.Component {
                         </ExpansionPanelSummary>
                         <ExpansionPanelDetails>
                             <Grid direction="column" alignItems="stretch" container spacing={8}>
-                                <EventList start={moment().add(-1, 'month')} end={moment()} onCheckin={this.onCheckin} />
+                                <EventList start={moment().add(-1, 'month')} end={moment()} onCheckIn={this.doCheckin} />
                                 {this.props.myBroadcasts.skip(1).map(m => (
                                     <MessageCard key={m} message={m} />
                                 )).toArray()}
