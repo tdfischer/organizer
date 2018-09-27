@@ -25,7 +25,7 @@ const mapStateToProps = state => {
 }
 
 const mapDispatchToProps = dispatch => {
-    return bindActionCreators({push})
+    return bindActionCreators({push}, dispatch)
 }
 
 const CaptainButtons = () => [
