@@ -20,7 +20,6 @@ LOG_REQUESTS = True
 
 LOGGING = {
     "version": 1,
-    "disable_existing_loggers": False,
     "filters": {
         "request_id": {
             "()": "request_id.logging.RequestIdFilter"
@@ -40,10 +39,14 @@ LOGGING = {
             "formatter": "console"
         }
     },
+    "root": {
+        "level": os.getenv('LOG_LEVEL', 'INFO'),
+        "handlers": ["console"]
+    },
     "loggers": {
-        "": {
-            "level": "DEBUG",
-            "handlers": ["console"]
+        "django": {
+            "level": os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            "propagate": True
         }
     }
 }
