@@ -33,6 +33,13 @@ const WidgetForField = withFieldState('property')(props => {
                 <MaterialFormModelSelect value={t => t.id} display={t => (t.name + ', ' + _.get(t, 'locality.name') + ' ' + _.get(t, 'locality.postal_code'))} model="turfs" field="value" />
             </FormControl>
         )
+    case 'geo.properties.city':
+        return (
+            <FormControl fullWidth>
+                <InputLabel>City</InputLabel>
+                <MaterialFormModelSelect model="cities" field="value" />
+            </FormControl>
+        )
     default:
         return <MaterialFormText fullWidth label="Value" field="value" />
     }
@@ -41,6 +48,7 @@ const WidgetForField = withFieldState('property')(props => {
 const OperatorWidgetForField = withFieldState('property')(props => {
     switch(props.fieldState.value) {
     case 'current_turf.id':
+    case 'geo.properties.city':
     case 'state':
         return (
             <FormControl fullWidth>
