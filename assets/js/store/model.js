@@ -177,7 +177,7 @@ export default class Model {
     }
 
     deserializeGeo(geo) {
-        return (geo && geo.lat != undefined && geo.lng != undefined) ? point([geo.lat, geo.lng]) : undefined
+        return (geo && geo.lat != undefined && geo.lng != undefined) ? point([geo.lat, geo.lng], {city: geo.city}) : undefined
     }
 
     create(modelData) {
