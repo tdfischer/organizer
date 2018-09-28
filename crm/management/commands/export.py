@@ -30,12 +30,7 @@ class Command(BaseCommand):
         with tqdm(exporters, desc='destinations', unit=' destination') as expIt:
             for (exporterName, exporter) in expIt:
                 exportedResource = exporter.Meta.resource()
-                queryset = exportedResource.get_queryset()
-                batchSize = getattr(exporter.Meta, 'page_size', 100)
-                exporter.init()
-                exportRange = xrange(0, queryset.count(), batchSize)
-                with tqdm(exportRange, desc=exporterName, unit=' page') as it:
-                    for offset in it:
-                        log.debug('Exporting %s...%s', offset, offset + batchSize)
-                        exporter.export_page(exportedResource.export(queryset[offset:(offset+batchSize)]),
-                                dry_run=dryRun)
+                with tqdm(exporter, desc=exporterName, unit=' page') as it:
+                    log.debug('Exporting %s items', len(exporter))
+                    for page in it:
+                        exporter.export_page(page, dry_run=dryRun)

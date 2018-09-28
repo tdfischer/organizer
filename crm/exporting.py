@@ -1,16 +1,39 @@
 from django.conf import settings
 from airtable import Airtable
 import logging
+from mailchimp3 import MailChimp
+import hashlib
 
 from organizer.exporting import DatasetExporter
 from crm.importing import PersonResource
 
 log = logging.getLogger(__name__)
 
+class MailchimpExporter(DatasetExporter):
+    class Meta:
+        resource = PersonResource
+
+    def init(self):
+        self.mailchimp = MailChimp(mc_api=settings.MAILCHIMP_SECRET_KEY)
+
+    def export_page(self, page, dry_run=False):
+        for row in page.dict:
+            hasher = hashlib.md5()
+            hasher.update(row['email'].lower())
+            hashedAddr = hasher.hexdigest()
+            if not dry_run:
+                self.mailchimp.lists.members.create_or_update(
+                    settings.MAILCHIMP_LIST_ID,
+                    hashedAddr,
+                    dict(
+                        email_address = row['email'],
+                        status_if_new = 'subscribed'
+                    )
+                )
+
 class AirtableExporter(DatasetExporter):
     class Meta:
         resource = PersonResource
-        #page_size = 1
 
     def init(self):
         self.airtable = Airtable(
