@@ -47,7 +47,10 @@ class Person(models.Model):
 
     @property
     def geo(self):
-        return {'lat': self.lat, 'lng': self.lng}
+        city = None
+        if self.address is not None and self.address.locality is not None:
+            city = self.address.locality.name
+        return {'lat': self.lat, 'lng': self.lng, 'city': city}
 
     def update_geo(self):
         resolved = geocache.geocode(self.address.raw)
