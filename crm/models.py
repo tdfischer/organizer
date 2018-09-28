@@ -48,7 +48,9 @@ class Person(models.Model):
     @property
     def geo(self):
         city = None
-        if self.address is not None and self.address.locality is not None:
+        if self.current_turf is not None:
+            city = self.current_turf.locality.name
+        elif self.address is not None and self.address.locality is not None:
             city = self.address.locality.name
         return {'lat': self.lat, 'lng': self.lng, 'city': city}
 
