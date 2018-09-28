@@ -85,7 +85,10 @@ class Person(models.Model):
 
     @property
     def current_turf(self):
-        return Turf.objects.get(pk=self.current_turf_id)
+        if hasattr(self, 'current_turf_id'):
+            return Turf.objects.get(pk=self.current_turf_id)
+        else:
+            return self.turf_memberships.order_by('-joined_on')[0].turf
 
     def __unicode__(self):
         ret = self.name.strip()
