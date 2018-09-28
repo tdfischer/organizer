@@ -82,7 +82,7 @@ const BooleanFilter = props => {
                         <MaterialFormSelect initialValue="name" field="property">
                             <MenuItem value="name">Name</MenuItem>
                             <MenuItem value="email">E-Mail</MenuItem>
-                            <MenuItem value="address.locality">City</MenuItem>
+                            <MenuItem value="geo.properties.city">City</MenuItem>
                             <MenuItem value="tags">A tag</MenuItem>
                             <MenuItem value="state">State</MenuItem>
                             <MenuItem value="current_turf.id">Turf</MenuItem>
