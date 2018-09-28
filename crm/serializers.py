@@ -24,7 +24,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
 class LocalitySerializer(serializers.ModelSerializer):
     class Meta:
         model = address.models.Locality
-        fields = ('name', 'postal_code')
+        fields = ('name', 'postal_code', 'id')
 
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
