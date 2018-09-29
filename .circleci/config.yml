@@ -29,6 +29,7 @@ jobs:
             git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git
   test-python:
     <<: *defaults
+    parallelism: 2
     steps:
       - checkout
       - restore_cache:
@@ -54,7 +55,7 @@ jobs:
           command: |
             mkdir -p test-results/nose codeclimate/
             ./cc-test-reporter before-build
-            pipenv run pytest --cov=./ --cov-report xml --cov-branch --hypothesis-show-statistics
+            pipenv run pytest --test-group-count=$CIRCLE_NODE_TOTAL --test-group=$(($CIRCLE_NODE_INDEX+1)) --cov=./ --cov-report xml --cov-branch --hypothesis-show-statistics
             ./cc-test-reporter format-coverage --output ./codeclimate/python.json
             bash <(curl -s https://codecov.io/bash) -cF python
       - persist_to_workspace:
