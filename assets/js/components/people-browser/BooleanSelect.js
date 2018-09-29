@@ -3,7 +3,7 @@ import MenuItem from '@material-ui/core/MenuItem'
 
 import MaterialFormSelect from '../MaterialFormSelect'
 
-const BooleanSelect = props => {
+export const BooleanSelect = props => {
     return (
         <MaterialFormSelect {...props}>
             <MenuItem value='contains'>Contains</MenuItem>

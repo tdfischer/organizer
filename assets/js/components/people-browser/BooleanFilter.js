@@ -79,7 +79,7 @@ const RemoveButton = withFormApi(props => (
     </IconButton>
 ))
 
-const BooleanFilter = props => {
+export const BooleanFilter = props => {
     return (
         <Scope scope={props.field}>
             <Grid container spacing={8}>

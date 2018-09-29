@@ -21,7 +21,7 @@ const AddButton = withFormApi(props => (
     </IconButton>
 ))
 
-const Search = props => {
+export const Search = props => {
     return (
         <Form initialValues={{filter: [{}]}} onChange={({values}) => props.filter.set(values.filter)}>
             {({formApi}) => (
