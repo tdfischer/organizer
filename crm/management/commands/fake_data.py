@@ -11,7 +11,7 @@ from crm import models
 from events.models import Event
 fake = Faker()
 
-class Command(BaseCommand):
+class Command(BaseCommand): # pragma: no cover
     def create_model(self, Model, count, fakers):
         ret = []
         for i in range(0, count):
@@ -35,33 +35,65 @@ class Command(BaseCommand):
         states = self.create_model(models.PersonState, 4, {
             'name': fake.word
         })
-        country = Country.objects.create(name=fake.country())
-        state = State.objects.create(name=fake.state(), country=country)
-        locality = Locality.objects.create(name=fake.city(), state=state)
+        country = Country.objects.get_or_create(name=fake.country())[0]
+        state = State.objects.get_or_create(name=fake.state(),
+                country=country)[0]
+        locality = Locality.objects.get_or_create(name=fake.city(),
+                state=state)[0]
         turfs = self.create_model(models.Turf, 10, {
             'name': fake.city,
             'locality': lambda: locality
         })
+        localFakeAddress = lambda: fakeAddress(dict(
+            locality = locality.name,
+            country = country.name,
+            state = state.name
+        ))
+
+        print "Populating %s, %s, %s with 100 people..."%(locality.name, state.name,
+                country.name)
         people = self.create_model(models.Person, 100, {
             'name': fake.name,
-            'address': fake.address,
+            'address': localFakeAddress,
             'email': fake.email,
-            'state': lambda: random.choice(states)
+            'state': lambda: random.choice(states),
+            'lat': fakeLatitude,
+            'lng': fakeLongitude
         })
 
         for person in people:
             models.TurfMembership.objects.create(person=person,
                     turf=random.choice(turfs))
+            print person, "moved in to", person.current_turf
 
-        self.create_model(Event, 20, fakeEventData)
+        self.create_model(Event, 20, lambda: fakeEventData(localFakeAddress))
 
-def fakeEventData():
+def fakeLatitude():
+    return random.triangular(37, 38)
+
+def fakeLongitude():
+    return random.triangular(-123, -122)
+
+def fakeAddress(template={}):
+    street = getattr(template, 'street', fake.name() + ' Street')
+    city = getattr(template, 'locality', fake.city())
+    state = getattr(template, 'state', fake.state())
+    country = getattr(template, 'country', fake.country())
+    return {
+        'raw': street + ", " + city + ", " + state + ", " + country,
+        'route': street,
+        'locality': city,
+        'state': state,
+        'country': country,
+    }
+
+def fakeEventData(locationFaker):
     start = timezone.now() + timedelta(hours=random.randint(-72, 72))
     return {
         'name': fake.catch_phrase(),
-        'location': fake.address(),
-        'lat': random.triangular(37, 38),
-        'lng': random.triangular(-123, -122),
+        'location': locationFaker(),
+        'lat': fakeLatitude(),
+        'lng': fakeLongitude(),
         'timestamp': start,
         'end_timestamp': start + timedelta(hours=1),
         'uid': fake.uuid4

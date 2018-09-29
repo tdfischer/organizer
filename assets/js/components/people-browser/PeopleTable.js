@@ -1,9 +1,9 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import ImmutablePropTypes from 'react-immutable-proptypes'
 import _ from 'lodash'
 import { connect } from 'react-redux'
 import Chip from '@material-ui/core/Chip'
+import Typography from '@material-ui/core/Typography'
 import { withStyles } from '@material-ui/core/styles'
 import Checkbox from '@material-ui/core/Checkbox'
 import { WindowScroller, Column, Table } from 'react-virtualized'
@@ -63,36 +63,19 @@ const TagList = props => (
     _.map(props.tags, tag => <Chip key={tag} className="tag" label={tag} />)
 )
 
-const rowStyles = {
-    row: {
-        height: '48px',
-        display: 'table-row',
-        verticalAlign: 'middle',
-        margin: 0
-    }
-}
-
-const PersonRow = withStyles(rowStyles)(props => (
-    <div role="row" className={props.classes.row}>
-        <div className={props.classes.cell}>
-            <Checkbox checked={props.person.selected} onChange={() => props.selector.toggle(props.person.email)}/>
-        </div>
-        <div className={props.classes.cell}>{props.person.name} <TagList tags={props.person.tags} /></div>
-        <div className={props.classes.cell}>{props.person.email}</div>
-    </div>
-))
-
-PersonRow.propTypes = {
-    person: PropTypes.object.isRequired,
-    selector: PropTypes.object.isRequired,
-}
-
 const renderCheckboxCell = props => (
     <Checkbox checked={props.rowData.selected} onChange={() => props.selector.toggle(props.rowData.email)}/>
 )
 
 const renderCheckboxHeader = props => (
     <Checkbox checked={props.people.reduce((prev, person) => prev && person.selected, true)} onChange={(_e, newValue) => props.people.map(_.property('email')).forEach(newValue ? props.selector.add : props.selector.remove)} />
+)
+
+const renderNameCell = props => (
+    <React.Fragment>
+        {props.rowData.name} <TagList tags={props.rowData.tags} />
+        <Typography variant="caption">{props.rowData.email} - {_.get(props.rowData, 'current_turf.name')}, {_.get(props.rowData, 'current_turf.locality.name')} {_.get(props.rowData, 'current_turf.locality.postal_code')}</Typography>
+    </React.Fragment>
 )
 
 export const PeopleTable = props => (
@@ -111,8 +94,7 @@ export const PeopleTable = props => (
                 headerHeight={48}
                 width={width}>
                 <Column headerRenderer={() => renderCheckboxHeader({selector: props.selector, people: props.filteredPeople})} className={props.classes.checkboxCell} width={32} label='' dataKey='selected' cellRenderer={p => renderCheckboxCell({selector: props.selector, ...p})} />
-                <Column className={props.classes.cell} width={(width/3*2)-32} label='Name' dataKey='name' />
-                <Column className={props.classes.cell} width={(width/3)-32} label='Email' dataKey='email' />
+                <Column cellRenderer={p => renderNameCell(p)} className={props.classes.cell} width={width-32-10} label='Name' dataKey='name' />
             </Table>
         )}
     </WindowScroller>

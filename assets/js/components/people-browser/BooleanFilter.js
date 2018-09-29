@@ -1,5 +1,6 @@
 import React from 'react'
 import Grid from '@material-ui/core/Grid'
+import _ from 'lodash'
 import FormControl from '@material-ui/core/FormControl'
 import InputLabel from '@material-ui/core/InputLabel'
 import MenuItem from '@material-ui/core/MenuItem'
@@ -12,8 +13,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 faLibrary.add(faMinusSquare)
 
 import MaterialFormSelect from '../MaterialFormSelect'
-import MaterialFormStateSelect from '../MaterialFormStateSelect'
-import MaterialFormTurfSelect from '../MaterialFormTurfSelect'
+import MaterialFormModelSelect from '../MaterialFormModelSelect'
 import MaterialFormText from '../MaterialFormText'
 import BooleanSelect from './BooleanSelect'
 
@@ -23,14 +23,21 @@ const WidgetForField = withFieldState('property')(props => {
         return (
             <FormControl fullWidth>
                 <InputLabel>State</InputLabel>
-                <MaterialFormStateSelect field="value" />
+                <MaterialFormModelSelect model="states" field="value" />
             </FormControl>
         )
     case 'current_turf.id':
         return (
             <FormControl fullWidth>
                 <InputLabel>Turf</InputLabel>
-                <MaterialFormTurfSelect field="value" />
+                <MaterialFormModelSelect value={t => t.id} display={t => (t.name + ', ' + _.get(t, 'locality.name') + ' ' + _.get(t, 'locality.postal_code'))} model="turfs" field="value" />
+            </FormControl>
+        )
+    case 'geo.properties.city':
+        return (
+            <FormControl fullWidth>
+                <InputLabel>City</InputLabel>
+                <MaterialFormModelSelect model="cities" field="value" />
             </FormControl>
         )
     default:
@@ -41,6 +48,7 @@ const WidgetForField = withFieldState('property')(props => {
 const OperatorWidgetForField = withFieldState('property')(props => {
     switch(props.fieldState.value) {
     case 'current_turf.id':
+    case 'geo.properties.city':
     case 'state':
         return (
             <FormControl fullWidth>
@@ -71,7 +79,7 @@ const RemoveButton = withFormApi(props => (
     </IconButton>
 ))
 
-const BooleanFilter = props => {
+export const BooleanFilter = props => {
     return (
         <Scope scope={props.field}>
             <Grid container spacing={8}>
@@ -82,7 +90,7 @@ const BooleanFilter = props => {
                         <MaterialFormSelect initialValue="name" field="property">
                             <MenuItem value="name">Name</MenuItem>
                             <MenuItem value="email">E-Mail</MenuItem>
-                            <MenuItem value="address.locality">City</MenuItem>
+                            <MenuItem value="geo.properties.city">City</MenuItem>
                             <MenuItem value="tags">A tag</MenuItem>
                             <MenuItem value="state">State</MenuItem>
                             <MenuItem value="current_turf.id">Turf</MenuItem>

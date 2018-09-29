@@ -47,7 +47,12 @@ class Person(models.Model):
 
     @property
     def geo(self):
-        return {'lat': self.lat, 'lng': self.lng}
+        city = None
+        if self.current_turf is not None:
+            city = self.current_turf.locality.name
+        elif self.address is not None and self.address.locality is not None:
+            city = self.address.locality.name
+        return {'lat': self.lat, 'lng': self.lng, 'city': city}
 
     def update_geo(self):
         resolved = geocache.geocode(self.address.raw)
@@ -85,7 +90,10 @@ class Person(models.Model):
 
     @property
     def current_turf(self):
-        return Turf.objects.get(pk=self.current_turf_id)
+        if hasattr(self, 'current_turf_id'):
+            return Turf.objects.get(pk=self.current_turf_id)
+        else:
+            return self.turf_memberships.order_by('-joined_on')[0].turf
 
     def __unicode__(self):
         ret = self.name.strip()

@@ -42,6 +42,16 @@ export const persistor = persistStore(store)
 export const withModelData = mapModelToFetch => WrappedComponent => {
     return connect()(class Fetcher extends React.PureComponent {
         componentDidMount() {
+            this.fetch()
+        }
+
+        componentDidUpdate(prevProps) {
+            if (prevProps.model != this.props.model) {
+                this.fetch()
+            }
+        }
+
+        fetch() {
             Object.entries(mapModelToFetch(this.props)).forEach(([modelName, params]) => {
                 const model = new Model(modelName)
                 if (typeof(params) == 'object') {

@@ -93,9 +93,15 @@ class PersonStateViewSet(IntrospectiveViewSet):
     queryset = models.PersonState.objects.all()
     serializer_class = serializers.PersonStateSerializer
 
+class CityViewSet(IntrospectiveViewSet):
+    permission_classes = (IsAuthenticated,)
+    queryset = address.models.Locality.objects.all()
+    serializer_class = serializers.LocalitySerializer
+
 views = {
     'users': UserViewSet,
     'turfs': TurfViewSet,
     'people': PersonViewSet,
-    'states': PersonStateViewSet
+    'states': PersonStateViewSet,
+    'cities': CityViewSet
 }
