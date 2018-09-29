@@ -11,7 +11,7 @@ from crm import models
 from events.models import Event
 fake = Faker()
 
-class Command(BaseCommand):
+class Command(BaseCommand): # pragma: no cover
     def create_model(self, Model, count, fakers):
         ret = []
         for i in range(0, count):
