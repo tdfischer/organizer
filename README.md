@@ -212,6 +212,11 @@ This performs the following:
 After starting the application, send your browser to the django server on
 http://localhost:8000/
 
+Provided that you set both the ``DEBUG`` and
+``USE_REALLY_INSECURE_DEVELOPMENT_AUTHENTICATION_BACKEND`` environment
+variables, organizer has an incredibly insecure authentication backend for
+development. It is an error to use LocalDevAuth without these variables set.
+
 ## Contributions
 
 Pull requests welcome. All contributions retain their copyright, but must be
