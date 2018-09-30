@@ -66,10 +66,10 @@ class AirtableImporter(DatasetImporter):
     def next_page(self):
         #FIXME: These field names are hardcoded, very EBFE specific
         COLUMNMAP = dict(
-            email = 'Email',
-            name = 'Name',
-            address = 'Full Address',
-            state = 'Membership Basis'
+            email = settings.AIRTABLE_EMAIL_COLUMN,
+            name = settings.AIRTABLE_NAME_COLUMN,
+            address = settings.AIRTABLE_ADDRESS_COLUMN,
+            state = settings.AIRTABLE_STATE_COLUMN
         )
         ret = tablib.Dataset(headers=COLUMNMAP.keys())
         page = self.__pages.next()
