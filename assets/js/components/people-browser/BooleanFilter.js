@@ -73,7 +73,7 @@ const RemoveButton = withFormApi(props => (
         color="secondary"
         onClick={() => {
             const curFilter = props.formApi.getState().values.filter || []
-            props.formApi.setValues({filter: curFilter.filter((_v, k) => k != props.index)})
+            props.formApi.setValues({...(props.formApi.getState().values), filter: curFilter.filter((_v, k) => k != props.index)})
         }}>
         <FontAwesomeIcon icon={['fa', 'minus-square']} />
     </IconButton>
