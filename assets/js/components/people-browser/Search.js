@@ -5,6 +5,7 @@ import { Form, withFormApi } from 'informed'
 import faPlusSquare from '@fortawesome/fontawesome-free-solid/faPlusSquare'
 import { library as faLibrary } from '@fortawesome/fontawesome'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import MaterialFormSwitch from '../MaterialFormSwitch'
 
 faLibrary.add(faPlusSquare)
 
@@ -15,7 +16,7 @@ const AddButton = withFormApi(props => (
         color="primary"
         onClick={() => {
             const curFilter = props.formApi.getState().values.filter || []
-            props.formApi.setValues({filter: [...curFilter, {}]})
+            props.formApi.setValues({...(props.formApi.getState().values), filter: [...curFilter, {}]})
         }}>
         <FontAwesomeIcon icon={['fa', 'plus-square']} />
     </IconButton>
@@ -23,9 +24,10 @@ const AddButton = withFormApi(props => (
 
 export const Search = props => {
     return (
-        <Form initialValues={{filter: [{}]}} onChange={({values}) => props.filter.set(values.filter)}>
+        <Form initialValues={{filter: [{}]}} onChange={({values}) => props.filter.set({op: values.op ? 'or' : 'and', children: values.filter})}>
             {({formApi}) => (
                 <Grid container direction="column" alignItems="stretch" spacing={8}>
+                    <Grid item>Match All <MaterialFormSwitch field='op'/> Match Any</Grid>
                     {(formApi.getValue('filter') || []).map((_values, idx) => 
                         <Grid key={idx} item>
                             <BooleanFilter index={idx} field={'filter['+idx+']'} />

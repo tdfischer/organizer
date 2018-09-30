@@ -7,53 +7,11 @@ import Typography from '@material-ui/core/Typography'
 import { withStyles } from '@material-ui/core/styles'
 import Checkbox from '@material-ui/core/Checkbox'
 import { WindowScroller, Column, Table } from 'react-virtualized'
+import { matchPattern } from '../../lib/filter-ast'
 
 import 'react-virtualized/styles.css'
 
 import { Model, Filterable, Selectable, withModelData } from '../../store'
-
-const matchOrContains = (needle, haystack) => {
-    if (typeof(haystack) == 'string') {
-        return haystack.match(needle)
-    } else if (haystack instanceof Array) {
-        return _.reduce(haystack, (acc, stack) => acc || matchOrContains(needle, stack), false)
-    } else {
-        return false
-    }
-}
-
-const isEqual = (needle, haystack) => {
-    if (haystack instanceof Array) {
-        return haystack.indexOf(needle) != -1
-    } else {
-        return needle == haystack
-    }
-}
-
-const makeComparator = ({property, op, value}) => {
-    if (property == undefined) {
-        return () => true
-    }
-    switch (op) {
-    case 'contains':
-        return (row) => matchOrContains(value, _.get(row, property))
-    case 'is':
-        return (row) => isEqual(value, _.get(row, property))
-    case undefined:
-        return () => true
-    default:
-        throw Error('Unknown operator ' + op)
-    }
-}
-
-const makePatternMatcher = _.memoize(patterns => {
-    const comparators = _.map(patterns, makeComparator)
-    return obj => _.reduce(comparators, (acc, comparator) => acc && comparator(obj), true)
-}, patterns => _.flatMap(patterns, p => [p.property, p.op, p.value]).join('.'))
-
-const matchPattern = (obj, patterns) => {
-    return makePatternMatcher(patterns)(obj)
-}
 
 const People = new Model('people')
 const PeopleSelector = new Selectable('people')
