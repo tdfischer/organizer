@@ -17,7 +17,11 @@
       "{{backend}}": "{% url 'social:begin' backend %}?next=/",
     {% endfor %}
   };
-  var LOGIN_URL = "{% url 'social:begin' 'slack' %}?next=/";
+  var ORG_METADATA = {
+      name: "{{settings.ORG_NAME}}",
+      shortname: "{{settings.ORG_SHORTNAME}}",
+      logo_url: {% if settings.ORG_LOGO_URL %}"{{settings.ORG_LOGO_URL}}"{% else %} undefined {% endif %},
+  };
   var CURRENT_USER = {{user_data|safe}};
   var SENTRY_PUBLIC_DSN = "{% sentry_public_dsn %}"
   </script>
