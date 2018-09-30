@@ -16,7 +16,13 @@ class Command(BaseCommand):
         print "Event leaderboard since", windowStart
         print "==========="
         for person in leaderboard:
-            print "%s\t%s"%(person.name, person.events.filter(within30Days).count())
+            print "%s\t%s"%(person, person.event_count)
+            friendOverlap = Person.objects.filter(events__in=person.events.all()).annotate(
+                event_count = Count('events', filter=within30Days)
+            ).order_by('-event_count')
+            print "\tFriends with:"
+            for friend in friendOverlap[0:5]:
+                print "\t\t%s %s"%(friend, friend.event_count)
 
         events = Event.objects.filter(within30Days).annotate(
             attendee_count=Count('attendees')
@@ -24,4 +30,4 @@ class Command(BaseCommand):
         print "Most popular events"
         print "==========="
         for event in events:
-            print "%s\t%s"%(event.name, event.attendees.count())
+            print "%s\t%s"%(event, event.attendees.count())
