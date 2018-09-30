@@ -116,3 +116,10 @@ class PersonSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer)
                 'geo': {'read_only': True},
                 'phone': {'write_only': True},
         }
+
+        field_aliases = {
+            'address': ['street address', 'zipcode', 'city', 'mailing address'],
+            'name': ['full name'],
+            'email': ['e-mail', 'e-mail address', 'email address'],
+            'phone': ['phone number']
+        }
