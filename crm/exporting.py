@@ -50,8 +50,8 @@ class AirtableExporter(DatasetExporter):
         rowEmail = row['email'].strip().lower()
         rowState = row['state']
         for m in self.members:
-            memberEmail = m['fields'].get('Email', '').strip().lower()
-            memberState = m['fields'].get('Membership Basis', '')
+            memberEmail = m['fields'].get(settings.AIRTABLE_EMAIL_COLUMN, '').strip().lower()
+            memberState = m['fields'].get(settings.AIRTABLE_STATE_COLUMN, '')
             if memberEmail == rowEmail:
                 if memberState != rowState:
                     log.info("Updating %s: %s -> %s", memberEmail, memberState, rowState)
@@ -63,7 +63,7 @@ class AirtableExporter(DatasetExporter):
         log.info('Creating %s <%s>: %s', row['name'], row['email'], rowState)
         if not dry_run:
             self.airtable.insert({
-                'Name': row['name'],
-                'Email': row['email'],
-                'Membership Basis': rowState
+                settings.AIRTABLE_NAME_COLUMN: row['name'],
+                settings.AIRTABLE_EMAIL_COLUMN: row['email'],
+                settings.AIRTABLE_STATE_COLUMN: rowState
             })
