@@ -12,6 +12,7 @@ it('should render an empty login splash', () => {
 it('should render a list of login URLs', () => {
     fc.assert(fc.property(fc.array(fc.tuple(fc.string(), fc.string())), urls => {
         global.LOGIN_URLS = urls
+        global.ORG_METADATA = {name: 'Name', shortname: 'Shortname'}
         const wrapper = shallow(<LoginSplash />)
         expect(wrapper.find(Button)).toHaveLength(urls.length)
     }))

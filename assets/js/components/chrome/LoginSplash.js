@@ -14,10 +14,14 @@ import EBFESymbol from 'svg-react-loader!../../../img/symbol.svg'
 
 faLibrary.add(faDiscourse, faSlack, faGithub)
 
+const Logo = props => (
+    (window.ORG_METADATA || {}).logo_url ? <img {...props} src={window.ORG_METADATA.logo_url} /> : <EBFESymbol {...props} />
+)
+
 export const LoginSplash = (_props) => (
     <Paper className="app-splash">
-        <p><EBFESymbol style={{width: 'auto', 'height': '4rem'}}/></p>
-        <p>Please sign in with your EBFE account to continue.</p>
+        <p><Logo style={{width: 'auto', 'height': '4rem'}}/></p>
+        <p>Please sign in with your {(window.ORG_METADATA || {}).shortname} account to continue.</p>
         <p />
         {Object.entries(window.LOGIN_URLS || []).map(([name, url]) => (
             <p key={name}><Button
@@ -29,11 +33,11 @@ export const LoginSplash = (_props) => (
         ))}
         <p><em><a href="https://eastbayforeveryone.org/join">Not a member?</a></em></p>
         <Divider />
-        <h1>East Bay for Everyone <div className="pop">Organizer</div></h1>
-        <p>The housing shortage is not an unintended policy failure. The Bay Area
-      has a housing shortage because of decades of voting and organizing against
-      housing. The solution is to organize for housing.</p>
-        <p>East Bay for Everyone Organizer helps people organize for housing.</p>
+        <h1><div className="pop">Organizer</div></h1>
+        <p>The housing shortage is not an unintended policy failure. We
+        have a housing shortage because of decades of voting and organizing against
+        housing. The solution is to organize for housing.</p>
+        <p>{(window.ORG_METADATA || {}).name} organizer helps people organize for housing.</p>
         <p className="github-link"><a href="https://github.com/tdfischer/organizer/"><FontAwesomeIcon icon={['fab', 'github']} /></a></p>
     </Paper>
 )

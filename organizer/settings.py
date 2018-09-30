@@ -18,6 +18,10 @@ import dj_database_url
 LOG_REQUEST_ID_HEADER = 'HTTP_X_REQUEST_ID'
 LOG_REQUESTS = True
 
+ORG_NAME = os.getenv('ORG_NAME', 'East Bay for Everyone')
+ORG_SHORTNAME = os.getenv('ORG_SHORTNAME', 'EBFE')
+ORG_LOGO_URL = os.getenv('ORG_LOGO_URL', None)
+
 LOGGING = {
     "version": 1,
     "filters": {
