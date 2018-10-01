@@ -5,7 +5,7 @@ from django.db import models
 from crm.models import Turf, PersonState
 
 class NewNeighborNotificationTarget(models.Model):
-    turfs = models.ManyToManyField(Turf)
+    turfs = models.ManyToManyField(Turf, related_name='notification_targets')
     email = models.CharField(max_length=200)
     last_notified = models.DateField(null=True)
     states = models.ManyToManyField(PersonState)
