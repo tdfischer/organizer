@@ -91,6 +91,7 @@ INSTALLED_APPS = [
     'raven.contrib.django.raven_compat',
     'social_django',
     'django_rq',
+    'import_export',
     'taggit',
     'taggit_serializer',
     'crm',

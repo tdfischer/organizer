@@ -96,6 +96,8 @@ class Person(models.Model):
             return self.turf_memberships.order_by('-joined_on')[0].turf
 
     def __unicode__(self):
+        if self.name is None:
+            return ""
         ret = self.name.strip()
         if len(ret) == 0:
             return self.email

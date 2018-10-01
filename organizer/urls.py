@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.conf import settings
 from importlib import import_module
 from rest_framework import routers
+from organizer.admin import admin_site
 
 from crm import views
 
@@ -36,7 +37,8 @@ for app in settings.INSTALLED_APPS:
                 router.register(slug, viewset)
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
+    url(r'^admin/', admin_site.urls),
+    url(r'^superuser/', admin.site.urls),
     url(r'^api/', include(router.urls)),
     url(r'^crm/', include('crm.urls')),
     url(r'^django-rq/', include('django_rq.urls')),
