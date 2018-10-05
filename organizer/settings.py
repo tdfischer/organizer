@@ -99,6 +99,8 @@ INSTALLED_APPS = [
     'events',
 ]
 
+SECURE_SSL_REDIRECT = True
+
 DATETIME_INPUT_FORMATS = (
     '%Y-%m-%dT%H:%M:%S%z',
     '%Y-%m-%d %H:%M:%S',     # '2006-10-25 14:30:59'
