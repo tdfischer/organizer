@@ -52,6 +52,13 @@ def _mock_skipped_auth(request):
         request.addfinalizer(patched.stop)
 
 @pytest.fixture(autouse=True)
+def _disable_ssl(request):
+    override = override_settings(SECURE_SSL_REDIRECT=False)
+    override.enable()
+    request.addfinalizer(override.disable)
+    return None
+
+@pytest.fixture(autouse=True)
 def _mock_redis_marker(request):
     marker = request.node.get_closest_marker('mock_redis')
     if marker:
