@@ -12,6 +12,9 @@ coverage = "*"
 pytest = "*"
 mock = "*"
 pytest-forked = "*"
+sphinx = "*"
+sphinx-autobuild = "*"
+pytest-test-groups = "*"
 
 [packages]
 appdirs = "==1.4.3"

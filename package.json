@@ -5,6 +5,7 @@
   "scripts": {
     "heroku-postbuild": "yarn run build",
     "build": "webpack -p --config webpack.prod.js",
+    "build:docs": "sphinx-build -b html . ./_build",
     "frontend": "webpack-dev-server --config webpack.dev.js",
     "backend": "python manage.py runserver",
     "worker": "python manage.py rqworker",

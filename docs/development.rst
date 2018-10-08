@@ -1,0 +1,61 @@
+Development
+===========
+
+Organizer is split into two parts. The backend is written for Python 2.x, using
+Django. The frontend is written for node 9.x using React, Redux, webpack, and
+friends; webpack-dev-server runs in development mode, and compiles to static
+files in production.
+
+Running Organizer locally is similar to most django and npm projects. Organizer
+suggests using ``pipenv`` to manage your virtualenv and dependencies.
+
+Install python dependencies:
+
+    $ pipenv install
+
+Install nodejs dependencies:
+
+    $ npm install
+
+Initialize the database:
+
+    $ ./manage.py migrate
+
+Run the backend server, frontend server, and redis-server all at once:
+
+    $ pipenv run npm start
+
+This performs the following:
+
+* Starts ``redis-server``
+* Runs ``webpack-dev-server`` on port 8080. You should never have to point your
+  browser at this directly.
+* Runs ``./manage.py runserver``, the django development server, on port 8000.
+  This is where you send your browser.
+
+After starting the application, send your browser to the django server on
+http://localhost:8000/
+
+Provided that you set both the ``DEBUG`` and
+``USE_REALLY_INSECURE_DEVELOPMENT_AUTHENTICATION_BACKEND`` environment
+variables, organizer has an incredibly insecure authentication backend for
+development. It is an error to use LocalDevAuth without these variables set.
+
+Useful commands
+---------------
+
+* fake_data - Generates fake data. Default geolocation coordinates for created
+  objects are within an arbitrary rectangle around Oakland, CA. Will create
+  numerous fake people, events, and neighborhoods in one fake city with each
+  run. Requires that you configure DEBUG to be set for it to run.
+
+REST API
+--------
+
+Organizer provides a full REST API via /api/. Logged in administrators will be
+able to view the self-generated documentation.
+
+Contributions
+-------------
+Pull requests welcome. All contributions retain their copyright, but must be
+licensed under the Affero General Public License v3.
