@@ -100,7 +100,8 @@ INSTALLED_APPS = [
     'events',
 ]
 
-SECURE_SSL_REDIRECT = True
+#Force SSL if debug is disabled
+SECURE_SSL_REDIRECT = os.getenv('DEBUG', False) == False
 
 DATETIME_INPUT_FORMATS = (
     '%Y-%m-%dT%H:%M:%S%z',
