@@ -19,8 +19,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { library as faLibrary } from '@fortawesome/fontawesome'
 import faSignOutAlt from '@fortawesome/fontawesome-free-solid/faSignOutAlt'
 import faBug from '@fortawesome/fontawesome-free-solid/faBug'
+import faExternalLinkAlt from '@fortawesome/fontawesome-free-solid/faExternalLinkAlt'
 
-faLibrary.add(faSignOutAlt, faBug)
+faLibrary.add(faSignOutAlt, faBug, faExternalLinkAlt)
 
 import BusyIndicator from './BusyIndicator'
 import { logout } from '../../actions'
@@ -55,6 +56,10 @@ export const AppMenu = props => (
             <ListItemIcon><FontAwesomeIcon icon={['fas', 'sign-out-alt']} /></ListItemIcon>
             <ListItemText>Logout</ListItemText>
         </MenuItem>
+        {props.current_user.is_staff ? <MenuItem onClick={() => {window.location = '/admin/'}}>
+            <ListItemIcon><FontAwesomeIcon icon={['fas', 'external-link-alt']} /></ListItemIcon>
+            <ListItemText>Administration</ListItemText>
+        </MenuItem> : null }
         <Divider />
         <MenuItem onClick={() => {doReport();props.onClose()}}>
             <ListItemIcon><FontAwesomeIcon icon={['fas', 'bug']} /></ListItemIcon>
@@ -70,7 +75,7 @@ export const OrganizerAppBar = (props) => (
                 {(doOpen, doClose, isOpen) => (
                     <React.Fragment>
                         <IconButton onClick={doOpen} ><Avatar src={gravatar.url(props.current_user.email, {s: 32, d: 'retro'})}/></IconButton>
-                        <AppMenu open={isOpen} onClose={doClose} onLogout={props.logout} />
+                        <AppMenu current_user={props.current_user} open={isOpen} onClose={doClose} onLogout={props.logout} />
                     </React.Fragment>
                 )}
             </DialogOpener>

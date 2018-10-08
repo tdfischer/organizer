@@ -10,11 +10,16 @@ from django.conf.urls import url
 from django.shortcuts import render
 from django.contrib import admin
 from django.contrib import messages
+from django.utils.html import format_html_join
+from django.utils.safestring import mark_safe
 from django.db.models import Count
-from . import models
+from . import models, importing
+from import_export.admin import ImportExportModelAdmin
+import onboarding
 from django.core.mail import send_mail
 from django.conf import settings
 from address.models import Locality
+from organizer.admin import admin_site
 import StringIO
 
 class TurfMembershipInline(admin.TabularInline):
@@ -30,7 +35,7 @@ class TurfFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() is not None:
-            return queryset.filter(current_turf=self.value())
+            return queryset.filter(current_turf_id=self.value())
         return queryset
 
 class CityFilter(admin.SimpleListFilter):
@@ -46,6 +51,19 @@ class CityFilter(admin.SimpleListFilter):
             return queryset.filter(address__locality_id=self.value())
         return queryset
 
+class LocalityFilter(CityFilter):
+    title = 'City'
+    parameter_name = 'locality'
+
+    def lookups(self, request, model_admin):
+        return map(lambda x: (x.id, x.name),
+                Locality.objects.all().order_by('name'))
+
+    def queryset(self, request, queryset):
+        if self.value() is not None:
+            return queryset.filter(locality_id=self.value())
+        return queryset
+
 class StateFilter(admin.SimpleListFilter):
     title = 'State'
     parameter_name = 'state'
@@ -59,17 +77,40 @@ class StateFilter(admin.SimpleListFilter):
             return queryset.filter(state_id=self.value())
         return queryset
 
-class PersonAdmin(admin.ModelAdmin):
+class PersonAdmin(ImportExportModelAdmin):
+    resource_class = importing.PersonResource
     search_fields = [
         'name', 'email', 'address__raw', 'address__locality__name',
-        'current_turf__name', 'state__name', 'phone'
+        'turf_memberships__turf__name', 'state__name', 'phone'
     ]
 
-    list_filter = [
+    fieldsets = (
+        (None, {
+            'fields': (('name', 'email'), ('phone', 'address'), 'state',
+            'attendance_record')
+        }),
+        ('Advanced', {
+            'classes': ('collapse',),
+            'fields': ('lat', 'lng', 'created')
+        })
+    )
+
+    def attendance_record(self, instance):
+        return format_html(
+            "<table><tr><th>Name</th><th>Date</th></tr>{}{}</table>",
+            format_html_join('\n', "<tr><td><a href='{}'>{}</a></td><td>{}</td></tr>",
+                ((reverse('admin:events_event_change', args=(evt.id, )),
+                    evt.name, evt.timestamp) for evt in instance.events.all())
+            ),
+            format_html("<tr><th>Total</th><th>{}</th></tr>",
+                instance.events.count())
+        )
+
+    list_filter = (
+        ('state', admin.RelatedOnlyFieldListFilter),
         CityFilter,
         TurfFilter,
-        StateFilter
-    ]
+    )
 
     list_display = [
         'name', 'email', 'phone', 'city', 'current_turf', 'state', 'valid_geo'
@@ -83,16 +124,28 @@ class PersonAdmin(admin.ModelAdmin):
     def city(self, obj):
         return obj.address.locality
 
-    readonly_fields = ['lat', 'lng']
+    readonly_fields = ['lat', 'lng', 'created', 'attendance_record']
 
     inlines  = [
         TurfMembershipInline,
     ]
 
+class NeighborNotificationInline(admin.TabularInline):
+    model = models.Turf.notification_targets.through
+
 class TurfAdmin(admin.ModelAdmin):
     list_display = [
-        'name', 'locality', 'member_count'
+        'name', 'locality', 'member_count', 'has_notification'
     ]
+
+    exclude = ['notification_targets']
+
+    list_filter = (
+        LocalityFilter,
+    )
+
+    def has_notification(self, obj):
+        return obj.notification_targets.count() > 0
 
     def member_count(self, obj):
         return obj.member_count
@@ -103,7 +156,8 @@ class TurfAdmin(admin.ModelAdmin):
         return ret.annotate(member_count=Count('members'))
 
     inlines = [
-        TurfMembershipInline
+        TurfMembershipInline,
+        NeighborNotificationInline
     ]
 
 
@@ -111,3 +165,6 @@ admin.site.register(models.Person, PersonAdmin)
 admin.site.register(models.Turf, TurfAdmin)
 admin.site.register(models.TurfMembership)
 admin.site.register(models.PersonState)
+
+admin_site.register(models.Person, PersonAdmin)
+admin_site.register(models.Turf, TurfAdmin)

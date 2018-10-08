@@ -8,7 +8,7 @@ import { AppMenu } from './OrganizerAppBar'
 jest.mock('raven-js')
 
 it('should trigger a report dialog when the user clicks the report button', () => {
-    const wrapper = shallow(<AppMenu onClose={jest.fn()} onLogout={jest.fn()} />)
+    const wrapper = shallow(<AppMenu current_user={{}} onClose={jest.fn()} onLogout={jest.fn()} />)
     const menuItems = wrapper.find(MenuItem)
     menuItems.last().dive().simulate('click')
     expect(Raven.captureMessage).toHaveBeenCalledWith("Manual report")
@@ -17,7 +17,7 @@ it('should trigger a report dialog when the user clicks the report button', () =
 
 it('should log the user out when the user clicks the logout button', () => {
     const loggerOuter = jest.fn()
-    const wrapper = shallow(<AppMenu onClose={jest.fn()} onLogout={loggerOuter} />)
+    const wrapper = shallow(<AppMenu current_user={{}} onClose={jest.fn()} onLogout={loggerOuter} />)
     const menuItems = wrapper.find(MenuItem)
     menuItems.first().dive().simulate('click')
     expect(loggerOuter).toHaveBeenCalled()

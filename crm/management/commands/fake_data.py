@@ -61,12 +61,18 @@ class Command(BaseCommand): # pragma: no cover
             'lng': fakeLongitude
         })
 
+        events = self.create_model(Event, 20, lambda: fakeEventData(localFakeAddress))
+
         for person in people:
             models.TurfMembership.objects.create(person=person,
                     turf=random.choice(turfs))
             print person, "moved in to", person.current_turf
 
-        self.create_model(Event, 20, lambda: fakeEventData(localFakeAddress))
+        for person in people:
+            for idx in range(0, 10):
+                evt = random.choice(events)
+                evt.attendees.add(person)
+                evt.save()
 
 def fakeLatitude():
     return random.triangular(37, 38)
