@@ -8,7 +8,7 @@ faLibrary.add(faCalendar)
 
 export const NoEvents = props => (
     <div className={props.classes.root}>
-        <FontAwesomeIcon icon={['fa', 'calendar']}  className={props.classes.icon} />
+        <FontAwesomeIcon icon={['fa', 'calendar']}  size="4x" />
         <p>No events.</p>
         <p><em>Go make some trouble.</em></p>
     </div>
@@ -20,10 +20,6 @@ const styles = {
         color: '#aaa',
         textAlign: 'center',
         padding: '3rem'
-    },
-    icon: {
-        height: '4rem',
-        width: 'auto'
     }
 }
 

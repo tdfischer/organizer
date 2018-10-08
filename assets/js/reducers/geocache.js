@@ -5,9 +5,12 @@ export default function(state = Immutable.Map(), action = {}) {
     switch (action.type) {
     case Actions.Geocache.UPDATE_CURRENT_LOCATION:
         return state.set('currentLocation', action.geo)
+    case Actions.Geocache.SET_LOCATION_STATUS:
+        return state.set('status', action.status)
     default:
         return Immutable.Map({
             currentLocation: undefined,
+            status: undefined,
         }).merge(state)
     }
 }
