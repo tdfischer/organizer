@@ -11,13 +11,33 @@ import { withStyles } from '@material-ui/core/styles'
 import MessageCard from './MessageCard'
 import { getCurrentUser } from '../selectors/auth'
 import { Model, withModelData } from '../store'
-import { withCurrentLocation } from '../actions/geocache'
+import { getLocationStatus } from '../selectors/geocache'
+import { STATUS_DENIED, STATUS_UNAVAILABLE, STATUS_TIMEOUT, withCurrentLocation } from '../actions/geocache'
 import RawDataExpansionPanel from './RawDataExpansionPanel'
 import EventList from './events/EventList'
+import NoLocation from './events/NoLocation'
 
 const People = new Model('people')
 const Events = new Model('events')
 const Broadcasts = new Model('broadcasts')
+
+const mapErrStateToProps = state => {
+    return {status: getLocationStatus(state)}
+}
+
+const LocationError = connect(mapErrStateToProps)(props => {
+    switch (props.status) {
+    case STATUS_DENIED:
+        return <NoLocation message="You must enable location access to continue" />
+    case STATUS_UNAVAILABLE:
+    case STATUS_TIMEOUT:
+        return <NoLocation message="Location unavailable." />
+    case undefined:
+        return <NoLocation onStartGeolocation={props.onStartGeolocation} message="You must enable location" />
+    default:
+        return null
+    }
+})
 
 export class OrganizerDashboard extends React.Component {
     componentDidMount() {
@@ -41,7 +61,7 @@ export class OrganizerDashboard extends React.Component {
                 <Grid item>
                     <Grid container direction="column" justify="space-evenly" alignItems="stretch" spacing={8}>
                         {recentBroadcast ? <MessageCard message={recentBroadcast} /> : null}
-                        <EventList start={moment()} end={moment().add(1, 'month')} onCheckIn={this.doCheckin} />
+                        {this.props.locationStatus == 0 ? <EventList start={moment()} end={moment().add(1, 'month')} onCheckIn={this.doCheckin} /> : <LocationError onStartGeolocation={this.props.startGeolocation}/>}
                     </Grid>
                 </Grid>
                 <Grid item>
@@ -80,7 +100,8 @@ const mapStateToProps = state => {
     return {
         currentUser,
         currentPerson,
-        myBroadcasts
+        myBroadcasts,
+        locationStatus: getLocationStatus(state)
     }
 }
 
