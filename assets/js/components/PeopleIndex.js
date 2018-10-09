@@ -15,6 +15,7 @@ import PeopleTable from './people-browser/PeopleTable'
 import Search from './people-browser/Search'
 
 const ImportDialog = importedComponent(() => import('./ImportDialog'))
+const Editor = importedComponent(() => import('./people-browser/Editor'))
 
 const States = new Model('states')
 const People = new Model('people')
@@ -83,7 +84,7 @@ export class PeopleIndex extends Component {
         super(props)
         this.state = {
             currentState: 0,
-            copied: false
+            copied: false,
         }
         this.onCopy = this.onCopy.bind(this)
     }
@@ -91,6 +92,11 @@ export class PeopleIndex extends Component {
     onCopy() {
         this.setState({copied: true})
         copy(this.props.selection.join(', '))
+    }
+
+    onPersonClicked(person, opener) {
+        this.setState({clickedPerson: person.id})
+        opener()
     }
 
     render() {
@@ -115,7 +121,14 @@ export class PeopleIndex extends Component {
                     </Grid>
                 </Grid>
                 <Grid container><Grid item xs><Search filter={props.filter} /></Grid></Grid>
-                <PeopleTable />
+                <DialogOpener>
+                    {(open, close, isOpen) => (
+                        <React.Fragment>
+                            <Editor personID={this.state.clickedPerson} open={isOpen} onClose={close} />
+                            <PeopleTable onPersonClick={(person) => this.onPersonClicked(person, open)} />
+                        </React.Fragment>
+                    )}
+                </DialogOpener>
             </React.Fragment>
         )
     }

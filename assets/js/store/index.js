@@ -56,7 +56,7 @@ export const withModelData = mapModelToFetch => WrappedComponent => {
                 const model = new Model(modelName)
                 if (typeof(params) == 'object') {
                     this.props.dispatch(model.fetchAll(params))
-                } else {
+                } else if (typeof(params) == 'number') {
                     this.props.dispatch(model.fetchIfNeeded(params))
                 }
             })

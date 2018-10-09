@@ -30,10 +30,10 @@ const renderCheckboxHeader = props => (
 )
 
 const renderNameCell = props => (
-    <React.Fragment>
+    <div onClick={() => props.onPersonClick(props.rowData)}>
         {props.rowData.name} <TagList tags={props.rowData.tags} />
         <Typography variant="caption">{props.rowData.email} - {_.get(props.rowData, 'current_turf.name')}, {_.get(props.rowData, 'current_turf.locality.name')} {_.get(props.rowData, 'current_turf.locality.postal_code')}</Typography>
-    </React.Fragment>
+    </div>
 )
 
 export const PeopleTable = props => (
@@ -52,7 +52,12 @@ export const PeopleTable = props => (
                 headerHeight={48}
                 width={width}>
                 <Column headerRenderer={() => renderCheckboxHeader({selector: props.selector, people: props.filteredPeople})} className={props.classes.checkboxCell} width={32} label='' dataKey='selected' cellRenderer={p => renderCheckboxCell({selector: props.selector, ...p})} />
-                <Column cellRenderer={p => renderNameCell(p)} className={props.classes.cell} width={width-32-10} label='Name' dataKey='name' />
+                <Column
+                    cellRenderer={p => renderNameCell({...p, onPersonClick: props.onPersonClick})}
+                    className={props.classes.cell}
+                    width={width-32-10}
+                    label='Name'
+                    dataKey='name' />
             </Table>
         )}
     </WindowScroller>
