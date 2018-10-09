@@ -18,7 +18,8 @@ export const isEqual = (needle, haystack) => {
     }
 }
 
-export const makeComparator = ({children, property, op, value}) => {
+export const makeComparator = (obj) => {
+    const {children, property, op, value} = obj || {}
     if (children == undefined) {
         if (property == undefined || op == undefined || value == undefined) {
             return () => true

@@ -59,6 +59,9 @@ describe('makeComparator', () => {
             }
             expect(passed).toEqual(true)
         })
+        it('should always match with an undefined pattern', () => {
+            expect(makeComparator(undefined)(testObject)).toEqual(true)
+        })
         it('should always match without a property', () => {
             expect(makeComparator(pattern(undefined, 'is', 'Not A Name'))(testObject)).toEqual(true)
         })
