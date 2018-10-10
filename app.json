@@ -4,6 +4,10 @@
   "repository": "https://github.com/tdfischer/organizer",
   "success_url": "/",
   "keywords": ["organizing", "crm"],
+  "buildpacks": [
+    {"url": "heroku/nodejs"},
+    {"url": "heroku/python"}
+  ],
   "addons": [
       "heroku-postgresql", "redistogo"
   ],
