@@ -93,7 +93,10 @@ class Person(models.Model):
         if hasattr(self, 'current_turf_id'):
             return Turf.objects.get(pk=self.current_turf_id)
         else:
-            return self.turf_memberships.order_by('-joined_on')[0].turf
+            try:
+                return self.turf_memberships.latest('-joined_on').turf
+            except TurfMembership.DoesNotExist:
+                return None
 
     def __unicode__(self):
         if self.name is None:
