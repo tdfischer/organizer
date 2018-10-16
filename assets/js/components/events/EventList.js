@@ -60,7 +60,7 @@ const styles = {
 const mapPropsToModels = props => {
     return {
         events: {
-            timestamp__gte: props.start.toISOString(),
+            end_timestamp__gte: props.start.toISOString(),
             timestamp__lte: props.end.toISOString()
         }
     }

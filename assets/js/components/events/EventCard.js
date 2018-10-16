@@ -26,7 +26,7 @@ const MarkerMap = importedComponent(() => import('../mapping/MarkerMap'))
 
 import { getCurrentLocation } from '../../selectors/geocache'
 import { getCurrentUser } from '../../selectors/auth'
-import { makeGetNearbyEvents } from '../../selectors/events'
+import { getEventsWithLocation } from '../../selectors/events'
 import { withModelData } from '../../store'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
@@ -119,19 +119,16 @@ EventCard.defaultProps = {
     classes: {}
 }
 
-const mapStateToProps = () => {
-    const getNearbyEvents = makeGetNearbyEvents()
-    return (state, props) => {
-        const currentUser = getCurrentUser(state)
-        const evt = getNearbyEvents(state).get(props.event_id)
-        const checkedIn = evt.attendees.indexOf(currentUser.email) != -1
-        const currentLocation = getCurrentLocation(state)
-        return {
-            currentUser,
-            event: evt,
-            checkedIn,
-            currentLocation
-        }
+const mapStateToProps = (state, props) => {
+    const currentUser = getCurrentUser(state)
+    const evt = getEventsWithLocation(state).get(props.event_id)
+    const checkedIn = evt.attendees.indexOf(currentUser.email) != -1
+    const currentLocation = getCurrentLocation(state)
+    return {
+        currentUser,
+        event: evt,
+        checkedIn,
+        currentLocation
     }
 }
 

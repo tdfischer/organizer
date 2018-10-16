@@ -17,7 +17,7 @@ const OrganizerDashboard = importedComponent(() => import('./OrganizerDashboard'
 })
 const PeopleIndex = importedComponent(() => import('./PeopleIndex'))
 const CaptainIndex = importedComponent(() => import('./CaptainIndex'))
-export const LoginSplash = importedComponent(() => import('./chrome/LoginSplash'), {
+const AnonEventCheckin = importedComponent(() => import('./events/AnonEventCheckin'), {
     LoadingComponent: LoadingDisplay
 })
 
@@ -31,7 +31,7 @@ export const AppRoutes = props => (
                 <Route component={OrganizerDashboard} />
             </Switch>
         </ConnectedRouter>
-    ) : <LoginSplash />
+    ) : <AnonEventCheckin />
 )
 
 
