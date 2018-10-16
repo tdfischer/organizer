@@ -10,7 +10,6 @@ import Grid from '@material-ui/core/Grid'
 import { connect } from 'react-redux'
 import ColorHash from 'color-hash'
 import fontColorContrast from 'font-color-contrast'
-import moment from 'moment'
 import { library as faLibrary } from '@fortawesome/fontawesome'
 import distance from '@turf/distance'
 import bearing from '@turf/bearing'
@@ -27,12 +26,12 @@ const MarkerMap = importedComponent(() => import('../mapping/MarkerMap'))
 
 import { getCurrentLocation } from '../../selectors/geocache'
 import { getCurrentUser } from '../../selectors/auth'
-import { Model, withModelData } from '../../store'
+import { makeGetNearbyEvents } from '../../selectors/events'
+import { withModelData } from '../../store'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 faLibrary.add(faCalendar, faCalendarCheck, faLocationArrow)
 
-const Events = new Model('events')
 const hasher = new ColorHash({lightness: 0.8})
 const buttonHasher = new ColorHash()
 const colorForEvent = evt => hasher.hex(evt.uid || '')
@@ -47,13 +46,8 @@ const locationDisplay = (evt, currentLocation) => {
 
 export const CheckInButton = props => {
     const haveCheckedIn = props.checkedIn
-    const distanceFromHere = distance(props.currentLocation ? props.currentLocation : props.event.geo, props.event.geo, {units: 'miles'})
-    const isNearby = distanceFromHere < 0.25
-    const canCheckIn = !haveCheckedIn && props.onCheckIn && isNearby
+    const canCheckIn = !haveCheckedIn && props.onCheckIn && props.event.checkIn.isNearby
     const attendeeCount = props.event.attendees.length - (haveCheckedIn ? 1 : 0)
-    // FIXME: Move all this 'can the user check in?' logic to backend
-    const isInPast = props.event.end_timestamp.isSameOrBefore(moment().add(-1, 'hour'))
-    const hasNotStarted = props.event.timestamp.isSameOrAfter(moment().add(30, 'minutes'))
 
     if (haveCheckedIn) {
         return (
@@ -71,9 +65,9 @@ export const CheckInButton = props => {
                 <Grid item><p><em>{attendeeCount > 0 ? attendeeCount + ' other people checked in.' : 'Be the first to check in!'}</em></p></Grid>
             </React.Fragment>
         )
-    } else if (isInPast) {
+    } else if (props.event.checkIn.isInPast) {
         return <Grid item><p>This event already happened.</p></Grid>
-    } else if (hasNotStarted) {
+    } else if (props.event.checkIn.hasNotStarted) {
         return <Grid item><p>This event hasn&apos;t started yet.</p></Grid>
     } else {
         const eventBearing = props.currentLocation ? bearing(props.currentLocation, props.event.geo) - 45 : 0
@@ -98,7 +92,7 @@ export const EventCard = props => {
         <Card className={props.className} style={{backgroundColor: cardColor, color: textColor}}>
             <CardContent style={{position: 'relative', zIndex: 1}}>
                 <div style={{width: '175%', height: '100%', overflow: 'hidden', top: 0, left: 0, flex: 'auto', display: 'flex', position: 'absolute', zIndex: -1}}>
-                    <MarkerMap position={getCoords(props.event.geo)} center={getCoords(props.event.geo)} />
+                    {props.event.geo ? <MarkerMap position={getCoords(props.event.geo)} center={getCoords(props.event.geo)} /> : null}
                 </div>
                 <div style={{width: '100%', height: '100%', top: 0, left: 0, position: 'absolute', zIndex: -1, background: background}} />
                 <Grid style={{flexWrap: 'nowrap'}} direction="row" spacing={8} alignItems="stretch" container>
@@ -125,16 +119,19 @@ EventCard.defaultProps = {
     classes: {}
 }
 
-const mapStateToProps = (state, props) => {
-    const currentUser = getCurrentUser(state)
-    const evt = Events.immutableSelect(state).map(evt => ({...evt, timestamp: moment(evt.timestamp), end_timestamp: moment(evt.end_timestamp)})).get(props.event_id)
-    const checkedIn = evt.attendees.indexOf(currentUser.email) != -1
-    const currentLocation = getCurrentLocation(state)
-    return {
-        currentUser,
-        event: evt,
-        checkedIn,
-        currentLocation
+const mapStateToProps = () => {
+    const getNearbyEvents = makeGetNearbyEvents()
+    return (state, props) => {
+        const currentUser = getCurrentUser(state)
+        const evt = getNearbyEvents(state).get(props.event_id)
+        const checkedIn = evt.attendees.indexOf(currentUser.email) != -1
+        const currentLocation = getCurrentLocation(state)
+        return {
+            currentUser,
+            event: evt,
+            checkedIn,
+            currentLocation
+        }
     }
 }
 

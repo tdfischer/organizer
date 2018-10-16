@@ -77,6 +77,7 @@ describe('CheckInButton', () => {
                 geo: point([0, 0]),
                 timestamp: moment(),
                 end_timestamp: moment().add(1, 'hour'),
+                checkIn: {isNearby: true},
                 attendees: []
             },
             currentUser: {
