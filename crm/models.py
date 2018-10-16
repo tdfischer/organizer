@@ -94,8 +94,8 @@ class Person(models.Model):
             return Turf.objects.get(pk=self.current_turf_id)
         else:
             try:
-                return self.turf_memberships.latest('-joined_on').turf
-            except TurfMembership.DoesNotExist:
+                return self.turf_memberships.latest('joined_on').turf
+            except (Turf.DoesNotExist, TurfMembership.DoesNotExist):
                 return None
 
     def __unicode__(self):
