@@ -15,6 +15,7 @@ import { bindActionCreators } from 'redux'
 import gravatar from 'gravatar'
 import Raven from 'raven-js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import Logo from './Logo'
 
 import { library as faLibrary } from '@fortawesome/fontawesome'
 import faSignOutAlt from '@fortawesome/fontawesome-free-solid/faSignOutAlt'
@@ -74,14 +75,22 @@ export const OrganizerAppBar = (props) => (
             <DialogOpener>
                 {(doOpen, doClose, isOpen) => (
                     <React.Fragment>
-                        <IconButton onClick={doOpen} ><Avatar src={gravatar.url(props.current_user.email, {s: 32, d: 'retro'})}/></IconButton>
+                        {(props.logged_in) ? (
+                            <IconButton onClick={doOpen}><Avatar src={gravatar.url(props.current_user.email, {s: 32, d: 'retro'})}/></IconButton>
+                        ) : (
+                            <IconButton onClick={doOpen}><Logo style={{width: 'auto', height: '2rem', marginRight: '1rem'}}/></IconButton>
+                        )}
                         <AppMenu current_user={props.current_user} open={isOpen} onClose={doClose} onLogout={props.logout} />
                     </React.Fragment>
                 )}
             </DialogOpener>
             <div className={props.classes.flex}>
-                <Typography color="inherit" variant="title">{props.currentPerson.name || ''}</Typography>
-                <Typography color="inherit" variant="subheading">{props.current_user.email} - {props.currentPerson.twelve_month_event_count} events</Typography>
+                {(props.logged_in) ? (
+                    <React.Fragment>
+                        <Typography color="inherit" variant="title">{props.currentPerson.name || ''}</Typography>
+                        <Typography color="inherit" variant="subheading">{props.current_user.email} - {props.currentPerson.twelve_month_event_count} events</Typography>
+                    </React.Fragment>
+                ) : (<Typography color="inherit" variant="title">{(window.ORG_METADATA || {}).name}</Typography>)}
             </div>
             <BusyIndicator />
         </Toolbar>
