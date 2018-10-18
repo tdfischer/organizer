@@ -2,7 +2,7 @@ import React from 'react'
 import importedComponent from 'react-imported-component'
 import { hot } from 'react-hot-loader'
 
-import { withStyles } from '@material-ui/core/styles'
+import { MuiThemeProvider, createMuiTheme, withStyles } from '@material-ui/core/styles'
 import Raven from 'raven-js'
 import { library as faLibrary } from '@fortawesome/fontawesome'
 import faTimes from '@fortawesome/fontawesome-free-solid/faTimes'
@@ -13,6 +13,10 @@ import BottomNavigationAction from '@material-ui/core/BottomNavigationAction'
 import CircularProgress from '@material-ui/core/CircularProgress'
 
 faLibrary.add(faTimes)
+
+const theme = createMuiTheme({
+    palette: (window.ORG_METADATA || {}).palette
+})
 
 const EmptyAppBar = _props => (
     <AppBar style={{position: 'initial'}}>
@@ -83,15 +87,17 @@ const errorStyles = {
 const ErrorWrapper = withStyles(errorStyles)(ErrorWrapperBase)
 
 export const App = _props => (
-    <div className="the-app">
-        <OrganizerAppBar />
-        <div className="viewport" id="viewport">
-            <div className="scroll">
-                <AppRoutes />
+    <MuiThemeProvider theme={theme}>
+        <div className="the-app">
+            <OrganizerAppBar />
+            <div className="viewport" id="viewport">
+                <div className="scroll">
+                    <AppRoutes />
+                </div>
             </div>
+            <OrganizerBottomNav />
         </div>
-        <OrganizerBottomNav />
-    </div>
+    </MuiThemeProvider>
 )
 
 
