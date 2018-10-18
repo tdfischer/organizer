@@ -2,7 +2,7 @@ import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 import fetchMock from 'fetch-mock'
 
-import Model, { UPDATE_MODEL, REQUEST_MODELS, RECEIVE_MODELS } from './model'
+import Model, { UPDATE_MODEL, REQUEST_MODELS, RECEIVE_MODELS, SAVING_MODEL, SAVED_MODEL } from './model'
 
 const mockStore = configureMockStore([thunk])
 
@@ -45,7 +45,9 @@ it('should create data', () => {
     fetchMock.mock('/api/test/', {id: 1})
     return store.dispatch(model.create({}))
       .then((id) => {
-          expect(store.getActions()[0]).toEqual({data: {id: id}, id: id, type: UPDATE_MODEL, name: 'test'})
+          expect(store.getActions()[0]).toEqual({id: 0, type: SAVING_MODEL, name: 'test'})
+          expect(store.getActions()[1]).toEqual({data: {id: id}, id: id, type: UPDATE_MODEL, name: 'test'})
+          expect(store.getActions()[2]).toEqual({id: id, type: SAVED_MODEL, name: 'test'})
       })
 })
 
