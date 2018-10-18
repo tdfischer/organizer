@@ -5,7 +5,7 @@ import Icon from '@material-ui/core/Icon'
 import { push } from 'connected-react-router'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { getCurrentUser } from '../../selectors/auth'
+import { getCurrentUser, getLoggedIn } from '../../selectors/auth'
 import PropTypes from 'prop-types'
 import { withProvider } from '../../store'
 
@@ -20,7 +20,8 @@ faLibrary.add(faUsers, faGlobe, faUserCircle, faBullhorn)
 const mapStateToProps = state => {
     return {
         path: state.getIn(['router', 'location', 'pathname']),
-        currentUser: getCurrentUser(state)
+        currentUser: getCurrentUser(state),
+        loggedIn: getLoggedIn(state),
     }
 }
 
@@ -33,7 +34,7 @@ const CaptainButtons = () => [
     <BottomNavigationAction key="captain" value="/captain" icon={<Icon className="fa fa-bullhorn" />} label="Broadcasts" />
 ]
 
-export const OrganizerBottomNav = props => (
+export const OrganizerBottomNav = props => props.loggedIn ? (
     <BottomNavigation
         className="bottom-nav"
         showLabels  
@@ -43,14 +44,16 @@ export const OrganizerBottomNav = props => (
         <BottomNavigationAction value="/map" icon={<Icon className="fa fa-globe" />} label="Map" />
         {props.currentUser.is_staff ? CaptainButtons()  : null }
     </BottomNavigation>
-)
+) : null
 
 OrganizerBottomNav.propTypes = {
-    currentUser: PropTypes.object
+    currentUser: PropTypes.object,
+    loggedIn: PropTypes.bool
 }
 
 OrganizerBottomNav.defaultProps = {
-    currentUser: {}
+    currentUser: {},
+    loggedIn: false
 }
 
 export default withProvider(connect(mapStateToProps, mapDispatchToProps)(OrganizerBottomNav))
