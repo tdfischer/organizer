@@ -60,6 +60,7 @@ export default class Model {
     saving(id) {
         return {
             type: SAVING_MODEL,
+            name: this.name,
             id: Number(id)
         }
     }
@@ -67,6 +68,7 @@ export default class Model {
     saved(id) {
         return {
             type: SAVED_MODEL,
+            name: this.name,
             id: Number(id)
         }
     }
@@ -182,6 +184,7 @@ export default class Model {
 
     create(modelData) {
         return dispatch => {
+            dispatch(this.saving(0))
             const data = {
                 method: 'POST',
                 credentials: 'include',
@@ -199,6 +202,7 @@ export default class Model {
                 .then(json => {
                     if (Object.keys(json).length > 0) {
                         dispatch(this.update(json.id, json))
+                        dispatch(this.saved(json.id))
                         return Promise.resolve(json.id)
                     }
                 })
