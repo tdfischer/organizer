@@ -21,6 +21,8 @@ LOG_REQUESTS = True
 ORG_NAME = os.getenv('ORG_NAME', 'East Bay for Everyone')
 ORG_SHORTNAME = os.getenv('ORG_SHORTNAME', 'EBFE')
 ORG_LOGO_URL = os.getenv('ORG_LOGO_URL', None)
+ORG_PRIMARY_COLOR = os.getenv('ORG_PRIMARY_COLOR', None)
+ORG_SECONDARY_COLOR = os.getenv('ORG_SECONDARY_COLOR', None)
 
 LOGGING = {
     "version": 1,
