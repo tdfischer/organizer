@@ -204,6 +204,18 @@ def testUpdatePersonGeo(response, db, person):
             assert person.lat is None
             assert person.lng is None
 
+@pytest.mark.mock_redis
+@pytest.mark.django_db
+@given(turfData=fixed_dictionaries(geocodeDict))
+def testPersonCurrentTurf(turfData, person):
+    turf = geocache.turf(turfData)
+    models.TurfMembership.objects.create(person=person, turf=turf)
+    person.refresh_from_db()
+    assert person.current_turf is not None
+    p = models.Person.objects.filter(pk=person.id).values('id')[0]
+    assert not hasattr(person, 'current_turf_id')
+    assert person.current_turf is not None
+
 def assertValidResponse(resp, status=200):
     __tracebackhide__ = True
     assert resp.status_code == status
