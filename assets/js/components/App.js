@@ -8,8 +8,6 @@ import { library as faLibrary } from '@fortawesome/fontawesome'
 import faTimes from '@fortawesome/fontawesome-free-solid/faTimes'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
-import BottomNavigation from '@material-ui/core/BottomNavigation'
-import BottomNavigationAction from '@material-ui/core/BottomNavigationAction'
 import CircularProgress from '@material-ui/core/CircularProgress'
 
 faLibrary.add(faTimes)
@@ -23,20 +21,12 @@ const EmptyAppBar = _props => (
         <Toolbar><CircularProgress /> Organizer</Toolbar>
     </AppBar>
 )
-const EmptyBottomBar = _props => (
-    <BottomNavigation
-        className="bottom-nav">
-        <BottomNavigationAction value="/" icon={<i className="fa fa-user-circle" />}  label="Organizer" />
-    </BottomNavigation>
-)
 const Button = importedComponent(() => import('@material-ui/core/Button'))
 const AppRoutes = importedComponent(() => import('./AppRoutes'))
 const OrganizerAppBar = importedComponent(() => import('./chrome/OrganizerAppBar'), {
     LoadingComponent: EmptyAppBar
 })
-const OrganizerBottomNav = importedComponent(() => import('./chrome/OrganizerBottomNav'), {
-    LoadingComponent: EmptyBottomBar
-})
+const OrganizerBottomNav = importedComponent(() => import('./chrome/OrganizerBottomNav'))
 
 class ErrorWrapperBase extends React.Component {
     constructor(props) {

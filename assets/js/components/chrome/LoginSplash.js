@@ -9,14 +9,9 @@ import faSlack from '@fortawesome/fontawesome-free-brands/faSlack'
 import faGithub from '@fortawesome/fontawesome-free-brands/faGithub'
 
 import './LoginSplash.scss'
-
-import EBFESymbol from 'svg-react-loader!../../../img/symbol.svg'
+import Logo from './Logo'
 
 faLibrary.add(faDiscourse, faSlack, faGithub)
-
-const Logo = props => (
-    (window.ORG_METADATA || {}).logo_url ? <img {...props} src={window.ORG_METADATA.logo_url} /> : <EBFESymbol {...props} />
-)
 
 export const LoginSplash = (_props) => (
     <Paper className="app-splash">
