@@ -4,7 +4,7 @@ import { Filterable, Model, withModelData } from '../store'
 import _ from 'lodash'
 import gravatar from 'gravatar'
 import { connect } from 'react-redux'
-import { getCurrentUser } from '../selectors/auth'
+import { getCurrentPerson, getPeople } from '../selectors/people'
 import Button from '@material-ui/core/Button'
 import Grid from '@material-ui/core/Grid'
 import Slide from '@material-ui/core/Slide'
@@ -25,17 +25,14 @@ import MaterialFormText from './MaterialFormText'
 import MaterialFormSelect from './MaterialFormSelect'
 import MessageCard from './MessageCard'
 
-const People = new Model('people')
 const PeopleFilter = new Filterable('broadcast-people')
 const Broadcasts = new Model('broadcasts')
 const States = new Model('states')
 
 const mapStateToProps = state => {
-    const currentUser = getCurrentUser(state)
-    const currentPerson = People.immutableSelect(state).get(currentUser.email)
+    const currentPerson = getCurrentPerson(state)
     const captainTurfs = _.get(currentPerson, 'turf_memberships', [])
     return {
-        currentUser,
         currentPerson,
         captainTurfs,
     }
@@ -43,8 +40,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
-        people: People.bindActionCreators(dispatch),
-        peopleFilter: PeopleFilter.bindActionCreators(dispatch),
+        setFilter: filter => dispatch(PeopleFilter.set(filter)),
         broadcasts: Broadcasts.bindActionCreators(dispatch),
         states: States.bindActionCreators(dispatch),
     }
@@ -75,10 +71,9 @@ const MessageList = connect(messageListStateToProps)(props => (
 ))
 
 const destinationStateToProps = state => {
-    const currentUser = getCurrentUser(state)
-    const currentPerson = People.immutableSelect(state).get(currentUser.email)
+    const currentPerson = getCurrentPerson(state)
     const turfs = _.get(currentPerson, 'turf_memberships', [])
-    const people = PeopleFilter.filtered(state, People.immutableSelect(state)).toList().toJS()
+    const people = PeopleFilter.filtered(state, getPeople(state)).toList().toJS()
     const states = States.immutableSelect(state).toList().toJS()
     return {
         turfs,
@@ -174,7 +169,7 @@ export class CaptainIndex extends React.Component {
     }
 
     updateFilter(values) {
-        this.props.peopleFilter.set({
+        this.props.setFilter({
             state: values.filter.state, 
             current_turf: {id: values.filter.turf}
         })
