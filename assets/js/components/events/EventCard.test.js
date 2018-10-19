@@ -18,6 +18,11 @@ describe('CheckInButton', () => {
                 geo: point([0, 0]),
                 timestamp: moment(),
                 end_timestamp: moment().add(1, 'hour'),
+                checkIn: {
+                    isNearby: false,
+                    isInPast: false,
+                    hasNotStarted: false
+                },
                 attendees: []
             },
             currentUser: {
@@ -39,6 +44,11 @@ describe('CheckInButton', () => {
                 geo: point([0, 0]),
                 timestamp: moment().add(-1, 'month'),
                 end_timestamp: moment().add(-1, 'month').add(1, 'hour'),
+                checkIn: {
+                    isNearby: false,
+                    isInPast: true,
+                    hasNotStarted: false
+                },
                 attendees: []
             },
             currentUser: {
@@ -58,6 +68,11 @@ describe('CheckInButton', () => {
                 geo: point([0, 0]),
                 timestamp: moment().add(45, 'minutes'),
                 end_timestamp: moment().add(1, 'hour'),
+                checkIn: {
+                    isNearby: false,
+                    isInPast: false,
+                    hasNotStarted: true
+                },
                 attendees: []
             },
             currentUser: {
@@ -77,6 +92,11 @@ describe('CheckInButton', () => {
                 geo: point([0, 0]),
                 timestamp: moment(),
                 end_timestamp: moment().add(1, 'hour'),
+                checkIn: {
+                    isNearby: true,
+                    isInPast: false,
+                    hasNotStarted: false
+                },
                 attendees: []
             },
             currentUser: {
@@ -99,6 +119,11 @@ describe('CheckInButton', () => {
                 geo: point([0, 0]),
                 timestamp: moment(),
                 end_timestamp: moment().add(1, 'hour'),
+                checkIn: {
+                    isNearby: true,
+                    isInPast: false,
+                    hasNotStarted: false
+                },
                 attendees: []
             },
             currentUser: {
