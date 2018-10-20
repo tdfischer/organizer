@@ -83,7 +83,7 @@ export const SigninBox = props => (
                             !hasSaved ? (
                                 <React.Fragment>
                                     <Grid item><IntroText event={props.event} /></Grid>
-                                    <Grid item><MaterialFormText fullWidth label="E-Mail" field="email" validate={v => (v.indexOf('@') != -1) ? null : "Please enter your e-mail address."}/></Grid>
+                                    <Grid item><MaterialFormText fullWidth label="E-Mail" field="email" validate={v => (v.indexOf('@') != -1) ? null : 'Please enter your e-mail address.'}/></Grid>
                                     <Grid item><Button fullWidth variant="contained" color="primary" type="submit">Request to join</Button></Grid>
                                     <Grid item style={{marginTop: '1rem'}} container alignItems="center">
                                         <Grid item xs><Divider /></Grid>
