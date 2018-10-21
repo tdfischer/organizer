@@ -3,6 +3,7 @@ from . import models
 from django.contrib.auth.models import User, Group, Permission
 from taggit_serializer.serializers import TagListSerializerField, TaggitSerializer
 import address
+from django.db.models import Sum
 from django.utils import timezone
 from datetime import timedelta
 
@@ -81,6 +82,11 @@ class PersonSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer)
             slug_field='name', allow_null=True, required=False)
     address = AddressSerializer(write_only=True, allow_null=True, required=False)
     twelve_month_event_count = serializers.SerializerMethodField()
+    twelve_month_donation_value = serializers.SerializerMethodField()
+
+    def get_twelve_month_donation_value(self, obj):
+        oneYearAgo = timezone.now() + timedelta(days=-365)
+        return obj.donations.filter(timestamp__gte=oneYearAgo).aggregate(Sum('value'))['value__sum']
 
     def get_twelve_month_event_count(self, obj):
         oneYearAgo = timezone.now() + timedelta(days=-365)
@@ -106,7 +112,7 @@ class PersonSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer)
         model = models.Person
         fields = ('name',  'id', 'email', 'created', 'url', 'tags',
         'geo', 'current_turf', 'turf_memberships', 'state', 'address', 'phone',
-        'twelve_month_event_count')
+        'twelve_month_event_count', 'twelve_month_donation_value')
 
         lookup_field = 'email'
         extra_kwargs = {
