@@ -100,6 +100,7 @@ INSTALLED_APPS = [
     'onboarding',
     'messaging',
     'events',
+    'donations'
 ]
 
 #Force SSL if debug is disabled
@@ -287,6 +288,8 @@ GOOGLE_MAPS_KEY = os.environ.get('GOOGLE_MAPS_KEY', None)
 GOOGLE_API_KEY = GOOGLE_MAPS_KEY
 GOOGLE_SERVICE_ACCOUNT_CREDENTIALS = os.environ.get('GOOGLE_SERVICE_ACCOUNT_CREDENTIALS', None)
 GOOGLE_CALENDAR_IMPORT_ID = os.environ.get('GOOGLE_CALENDAR_IMPORT_ID', None)
+
+STRIPE_KEY = os.environ.get('STRIPE_KEY', None)
 
 AIRTABLE_API_KEY = os.environ.get('AIRTABLE_API_KEY', None)
 AIRTABLE_BASE_ID = os.environ.get('AIRTABLE_BASE_ID', None)

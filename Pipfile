@@ -57,6 +57,7 @@ python-dateutil = "*"
 tqdm = "*"
 markdown = "==2.2"
 django-request-id = "*"
+stripe = "*"
 
 [requires]
 python_version = "2.7"
