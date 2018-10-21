@@ -21,6 +21,10 @@ export default class Filterable {
         return values.filter(value => this.matcher(value, filterConfig))
     }
 
+    getFilter(state) {
+        return state.getIn(['filters', 'filters', this.key])
+    }
+
     bindActionCreators(dispatch) {
         return {
             set: f => dispatch(setFilter(this.key, f))
