@@ -13,9 +13,16 @@ export const matchOrContains = (needle, haystack) => {
 export const isEqual = (needle, haystack) => {
     if (haystack instanceof Array) {
         return haystack.indexOf(needle) != -1
+    } else if (typeof(haystack) == 'number') {
+        return Number.parseFloat(needle) == haystack
     } else {
         return needle == haystack
     }
+}
+
+function floatCmp(func, value) {
+    const asFloat = Number.parseFloat(value)
+    return (row) => func(row, asFloat)
 }
 
 export const makeComparator = (obj) => {
@@ -29,6 +36,14 @@ export const makeComparator = (obj) => {
             return (row) => matchOrContains(value, _.get(row, property))
         case 'is':
             return (row) => isEqual(value, _.get(row, property))
+        case 'gt':
+            return floatCmp((row, asFloat) => _.get(row, property) > asFloat, value)
+        case 'gte':
+            return floatCmp((row, asFloat) => _.get(row, property) >= asFloat, value)
+        case 'lt':
+            return floatCmp((row, asFloat) => _.get(row, property) < asFloat, value)
+        case 'lte':
+            return floatCmp((row, asFloat) => _.get(row, property) <= asFloat, value)
         default:
             throw Error('Unknown operator ' + op)
         }

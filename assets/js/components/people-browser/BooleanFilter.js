@@ -58,6 +58,19 @@ const OperatorWidgetForField = withFieldState('property')(props => {
                 </MaterialFormSelect>
             </FormControl>
         )
+    case 'twelve_month_event_count':
+        return (
+            <FormControl fullWidth>
+                <InputLabel>Comparison</InputLabel>
+                <MaterialFormSelect field="op">
+                    <MenuItem value='is'>Is</MenuItem>
+                    <MenuItem value='gt'>Greater than</MenuItem>
+                    <MenuItem value='lt'>Less than</MenuItem>
+                    <MenuItem value='lte'>At most</MenuItem>
+                    <MenuItem value='gte'>At least</MenuItem>
+                </MaterialFormSelect>
+            </FormControl>
+        )
     default:
         return (
             <FormControl fullWidth>
@@ -94,6 +107,7 @@ export const BooleanFilter = props => {
                             <MenuItem value="tags">A tag</MenuItem>
                             <MenuItem value="state">State</MenuItem>
                             <MenuItem value="current_turf.id">Turf</MenuItem>
+                            <MenuItem value="twelve_month_event_count">Events in the last 12 months</MenuItem>
                         </MaterialFormSelect>
                     </FormControl>
                 </Grid>
