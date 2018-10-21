@@ -47,7 +47,7 @@ class PersonResource(resources.ModelResource):
         import_id_fields = ('email',)
         fields = ('email', 'name', 'address', 'state')
         report_skipped = True
-        skup_unchanged = True
+        skip_unchanged = True
 
 class AirtableImporter(DatasetImporter):
     class Meta:
