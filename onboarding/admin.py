@@ -3,20 +3,35 @@ from __future__ import unicode_literals
 
 from django.contrib import admin
 from . import models
-from crm.models import Person
+from crm.models import Person, PersonState
 from organizer.admin import admin_site
 
-def approve_signups(modeladmin, request, queryset):
-    for signup in queryset:
-        event = signup.event
-        person = Person.objects.get_or_create(email=signup.email)[0]
-        event.attendees.add(person)
-        event.save()
-        signup.approved = True
-        signup.save()
-approve_signups.short_description = "Approve selected signups"
+def make_approver(state):
+    def signup_approver(modeladmin, request, queryset):
+        for signup in queryset:
+            person, _ = Person.objects.update_or_create(email=signup.email,
+                    defaults=dict(
+                        state=state
+                    ))
+            if signup.event is not None:
+                event = signup.event
+                event.attendees.add(person)
+                event.save()
+            signup.approved = True
+            signup.save()
+    signup_approver.short_description = "Approve selected signups as {0}".format(state.name)
+    signup_approver.__name__ = str("approve_signups_{0}".format(state.name))
+    return signup_approver
 
 class SignupAdmin(admin.ModelAdmin):
+    def get_actions(self, request):
+        actions = super(SignupAdmin, self).get_actions(request)
+        for state in PersonState.objects.all().order_by('name'):
+            approver = make_approver(state)
+            actions[approver.__name__] = (approver, approver.__name__,
+                    approver.short_description)
+        return actions
+
     list_display = [
         'email', 'created', 'event', 'approved'
     ]
@@ -24,7 +39,6 @@ class SignupAdmin(admin.ModelAdmin):
         'email', 'event__name'
     ]
     list_filter = ('approved', ('event', admin.RelatedOnlyFieldListFilter))
-    actions = [approve_signups]
 
 admin.site.register(models.NewNeighborNotificationTarget)
 admin.site.register(models.Signup, SignupAdmin)
