@@ -12,7 +12,7 @@ from django.contrib import admin
 from django.contrib import messages
 from django.utils.html import format_html_join
 from django.utils.safestring import mark_safe
-from django.db.models import Count
+from django.db.models import Count, Sum
 from . import models, importing
 from import_export.admin import ImportExportModelAdmin
 import onboarding
@@ -87,7 +87,7 @@ class PersonAdmin(ImportExportModelAdmin):
     fieldsets = (
         (None, {
             'fields': (('name', 'email'), ('phone', 'address'), 'state',
-            'attendance_record')
+            'attendance_record', 'donation_record')
         }),
         ('Advanced', {
             'classes': ('collapse',),
@@ -104,6 +104,17 @@ class PersonAdmin(ImportExportModelAdmin):
             ),
             format_html("<tr><th>Total</th><th>{}</th></tr>",
                 instance.events.count())
+        )
+
+    def donation_record(self, instance):
+        return format_html(
+            "<table><tr><th>Amount</th><th>Date</th></tr>{}{}</table>",
+            format_html_join('\n', "<tr><td><a href='{}'>{}</a></td><td>{}</td></tr>",
+                ((reverse('admin:donations_donation_change', args=(donation.id, )),
+                    donation.value/100, donation.timestamp) for donation in instance.donations.all())
+            ),
+            format_html("<tr><th>Total</th><th>{}</th></tr>",
+                instance.donations.aggregate(sum=Sum('value')/100)['sum'])
         )
 
     list_filter = (
@@ -124,7 +135,8 @@ class PersonAdmin(ImportExportModelAdmin):
     def city(self, obj):
         return obj.address.locality
 
-    readonly_fields = ['lat', 'lng', 'created', 'attendance_record']
+    readonly_fields = ['lat', 'lng', 'created', 'attendance_record',
+    'donation_record']
 
     inlines  = [
         TurfMembershipInline,
