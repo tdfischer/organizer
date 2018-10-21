@@ -44,13 +44,14 @@ export function isWithinWindow(start, end) {
     )
 }
 
-const getEvents = state => (
+const getEvents = (state, {start, end} = {}) => (
     Events.immutableSelect(state)
         .map(evt => ({
             ...evt, 
             end_timestamp: moment(evt.end_timestamp), 
             timestamp: moment(evt.timestamp),
         }))
+        .filter(isWithinWindow(start, end))
 )
 
 export const getEventsInWindow = (state, {start, end} = {}) => (
