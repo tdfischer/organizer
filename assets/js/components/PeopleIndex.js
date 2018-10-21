@@ -100,6 +100,7 @@ export class PeopleIndex extends Component {
             copied: false,
         }
         this.onCopy = this.onCopy.bind(this)
+        this.onFilterChange = this.onFilterChange.bind(this)
         if (this.props.urlFilter) {
             this.props.filter.set(this.props.urlFilter)
         }
@@ -108,6 +109,10 @@ export class PeopleIndex extends Component {
     onCopy() {
         this.setState({copied: true})
         copy(this.props.selection.join(', '))
+    }
+
+    onFilterChange(filter) {
+        this.props.filter.set(filter)
     }
 
     render() {
@@ -131,7 +136,7 @@ export class PeopleIndex extends Component {
                         <Tagger />
                     </Grid>
                 </Grid>
-                <Grid container><Grid item xs><Search initialFilter={this.props.initialFilter} filter={props.filter} /></Grid></Grid>
+                <Grid container><Grid item xs><Search initialFilter={this.props.initialFilter} onFilterChange={this.onFilterChange} /></Grid></Grid>
                 <PeopleTable />
             </React.Fragment>
         )

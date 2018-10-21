@@ -43,7 +43,14 @@ export const Search = props => {
     const initialOp = (props.initialFilter || {op: 'and'}).op
     const boolOp = initialOp == 'or'
     return (
-        <Form initialValues={{op: boolOp, filter: (initialFilter)}} onChange={({values}) => props.filter.set({op: values.op ? 'or' : 'and', children: values.filter})}>
+        <Form initialValues={{op: boolOp, filter: (initialFilter)}} onValueChange={(values) => {
+            if (values.filter && values.filter[0]) {
+                props.onFilterChange({
+                    op: values.op ? 'or' : 'and', 
+                    children: values.filter
+                })
+            }
+        }}>
             {({formApi}) => (
                 <Grid container direction="column" alignItems="stretch" spacing={8}>
                     <Grid item>Match All <MaterialFormSwitch field='op'/> Match Any</Grid>
