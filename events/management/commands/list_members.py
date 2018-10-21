@@ -1,13 +1,26 @@
 from django.core.management.base import BaseCommand
 from events.models import Event
+from django.utils import timezone
 from crm.models import Person
+from datetime import timedelta
+from django.db.models import Sum
 
 class Command(BaseCommand):
     def handle(*args, **kwargs):
+        oneYearAgo = timezone.now() + timedelta(days=-365)
         for person in Person.objects.all():
-            if person.events.count() >= 3:
-                print "[Voting] %s: %s <%s> - %s"%(person.state, person.name, person.email,
-                        person.events.count())
-            elif person.events.count() >= 1 or False: # person.donations.count() >= 1:
-                print "%s: %s <%s> - %s"%(person.state, person.name, person.email,
-                        person.events.count())
+            isVotingMember = person.events.filter(end_timestamp__gte=oneYearAgo).count() >= 3
+            isPatron = person.donations.filter(timestamp__gte=oneYearAgo).count() >= 1
+            isVolunteer = person.events.filter(end_timestamp__gte=oneYearAgo).count() >= 1
+            personTag = None
+            if isVotingMember:
+                personTag = "Voting"
+            elif isVolunteer:
+                personTag = "Volunteer"
+            elif isPatron:
+                personTag = "Patron"
+
+            if personTag is not None:
+                print "[%s] %s <%s> - %s events, $%s"%(personTag, person.name, person.email,
+                        person.events.count(),
+                        person.donations.aggregate(total=Sum('value') / 100)['total'])
