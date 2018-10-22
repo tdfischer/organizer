@@ -46,7 +46,6 @@ const locationDisplay = (evt, currentLocation) => {
 
 export const CheckInButton = props => {
     const haveCheckedIn = props.checkedIn
-    const canCheckIn = !haveCheckedIn && props.onCheckIn && props.event.checkIn.isNearby
     const attendeeCount = props.event.attendees.length - (haveCheckedIn ? 1 : 0)
 
     if (haveCheckedIn) {
@@ -56,7 +55,7 @@ export const CheckInButton = props => {
                 <Grid item><p>You and {attendeeCount} others checked in.</p></Grid>
             </React.Fragment>
         )
-    } else if (canCheckIn) {
+    } else if (props.event.checkIn.canCheckIn) {
         return (
             <React.Fragment>
                 <Grid item><Button style={{backgroundColor: buttonHasher.hex(props.event.uid)}} variant="outlined" size="large" className={props.classes.checkInButton} onClick={() => props.onCheckIn(props.event)}>

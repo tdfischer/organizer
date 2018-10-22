@@ -44,13 +44,14 @@ export function isWithinWindow(start, end) {
     )
 }
 
-const getEvents = state => (
+const getEvents = (state, {start, end} = {}) => (
     Events.immutableSelect(state)
         .map(evt => ({
             ...evt, 
             end_timestamp: moment(evt.end_timestamp), 
             timestamp: moment(evt.timestamp),
         }))
+        .filter(isWithinWindow(start, end))
 )
 
 export const getEventsInWindow = (state, {start, end} = {}) => (
@@ -60,10 +61,11 @@ export const getEventsInWindow = (state, {start, end} = {}) => (
 
 const cookEventWithLocation = (currentLocation, evt, now) => {
     const distanceFromHere = distance(currentLocation ? currentLocation : evt.geo, evt.geo)
-    const isNearby = distanceFromHere < 0.25
+    const isNearby = distanceFromHere <= 0.25
     const isInPast = evt.end_timestamp.diff(now, 'hours') <= 1
-    const hasNotStarted = evt.timestamp.diff(now, 'minutes') >= 30
     const timeFromNow = evt.timestamp.diff(now, 'minutes')
+    const hasNotStarted = timeFromNow >= 30
+    const canCheckIn = isNearby && !isInPast && !hasNotStarted
     const relevance = distanceFromHere + timeFromNow
     return {
         ...evt,
@@ -72,7 +74,8 @@ const cookEventWithLocation = (currentLocation, evt, now) => {
         checkIn: {
             isNearby,
             isInPast,
-            hasNotStarted
+            hasNotStarted,
+            canCheckIn
         }
     }
 }

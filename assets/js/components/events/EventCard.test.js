@@ -21,7 +21,8 @@ describe('CheckInButton', () => {
                 checkIn: {
                     isNearby: false,
                     isInPast: false,
-                    hasNotStarted: false
+                    hasNotStarted: false,
+                    canCheckIn: false
                 },
                 attendees: []
             },
@@ -47,7 +48,8 @@ describe('CheckInButton', () => {
                 checkIn: {
                     isNearby: false,
                     isInPast: true,
-                    hasNotStarted: false
+                    hasNotStarted: false,
+                    canCheckIn: false
                 },
                 attendees: []
             },
@@ -71,7 +73,8 @@ describe('CheckInButton', () => {
                 checkIn: {
                     isNearby: false,
                     isInPast: false,
-                    hasNotStarted: true
+                    hasNotStarted: true,
+                    canCheckIn: false
                 },
                 attendees: []
             },
@@ -95,7 +98,8 @@ describe('CheckInButton', () => {
                 checkIn: {
                     isNearby: true,
                     isInPast: false,
-                    hasNotStarted: false
+                    hasNotStarted: false,
+                    canCheckIn: true
                 },
                 attendees: []
             },
@@ -122,7 +126,8 @@ describe('CheckInButton', () => {
                 checkIn: {
                     isNearby: true,
                     isInPast: false,
-                    hasNotStarted: false
+                    hasNotStarted: false,
+                    canCheckIn: true
                 },
                 attendees: []
             },
