@@ -21,10 +21,24 @@ const People = new Model('people')
 const PeopleSelector = new Selectable('people')
 const PeopleFilter = new Filterable('people')
 
+function getUrlFilter(state) {
+    const url = new URL(state.getIn(['router', 'location', 'search'], ''), window.location)
+    const decoded = atob(url.searchParams.get('filter', undefined))
+    try {
+        return JSON.parse(decoded)
+    } catch (_e) {
+        return undefined
+    }
+}
+
 const mapStateToProps = state => {
     const selection = PeopleSelector.immutableSelected(state)
+    const storeFilter = PeopleFilter.getFilter(state)
+    const urlFilter = getUrlFilter(state)
     return {
         selection,
+        urlFilter,
+        initialFilter: urlFilter ? urlFilter : storeFilter
     }
 }
 
@@ -83,14 +97,22 @@ export class PeopleIndex extends Component {
         super(props)
         this.state = {
             currentState: 0,
-            copied: false
+            copied: false,
         }
         this.onCopy = this.onCopy.bind(this)
+        this.onFilterChange = this.onFilterChange.bind(this)
+        if (this.props.urlFilter) {
+            this.props.filter.set(this.props.urlFilter)
+        }
     }
 
     onCopy() {
         this.setState({copied: true})
         copy(this.props.selection.join(', '))
+    }
+
+    onFilterChange(filter) {
+        this.props.filter.set(filter)
     }
 
     render() {
@@ -114,7 +136,7 @@ export class PeopleIndex extends Component {
                         <Tagger />
                     </Grid>
                 </Grid>
-                <Grid container><Grid item xs><Search filter={props.filter} /></Grid></Grid>
+                <Grid container><Grid item xs><Search initialFilter={this.props.initialFilter} onFilterChange={this.onFilterChange} /></Grid></Grid>
                 <PeopleTable />
             </React.Fragment>
         )

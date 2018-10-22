@@ -53,7 +53,7 @@ const OperatorWidgetForField = withFieldState('property')(props => {
         return (
             <FormControl fullWidth>
                 <InputLabel>Comparison</InputLabel>
-                <MaterialFormSelect initialValue="is" field="op">
+                <MaterialFormSelect field="op">
                     <MenuItem value='is'>Is</MenuItem>
                 </MaterialFormSelect>
             </FormControl>
@@ -75,7 +75,7 @@ const OperatorWidgetForField = withFieldState('property')(props => {
         return (
             <FormControl fullWidth>
                 <InputLabel>Comparison</InputLabel>
-                <BooleanSelect initialValue="contains" field="op"/>
+                <BooleanSelect field="op"/>
             </FormControl>
         )
     }
@@ -100,7 +100,7 @@ export const BooleanFilter = props => {
                 <Grid item xs={3}>
                     <FormControl fullWidth>
                         <InputLabel>What</InputLabel>
-                        <MaterialFormSelect initialValue="name" field="property">
+                        <MaterialFormSelect field="property">
                             <MenuItem value="name">Name</MenuItem>
                             <MenuItem value="email">E-Mail</MenuItem>
                             <MenuItem value="geo.properties.city">City</MenuItem>
