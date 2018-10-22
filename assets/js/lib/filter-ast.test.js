@@ -8,6 +8,16 @@ describe('isEqual', () => {
     it('should not match two different strings', () => {
         expect(isEqual('foo', 'bar')).toEqual(false)
     })
+    it('should match two equal numbers', () => {
+        expect(isEqual("1024", 1024)).toEqual(true)
+        expect(isEqual(1024, 1024)).toEqual(true)
+    })
+    it('should not match two different numbers', () => {
+        expect(isEqual("1024", 256)).toEqual(false)
+        expect(isEqual(1024, 256)).toEqual(false)
+        expect(isEqual('', 256)).toEqual(false)
+        expect(isEqual(undefined, 256)).toEqual(false)
+    })
     it('should match a string in an array of strings', () => {
         expect(isEqual('foo', [])).toEqual(false)
         expect(isEqual('foo', ['foobar'])).toEqual(false)
@@ -45,7 +55,8 @@ const pattern = (property, op, value) => ({property, op, value})
 const joinPattern = (op, patterns) => ({children: patterns, op: op})
 const testObject = {
     name: 'Full Name',
-    tags: ['foo', 'bar', 'bazbiz']
+    tags: ['foo', 'bar', 'bazbiz'],
+    number: 0,
 }
 
 describe('makeComparator', () => {
@@ -82,6 +93,26 @@ describe('makeComparator', () => {
         })
         it('should match a subset of a string in an array property', () => {
             expect(makeComparator(pattern('tags', 'contains', 'biz'))(testObject)).toEqual(true)
+        })
+        it('should match >= for numbers', () => {
+            expect(makeComparator(pattern('number', 'gte', -100))(testObject)).toEqual(true)
+            expect(makeComparator(pattern('number', 'gte', 0))(testObject)).toEqual(true)
+            expect(makeComparator(pattern('number', 'gte', 100))(testObject)).toEqual(false)
+        })
+        it('should match > for numbers', () => {
+            expect(makeComparator(pattern('number', 'gt', -100))(testObject)).toEqual(true)
+            expect(makeComparator(pattern('number', 'gt', 0))(testObject)).toEqual(false)
+            expect(makeComparator(pattern('number', 'gt', 100))(testObject)).toEqual(false)
+        })
+        it('should match <= for numbers', () => {
+            expect(makeComparator(pattern('number', 'lte', -100))(testObject)).toEqual(false)
+            expect(makeComparator(pattern('number', 'lte', 0))(testObject)).toEqual(true)
+            expect(makeComparator(pattern('number', 'lte', 100))(testObject)).toEqual(true)
+        })
+        it('should match < for numbers', () => {
+            expect(makeComparator(pattern('number', 'lt', -100))(testObject)).toEqual(false)
+            expect(makeComparator(pattern('number', 'lt', 0))(testObject)).toEqual(false)
+            expect(makeComparator(pattern('number', 'lt', 100))(testObject)).toEqual(true)
         })
     })
 
