@@ -6,6 +6,10 @@ from . import models
 from organizer.admin import admin_site
 
 class EventAdmin(admin.ModelAdmin):
+    search_fields = [
+        'name', 'location__raw'
+    ]
+
     list_display = [
         'name', 'timestamp', 'end_timestamp', 'attendee_count'
     ]
