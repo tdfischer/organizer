@@ -24,7 +24,7 @@ class DiscourseSSOAuth(BaseAuth):
                 sha256).hexdigest()
         encodedParams = urllib.urlencode({'sso': base64Payload, 'sig':
             payloadSignature})
-        return settings.DISCOURSE_BASE_URL+"?"+encodedParams
+        return settings.DISCOURSE_BASE_URL+"/session/sso_provider?"+encodedParams
 
     def get_user_id(self, details, response):
         return response['email'][0]
