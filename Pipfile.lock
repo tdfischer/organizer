@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "4fc4cd0f7cb84ba219c1d3d26d0d6517f5da8498a418c96fc87e7788e2016331"
+            "sha256": "0ecb81a791e462fbc413d8553ea3d91cb9c83b56a37be918fdb54f10acbe9014"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -635,6 +635,13 @@
             "index": "pypi",
             "version": "==1.10.0"
         },
+        "slackclient": {
+            "hashes": [
+                "sha256:4d5f2d5b05a8fa717b745efa934d0a4240dfc8442f169fb2a8af4e5adb8297ad",
+                "sha256:d06b2105a1044651a7dcefe77c24cade6ae7c98ff53422e970634e62862e7bf3"
+            ],
+            "version": "==1.3.0"
+        },
         "social-auth-app-django": {
             "hashes": [
                 "sha256:6d0dd18c2d9e71ca545097d57b44d26f59e624a12833078e8e52f91baf849778",
@@ -710,6 +717,13 @@
             ],
             "index": "pypi",
             "version": "==0.5.1"
+        },
+        "websocket-client": {
+            "hashes": [
+                "sha256:8c8bf2d4f800c3ed952df206b18c28f7070d9e3dcbd6ca6291127574f57ee786",
+                "sha256:e51562c91ddb8148e791f0155fdb01325d99bb52c4cdbb291aee7a3563fd0849"
+            ],
+            "version": "==0.54.0"
         },
         "whitenoise": {
             "extras": [

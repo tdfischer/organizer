@@ -29,9 +29,38 @@ class SignupAdmin(admin.ModelAdmin):
         'email', 'event__name'
     ]
     list_filter = ('approved', ('event', admin.RelatedOnlyFieldListFilter))
+    raw_id_fields = ('event',)
+
+class StatusAdmin(admin.ModelAdmin):
+    list_display = [
+        'person', 'component', 'created', 'success'
+    ]
+
+    list_filter = ('component', 'success')
+    readonly_fields = ('message','created')
+
+def disable_components(modeladmin, request, queryset):
+    queryset.update(enabled=False)
+disable_components.short_description = "Disable selected components"
+
+def enable_components(modeladmin, request, queryset):
+    queryset.update(enabled=False)
+enable_components.short_description = "Enable selected components"
+
+class ComponentAdmin(admin.ModelAdmin):
+    list_display = [
+        'name', 'handler', 'filter', 'enabled'
+    ]
+
+    actions = [
+        disable_components,
+        enable_components
+    ]
 
 admin.site.register(models.NewNeighborNotificationTarget)
 admin.site.register(models.Signup, SignupAdmin)
+admin.site.register(models.OnboardingStatus, StatusAdmin)
+admin.site.register(models.OnboardingComponent, ComponentAdmin)
 
 admin_site.register(models.NewNeighborNotificationTarget)
 admin_site.register(models.Signup, SignupAdmin)

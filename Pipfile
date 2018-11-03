@@ -61,6 +61,7 @@ stripe = "*"
 django-admin-rangefilter = "*"
 redis = "==2.10.6"
 rq = "==0.12.0"
+slackclient = "*"
 
 [requires]
 python_version = "2.7"

@@ -16,12 +16,18 @@ from django.db import transaction
 from django.db.models import Count, Sum
 from . import models, importing
 from import_export.admin import ImportExportModelAdmin
-import onboarding
+from onboarding.models import OnboardingComponent
+from onboarding.jobs import runOnboarding
 from django.core.mail import send_mail
 from django.conf import settings
 from address.models import Locality
 from organizer.admin import admin_site
 import StringIO
+
+def onboard_people(modeladmin, request, queryset):
+    for person in queryset:
+        runOnboarding.delay(person)
+onboard_people.short_description = "Run onboarding for selected people"
 
 def merge_people(modeladmin, request, queryset):
     matches = queryset.order_by('created')
@@ -106,7 +112,8 @@ class PersonAdmin(ImportExportModelAdmin):
             'fields': (('name', 'email'), ('phone', 'address'))
         }),
         ('Membership', {
-            'fields': ('attendance_record', 'donation_record')
+            'fields': ('attendance_record', 'donation_record',
+            'onboarding_status')
         }),
         ('Advanced', {
             'classes': ('collapse',),
@@ -136,6 +143,36 @@ class PersonAdmin(ImportExportModelAdmin):
                 instance.donations.aggregate(sum=Sum('value')/100)['sum'])
         )
 
+    def onboarding_status(self, instance):
+        statuses = []
+        for component in OnboardingComponent.objects.filter():
+            myStatus = instance.onboarding_statuses.filter(component=component)
+            statusDate = "-"
+            success = "Not yet attempted"
+            statusLink = ""
+            if myStatus.exists():
+                s = myStatus.first()
+                statusDate = s.created
+                success = str(s.success) + ": " + s.message
+                statusLink = reverse('admin:onboarding_onboardingstatus_change', args=(s.id,)),
+
+            statuses.append((
+                reverse('admin:onboarding_onboardingcomponent_change', args=(component.id,)),
+                component.name,
+                statusLink,
+                statusDate,
+                success
+            ))
+
+        return format_html(
+            "<table><tr><th>Name</th><th>Date</th><th>Success</th></tr>{}</table>",
+            format_html_join(
+                '\n',
+                "<tr><td><a href='{}'>{}</a></td><td><a href='{}'>{}</a></td><td>{}</td></tr>",
+                iter(statuses)
+            )
+        )
+
     list_filter = (
         CityFilter,
         TurfFilter,
@@ -144,7 +181,8 @@ class PersonAdmin(ImportExportModelAdmin):
     actions = (
         merge_people,
         make_captain,
-        unmake_captain
+        unmake_captain,
+        onboard_people
     )
 
     list_display = [
@@ -154,6 +192,11 @@ class PersonAdmin(ImportExportModelAdmin):
 
     select_related = ['address__locality']
 
+    def onboarded(self, obj):
+        curCount = obj.onboarding_statuses.filter(success=True).aggregate(count=Count('component'))['count']
+        total = OnboardingComponent.objects.filter(enabled=True).count()
+        return "{0}/{1}".format(curCount, total)
+
     def valid_geo(self, obj):
         return not (obj.lat is None or obj.lng is None)
 
@@ -161,7 +204,7 @@ class PersonAdmin(ImportExportModelAdmin):
         return obj.address.locality
 
     readonly_fields = ['lat', 'lng', 'created', 'attendance_record',
-    'donation_record']
+    'donation_record', 'onboarding_status']
 
     inlines  = [
         TurfMembershipInline,
