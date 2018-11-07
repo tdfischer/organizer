@@ -325,7 +325,9 @@ SOCIAL_AUTH_SLACK_SLACK_SCOPE = ['identity.basic','identity.team',
         'identity.email']
 SOCIAL_AUTH_SLACK_TEAM = os.environ.get('SLACK_TEAM_ID', None)
 
-AUTHENTICATION_BACKENDS = ()
+SLACK_API_TOKEN = os.environ.get('SLACK_API_TOKEN', None)
+
+AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',)
 
 # This also must match the condition in the LocalDevAuth class.
 if DEBUG and ('USE_REALLY_INSECURE_DEVELOPMENT_AUTHENTICATION_BACKEND' in
