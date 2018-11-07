@@ -118,7 +118,8 @@ INSTALLED_APPS = [
     'onboarding',
     'messaging',
     'events',
-    'donations'
+    'donations',
+    'filtering'
 ]
 
 #Force SSL if debug is disabled

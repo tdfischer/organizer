@@ -62,6 +62,8 @@ django-admin-rangefilter = "*"
 redis = "==2.10.6"
 rq = "==0.12.0"
 slackclient = "*"
+django-mptt = "*"
+django-enumfields = "*"
 
 [requires]
 python_version = "2.7"
