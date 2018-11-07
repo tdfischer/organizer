@@ -6,6 +6,7 @@ import logging
 from django.utils.html import format_html
 from django.core.urlresolvers import reverse
 from django.template import loader
+from django.urls.resolvers import NoReverseMatch
 from django.conf.urls import url
 from django.shortcuts import render
 from django.contrib import admin
@@ -139,7 +140,7 @@ class PersonAdmin(ImportExportModelAdmin):
         return format_html(
             "<table><tr><th>Name</th><th>Date</th></tr>{}{}</table>",
             format_html_join('\n', "<tr><td><a href='{}'>{}</a></td><td>{}</td></tr>",
-                ((reverse('admin:events_event_change', args=(evt.id, )),
+                ((reverse('organizer-admin:events_event_change', args=(evt.id, )),
                     evt.name, evt.timestamp) for evt in instance.events.all())
             ),
             format_html("<tr><th>Total</th><th>{}</th></tr>",
@@ -150,7 +151,7 @@ class PersonAdmin(ImportExportModelAdmin):
         return format_html(
             "<table><tr><th>Amount</th><th>Date</th></tr>{}{}</table>",
             format_html_join('\n', "<tr><td><a href='{}'>{}</a></td><td>{}</td></tr>",
-                ((reverse('admin:donations_donation_change', args=(donation.id, )),
+                ((reverse('organizer-admin:donations_donation_change', args=(donation.id, )),
                     donation.value/100, donation.timestamp) for donation in instance.donations.all())
             ),
             format_html("<tr><th>Total</th><th>{}</th></tr>",
@@ -169,10 +170,14 @@ class PersonAdmin(ImportExportModelAdmin):
                     s = myStatus.first()
                     statusDate = s.created
                     success = str(s.success) + ": " + s.message
-                    statusLink = reverse('admin:onboarding_onboardingstatus_change', args=(s.id,)),
+                    statusLink = ""
+                    try:
+                        statusLink = reverse('organizer-admin:onboarding_onboardingstatus_change', args=(s.id,)),
+                    except NoReverseMatch:
+                        pass
 
                 statuses.append((
-                    reverse('admin:onboarding_onboardingcomponent_change', args=(component.id,)),
+                    reverse('organizer-admin:onboarding_onboardingcomponent_change', args=(component.id,)),
                     component.name,
                     statusLink,
                     statusDate,
