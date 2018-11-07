@@ -35,14 +35,23 @@ LOGGING = {
         "console": {
             "format": "%(asctime)s - %(levelname)-5s [%(name)s] request_id=%(request_id)s %(message)s",
             "datefmt": "%H:%M:%S"
+        },
+        "rq_console": {
+            "format": "%(asctime)s - %(levelname)-5s [%(name)s] %(message)s",
+            "datefmt": "%H:%M:%S"
         }
     },
     "handlers": {
         "console": {
             "level": "DEBUG",
             "filters": ["request_id"],
-            "class": "logging.StreamHandler",
+            "class": "rq.utils.ColorizingStreamHandler",
             "formatter": "console"
+        },
+        "rq_console": {
+            "level": "DEBUG",
+            "class": "rq.utils.ColorizingStreamHandler",
+            "formatter": "rq_console"
         }
     },
     "root": {
@@ -53,6 +62,11 @@ LOGGING = {
         "django": {
             "level": os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
             "propagate": True
+        },
+        "rq.worker": {
+            "level": os.getenv('RQ_LOG_LEVEL', 'INFO'),
+            "handlers": ["rq_console"],
+            "propagate": False
         }
     }
 }
