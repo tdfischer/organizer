@@ -18,6 +18,7 @@ from . import models, importing
 from import_export.admin import ImportExportModelAdmin
 from onboarding.models import OnboardingComponent
 from onboarding.jobs import runOnboarding
+from filtering.models import FilterNode
 from django.core.mail import send_mail
 from django.conf import settings
 from address.models import Locality
@@ -100,6 +101,19 @@ class LocalityFilter(CityFilter):
             return queryset.filter(locality_id=self.value())
         return queryset
 
+class NamedFilterFilter(admin.SimpleListFilter):
+    title = 'Saved filters'
+    parameter_name = 'named_filter'
+
+    def lookups(self, request, model_admin):
+        return map(lambda x: (x.id, x.name),
+                FilterNode.objects.named_for_model(model_admin.model).order_by('name'))
+
+    def queryset(self, request, queryset):
+        if self.value() is not None:
+            return FilterNode.objects.named().get(pk=self.value()).apply(queryset)
+        return queryset
+
 class PersonAdmin(ImportExportModelAdmin):
     resource_class = importing.PersonResource
     search_fields = [
@@ -146,23 +160,24 @@ class PersonAdmin(ImportExportModelAdmin):
     def onboarding_status(self, instance):
         statuses = []
         for component in OnboardingComponent.objects.filter():
-            myStatus = instance.onboarding_statuses.filter(component=component)
-            statusDate = "-"
-            success = "Not yet attempted"
-            statusLink = ""
-            if myStatus.exists():
-                s = myStatus.first()
-                statusDate = s.created
-                success = str(s.success) + ": " + s.message
-                statusLink = reverse('admin:onboarding_onboardingstatus_change', args=(s.id,)),
+            if component.filter.results.filter(pk=instance.pk).exists():
+                myStatus = instance.onboarding_statuses.filter(component=component)
+                statusDate = "-"
+                success = "Not yet attempted"
+                statusLink = ""
+                if myStatus.exists():
+                    s = myStatus.first()
+                    statusDate = s.created
+                    success = str(s.success) + ": " + s.message
+                    statusLink = reverse('admin:onboarding_onboardingstatus_change', args=(s.id,)),
 
-            statuses.append((
-                reverse('admin:onboarding_onboardingcomponent_change', args=(component.id,)),
-                component.name,
-                statusLink,
-                statusDate,
-                success
-            ))
+                statuses.append((
+                    reverse('admin:onboarding_onboardingcomponent_change', args=(component.id,)),
+                    component.name,
+                    statusLink,
+                    statusDate,
+                    success
+                ))
 
         return format_html(
             "<table><tr><th>Name</th><th>Date</th><th>Success</th></tr>{}</table>",
@@ -174,6 +189,7 @@ class PersonAdmin(ImportExportModelAdmin):
         )
 
     list_filter = (
+        NamedFilterFilter,
         CityFilter,
         TurfFilter,
     )
