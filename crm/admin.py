@@ -36,6 +36,22 @@ def merge_people(modeladmin, request, queryset):
         merged.save()
 merge_people.short_description = "Merge selected people"
 
+def make_captain(modeladmin, request, queryset):
+    for person in queryset:
+        membership = person.turf_memberships.latest('joined_on')
+        if membership is not None:
+            membership.is_captain = True
+            membership.save()
+make_captain.short_description = 'Mark selected people as captains in their turf'
+
+def unmake_captain(modeladmin, request, queryset):
+    for person in queryset:
+        membership = person.turf_memberships.latest('joined_on')
+        if membership is not None:
+            membership.is_captain = False
+            membership.save()
+unmake_captain.short_description = 'Strip turf captainship from selected people'
+
 class TurfMembershipInline(admin.TabularInline):
     model = models.TurfMembership
 
@@ -57,12 +73,12 @@ class CityFilter(admin.SimpleListFilter):
     parameter_name = 'city'
 
     def lookups(self, request, model_admin):
-        return map(lambda x: (x.id, x.name),
-                Locality.objects.all().order_by('name'))
+        return map(lambda x: (x.name, x.name),
+                Locality.objects.all().distinct('name').order_by('name'))
 
     def queryset(self, request, queryset):
         if self.value() is not None:
-            return queryset.filter(address__locality_id=self.value())
+            return queryset.filter(address__locality__name=self.value())
         return queryset
 
 class LocalityFilter(CityFilter):
@@ -78,30 +94,19 @@ class LocalityFilter(CityFilter):
             return queryset.filter(locality_id=self.value())
         return queryset
 
-class StateFilter(admin.SimpleListFilter):
-    title = 'State'
-    parameter_name = 'state'
-
-    def lookups(self, request, model_admin):
-        return map(lambda x: (x.id, x.name),
-                models.PersonState.objects.all().order_by('name'))
-
-    def queryset(self, request, queryset):
-        if self.value() is not None:
-            return queryset.filter(state_id=self.value())
-        return queryset
-
 class PersonAdmin(ImportExportModelAdmin):
     resource_class = importing.PersonResource
     search_fields = [
         'name', 'email', 'address__raw', 'address__locality__name',
-        'turf_memberships__turf__name', 'state__name', 'phone'
+        'turf_memberships__turf__name', 'phone'
     ]
 
     fieldsets = (
         (None, {
-            'fields': (('name', 'email'), ('phone', 'address'), 'state',
-            'attendance_record', 'donation_record')
+            'fields': (('name', 'email'), ('phone', 'address'))
+        }),
+        ('Membership', {
+            'fields': ('attendance_record', 'donation_record')
         }),
         ('Advanced', {
             'classes': ('collapse',),
@@ -132,13 +137,14 @@ class PersonAdmin(ImportExportModelAdmin):
         )
 
     list_filter = (
-        ('state', admin.RelatedOnlyFieldListFilter),
         CityFilter,
         TurfFilter,
     )
 
     actions = (
         merge_people,
+        make_captain,
+        unmake_captain
     )
 
     list_display = [
@@ -146,7 +152,7 @@ class PersonAdmin(ImportExportModelAdmin):
         'onboarded', 'is_captain'
     ]
 
-    select_related = ['state', 'address__locality']
+    select_related = ['address__locality']
 
     def valid_geo(self, obj):
         return not (obj.lat is None or obj.lng is None)

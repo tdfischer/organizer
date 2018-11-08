@@ -98,6 +98,13 @@ class Person(models.Model):
             except (Turf.DoesNotExist, TurfMembership.DoesNotExist):
                 return None
 
+    @property
+    def is_captain(self):
+        turf = self.current_turf
+        if turf is None:
+            return False
+        return self.turf_memberships.filter(is_captain=True, turf=turf).exists()
+
     def __unicode__(self):
         if self.name is None:
             return ""
