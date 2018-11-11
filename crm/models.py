@@ -40,7 +40,6 @@ class Person(models.Model):
     lng = models.FloatField(null=True, blank=True)
     state = models.ForeignKey(PersonState, db_index=True)
 
-
     objects = PersonManager()
 
     tags = TaggableManager(blank=True)
@@ -90,13 +89,13 @@ class Person(models.Model):
 
     @property
     def current_turf(self):
-        if hasattr(self, 'current_turf_id'):
-            return Turf.objects.get(pk=self.current_turf_id)
-        else:
-            try:
+        try:
+            if hasattr(self, 'current_turf_id'):
+                return Turf.objects.get(pk=self.current_turf_id)
+            else:
                 return self.turf_memberships.latest('joined_on').turf
-            except (Turf.DoesNotExist, TurfMembership.DoesNotExist):
-                return None
+        except (Turf.DoesNotExist, TurfMembership.DoesNotExist):
+            return None
 
     @property
     def is_captain(self):
