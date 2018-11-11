@@ -142,7 +142,8 @@ class PersonAdmin(ImportExportModelAdmin):
     )
 
     list_display = [
-        'name', 'email', 'phone', 'city', 'current_turf', 'state', 'valid_geo'
+        'name', 'email', 'phone', 'city', 'current_turf', 'valid_geo',
+        'onboarded', 'is_captain'
     ]
 
     select_related = ['state', 'address__locality']
