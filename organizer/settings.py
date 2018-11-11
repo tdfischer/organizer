@@ -102,6 +102,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rangefilter',
     'anymail',
     'address',
     'rest_framework',
