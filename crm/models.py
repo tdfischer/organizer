@@ -6,6 +6,7 @@ from django.db.models import Q, Subquery, OuterRef
 from django.utils import timezone
 from django.urls import reverse
 from django.conf import settings
+from django.contrib.postgres.fields import CIEmailField
 from address.models import AddressField, Address, Locality
 from taggit.managers import TaggableManager
 from crm import geocache
@@ -32,7 +33,7 @@ class PersonManager(models.Manager):
 
 class Person(models.Model):
     name = models.CharField(max_length=200, null=True, blank=True, default='')
-    email = models.EmailField(max_length=200, unique=True, db_index=True)
+    email = CIEmailField(max_length=200, unique=True, db_index=True)
     address = AddressField(blank=True)
     phone = models.CharField(max_length=200, null=True, blank=True, default=None)
     created = models.DateTimeField(auto_now_add=True)
