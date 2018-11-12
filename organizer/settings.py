@@ -215,6 +215,7 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.associate_by_email',
     'crm.pipeline.ensure_person_for_email',
     'organizer.pipeline.sync_from_discourse_auth',
+    'organizer.pipeline.sync_backend_group',
 )
 
 db_from_env = dj_database_url.config(conn_max_age=500)
