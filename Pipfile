@@ -31,7 +31,6 @@ requests = "*"
 six = "==1.10.0"
 webencodings = "==0.5.1"
 whitenoise = {version = "*", extras = ["brotli"]}
-"psycopg2" = "*"
 gunicorn = "*"
 "mailchimp3" = "*"
 raven = "*"
@@ -58,6 +57,7 @@ tqdm = "*"
 markdown = "==2.2"
 django-request-id = "*"
 stripe = "*"
+"psycopg2-binary" = "*"
 
 [requires]
 python_version = "2.7"
