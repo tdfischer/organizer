@@ -145,7 +145,8 @@ CACHES = {
 
 RQ_QUEUES = {
     'default': {
-        'USE_REDIS_CACHE': 'default'
+        'USE_REDIS_CACHE': 'default',
+        'ASYNC': not DEBUG
     }
 }
 
