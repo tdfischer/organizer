@@ -129,3 +129,29 @@ class TurfMembership(models.Model):
 
     def __unicode__(self):
         return "%s -> %s"%(self.person, self.turf)
+
+def merge_models(first, *duplicates):
+    relations = []
+    for field in Person._meta.get_fields():
+        log.debug("Merging %s", field.name)
+        firstValue = getattr(first, field.name)
+        if field.many_to_many:
+            for dupe in duplicates:
+                log.debug("Adding %s: %s", field.name, getattr(dupe,
+                    field.name).all())
+                firstValue.add(*getattr(dupe, field.name).all())
+        elif field.one_to_many:
+            for dupe in duplicates:
+                dupeValue = getattr(dupe, field.name)
+                for dupeRelation in dupeValue.all():
+                    log.debug("Remapping related object %s to use %s", dupeRelation,
+                            first)
+                    setattr(dupeRelation, field.remote_field.name, first)
+                    relations.append(dupeRelation)
+        else:
+            for dupe in duplicates:
+                dupeValue = getattr(dupe, field.name)
+                if firstValue is None and dupeValue is not None:
+                    log.debug("Using %s for %s", dupeValue, field.name)
+                    setattr(first, field.name, dupeValue)
+    return (first, relations)

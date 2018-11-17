@@ -1,73 +1,45 @@
 from django.core.management.base import BaseCommand
+from django.db import transaction
 from django.db.models import Count
-from django.conf import settings
-from airtable import Airtable
+from django.db.models.functions import Lower
+import logging
 
-from crm import models
+log = logging.getLogger(__name__)
 
-COMPUTED_FIELDS = ['Total Donations', 'ID', 'Full Address', 'Donations in last 30 days', 'Current Member', 'Created', 'Event Count', 'Voting Member', 'Events in last 12 months']
+from crm.models import Person, merge_models
 
 class Command(BaseCommand):
+    def add_arguments(self, parser):
+        parser.add_argument('email', default=[], nargs='*')
+        parser.add_argument('--debug', default=False, action='store_true')
+        parser.add_argument('--dry-run', default=False, action='store_true')
+
     def handle(self, *args, **options):
-        airtable = Airtable(
-                settings.AIRTABLE_BASE_ID,
-                settings.AIRTABLE_TABLE_NAME,
-                api_key=settings.AIRTABLE_API_KEY)
-        members = airtable.get_all()
-        by_email = {}
-        by_name = {}
-        for m in members:
-            email = m['fields'].get('Email', '').strip().lower()
-            name = m['fields'].get('Name', '').strip().lower()
-            by_email[email] = by_email.get(email, ()) + (m,)
-            by_name[name] = by_name.get(name, ()) + (m,)
-        allDupes = list(by_email.iteritems()) + list(by_name.iteritems())
-        for (email, rows) in allDupes:
-            if len(email) == 0:
-                continue
-            if len(rows) > 1:
-                print '%s:'%(email)
-                idx = 1
-                conflictingFields = []
-                for r in rows:
-                    for (fieldName, fieldValue) in r['fields'].iteritems():
-                        for row in rows:
-                            if fieldName not in COMPUTED_FIELDS and row['fields'].get(fieldName) != fieldValue:
-                                conflictingFields.append(fieldName)
-                for row in rows:
-                    print "\t%s"%(idx)
-                    for fieldName in set(conflictingFields):
-                        fieldPad = ' ' * (25 - len(fieldName))
-                        print "\t\t%s:%s%s"%(fieldName, fieldPad, row['fields'].get(fieldName))
-                    idx += 1
-                chosenIdx = input("Select the row to save, enter 0 to skip: ")
+        if options['debug']:
+            logging.basicConfig(level=logging.DEBUG)
 
-                if chosenIdx == 0:
-                    continue
+        dryRun = options['dry_run']
 
-                i = 0
-                deleted = []
-                merged = {}
-                for f in set(conflictingFields):
-                    merged[f] = rows[chosenIdx-1]['fields'].get(f, None)
-                for row in rows:
-                    if i != chosenIdx - 1:
-                        for f in set(conflictingFields):
-                            curVal = merged.get(f, None)
-                            if curVal is None or curVal == '':
-                                merged[f] = row['fields'].get(f, curVal)
-                            if type(curVal) is list:
-                                merged[f] += row['fields'].get(f, [])
-                        deleted.append(row['id'])
-                    i += 1
-                print "\tmerged:"
-                for fieldName in set(conflictingFields):
-                    fieldPad = ' ' * (25 - len(fieldName))
-                    print "\t\t%s:%s%s"%(fieldName, fieldPad, merged.get(fieldName))
-                doCommit = raw_input("Commit? [N/y]")
-                if doCommit is None:
-                    continue
-                if doCommit.strip().lower() == "y":
-                    airtable.batch_delete(deleted)
-                    airtable.update(rows[chosenIdx-1]['id'], merged)
-                    pass
+        allPeople = Person.objects.values(lower_email=Lower('email')) \
+                .annotate(Count('id')) \
+                .filter(id__count__gt=1)
+
+        if len(options['email']) > 0:
+            duplicates = allPeople.filter(lower_email__in=options['email'])
+        else:
+            duplicates = allPeople
+
+        log.info("Duplicates", duplicates)
+        relatedModels = []
+        for dupe in duplicates.values_list('lower_email'):
+            matches = Person.objects.filter(email__iexact=dupe).order_by('created')
+            first = matches[0]
+            duplicates = matches[1:]
+            merged, relations = merge_models(first, *duplicates)
+            if not dryRun:
+                with transaction.atomic():
+                    for d in duplicates:
+                        d.delete()
+                    first.save()
+                    for r in relations:
+                        r.save()

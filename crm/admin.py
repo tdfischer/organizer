@@ -12,6 +12,7 @@ from django.contrib import admin
 from django.contrib import messages
 from django.utils.html import format_html_join
 from django.utils.safestring import mark_safe
+from django.db import transaction
 from django.db.models import Count, Sum
 from . import models, importing
 from import_export.admin import ImportExportModelAdmin
@@ -21,6 +22,19 @@ from django.conf import settings
 from address.models import Locality
 from organizer.admin import admin_site
 import StringIO
+
+def merge_people(modeladmin, request, queryset):
+    matches = queryset.order_by('created')
+    first = matches[0]
+    duplicates = matches[1:]
+    merged, relations = models.merge_models(first, *list(duplicates))
+    with transaction.atomic():
+        for d in duplicates:
+            d.delete()
+        for r in relations:
+            r.save()
+        merged.save()
+merge_people.short_description = "Merge selected people"
 
 class TurfMembershipInline(admin.TabularInline):
     model = models.TurfMembership
@@ -121,6 +135,10 @@ class PersonAdmin(ImportExportModelAdmin):
         ('state', admin.RelatedOnlyFieldListFilter),
         CityFilter,
         TurfFilter,
+    )
+
+    actions = (
+        merge_people,
     )
 
     list_display = [
