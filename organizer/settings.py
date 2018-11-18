@@ -67,7 +67,10 @@ LOGGING = {
             "level": os.getenv('RQ_LOG_LEVEL', 'INFO'),
             "handlers": ["rq_console"],
             "propagate": False
-        }
+        },
+        "raven.contrib.django.client.DjangoClient": {
+            "level": 'WARN'
+        },
     }
 }
 
