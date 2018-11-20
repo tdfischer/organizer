@@ -67,7 +67,10 @@ LOGGING = {
             "level": os.getenv('RQ_LOG_LEVEL', 'INFO'),
             "handlers": ["rq_console"],
             "propagate": False
-        }
+        },
+        "raven.contrib.django.client.DjangoClient": {
+            "level": 'WARN'
+        },
     }
 }
 
@@ -99,6 +102,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rangefilter',
     'anymail',
     'address',
     'rest_framework',

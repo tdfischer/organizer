@@ -40,7 +40,6 @@ class Person(models.Model):
     lng = models.FloatField(null=True, blank=True)
     state = models.ForeignKey(PersonState, db_index=True)
 
-
     objects = PersonManager()
 
     tags = TaggableManager(blank=True)
@@ -90,13 +89,20 @@ class Person(models.Model):
 
     @property
     def current_turf(self):
-        if hasattr(self, 'current_turf_id'):
-            return Turf.objects.get(pk=self.current_turf_id)
-        else:
-            try:
+        try:
+            if hasattr(self, 'current_turf_id'):
+                return Turf.objects.get(pk=self.current_turf_id)
+            else:
                 return self.turf_memberships.latest('joined_on').turf
-            except (Turf.DoesNotExist, TurfMembership.DoesNotExist):
-                return None
+        except (Turf.DoesNotExist, TurfMembership.DoesNotExist):
+            return None
+
+    @property
+    def is_captain(self):
+        turf = self.current_turf
+        if turf is None:
+            return False
+        return self.turf_memberships.filter(is_captain=True, turf=turf).exists()
 
     def __unicode__(self):
         if self.name is None:
@@ -132,7 +138,7 @@ class TurfMembership(models.Model):
 
 def merge_models(first, *duplicates):
     relations = []
-    for field in Person._meta.get_fields():
+    for field in first._meta.get_fields():
         log.debug("Merging %s", field.name)
         firstValue = getattr(first, field.name)
         if field.many_to_many:

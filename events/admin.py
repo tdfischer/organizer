@@ -4,11 +4,22 @@ from __future__ import unicode_literals
 from django.contrib import admin
 from . import models
 from organizer.admin import admin_site
+from rangefilter.filter import DateTimeRangeFilter
 
 class EventAdmin(admin.ModelAdmin):
+    search_fields = [
+        'name', 'location__raw'
+    ]
+
     list_display = [
         'name', 'timestamp', 'end_timestamp', 'attendee_count'
     ]
+
+    list_filter = (
+        ('timestamp', DateTimeRangeFilter),
+        ('end_timestamp', DateTimeRangeFilter),
+        'location'
+    )
 
     fieldsets = (
         (None, {
