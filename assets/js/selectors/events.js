@@ -62,9 +62,10 @@ export const getEventsInWindow = (state, {start, end} = {}) => (
 const cookEventWithLocation = (currentLocation, evt, now) => {
     const distanceFromHere = distance(currentLocation ? currentLocation : evt.geo, evt.geo)
     const isNearby = distanceFromHere <= 0.25
-    const isInPast = evt.end_timestamp.diff(now, 'hours') <= 1
     const timeFromNow = evt.timestamp.diff(now, 'minutes')
+    const endTimeFromNow = evt.end_timestamp.diff(now, 'minutes')
     const hasNotStarted = timeFromNow >= 30
+    const isInPast = endTimeFromNow <= -60
     const canCheckIn = isNearby && !isInPast && !hasNotStarted
     const relevance = distanceFromHere + timeFromNow
     return {

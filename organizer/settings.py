@@ -35,14 +35,23 @@ LOGGING = {
         "console": {
             "format": "%(asctime)s - %(levelname)-5s [%(name)s] request_id=%(request_id)s %(message)s",
             "datefmt": "%H:%M:%S"
+        },
+        "rq_console": {
+            "format": "%(asctime)s - %(levelname)-5s [%(name)s] %(message)s",
+            "datefmt": "%H:%M:%S"
         }
     },
     "handlers": {
         "console": {
             "level": "DEBUG",
             "filters": ["request_id"],
-            "class": "logging.StreamHandler",
+            "class": "rq.utils.ColorizingStreamHandler",
             "formatter": "console"
+        },
+        "rq_console": {
+            "level": "DEBUG",
+            "class": "rq.utils.ColorizingStreamHandler",
+            "formatter": "rq_console"
         }
     },
     "root": {
@@ -53,6 +62,11 @@ LOGGING = {
         "django": {
             "level": os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
             "propagate": True
+        },
+        "rq.worker": {
+            "level": os.getenv('RQ_LOG_LEVEL', 'INFO'),
+            "handlers": ["rq_console"],
+            "propagate": False
         }
     }
 }
@@ -131,7 +145,8 @@ CACHES = {
 
 RQ_QUEUES = {
     'default': {
-        'USE_REDIS_CACHE': 'default'
+        'USE_REDIS_CACHE': 'default',
+        'ASYNC': not DEBUG
     }
 }
 
@@ -200,6 +215,7 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.associate_by_email',
     'crm.pipeline.ensure_person_for_email',
     'organizer.pipeline.sync_from_discourse_auth',
+    'organizer.pipeline.sync_backend_group',
 )
 
 db_from_env = dj_database_url.config(conn_max_age=500)
@@ -311,7 +327,9 @@ SOCIAL_AUTH_SLACK_SLACK_SCOPE = ['identity.basic','identity.team',
         'identity.email']
 SOCIAL_AUTH_SLACK_TEAM = os.environ.get('SLACK_TEAM_ID', None)
 
-AUTHENTICATION_BACKENDS = ()
+SLACK_API_TOKEN = os.environ.get('SLACK_API_TOKEN', None)
+
+AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',)
 
 # This also must match the condition in the LocalDevAuth class.
 if DEBUG and ('USE_REALLY_INSECURE_DEVELOPMENT_AUTHENTICATION_BACKEND' in
