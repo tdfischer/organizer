@@ -53,7 +53,7 @@ class Command(BaseCommand): # pragma: no cover
         print "Populating %s, %s, %s with 100 people..."%(locality.name, state.name,
                 country.name)
         people = self.create_model(models.Person, 100, {
-            'name': fake.name,
+            'name': fakeName,
             'address': localFakeAddress,
             'email': fake.email,
             'state': lambda: random.choice(states),
@@ -85,13 +85,16 @@ def fakeAddress(template={}):
     city = getattr(template, 'locality', fake.city())
     state = getattr(template, 'state', fake.state())
     country = getattr(template, 'country', fake.country())
-    return {
-        'raw': street + ", " + city + ", " + state + ", " + country,
-        'route': street,
-        'locality': city,
-        'state': state,
-        'country': country,
-    }
+    if random.gauss(50, 25) >= 50:
+        return {
+            'raw': street + ", " + city + ", " + state + ", " + country,
+            'route': street,
+            'locality': city,
+            'state': state,
+            'country': country,
+        }
+    else:
+        return None
 
 def fakeEventData(locationFaker):
     start = timezone.now() + timedelta(hours=random.randint(-72, 72))
@@ -104,3 +107,8 @@ def fakeEventData(locationFaker):
         'end_timestamp': start + timedelta(hours=1),
         'uid': fake.uuid4
     }
+
+def fakeName():
+    if random.gauss(50, 25) >= 50:
+        return fake.name()
+    return None
