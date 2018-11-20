@@ -138,7 +138,7 @@ class TurfMembership(models.Model):
 
 def merge_models(first, *duplicates):
     relations = []
-    for field in Person._meta.get_fields():
+    for field in first._meta.get_fields():
         log.debug("Merging %s", field.name)
         firstValue = getattr(first, field.name)
         if field.many_to_many:
