@@ -33,7 +33,7 @@ def testDevLoginDisabledByDefault(client, settings):
             assert resp.status_code == 500
 
 @pytest.mark.django_db
-@pytest.mark.mock_redis
+@pytest.mark.redis_server
 def testDevLogin(client, settings):
     with patch('social_core.backends.utils.get_backend') as patched:
         patched.return_value = auth.LocalDevAuth

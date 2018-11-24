@@ -41,7 +41,7 @@ geocodeTest = \
     )
 
 @pytest.fixture
-def person(redis_queue):
+def person(redis_server):
     return models.Person.objects.get_or_create(name='',
             email='test@example.com')[0]
 
