@@ -9,13 +9,15 @@ from crm import geocache
 import django_rq
 import uuid
 
+@django_rq.job
 def updateEventGeo(eventID):
     event = Event.objects.get(pk=eventID)
-    resolved = geocache.geocode(event.location.raw)
-    event.location = resolved
-    event.lng = resolved.get('lng')
-    event.lat = resolved.get('lat')
-    event.save(_updateGeocache=False)
+    if event.location is not None:
+        resolved = geocache.geocode(event.location.raw)
+        event.location = resolved
+        event.lng = resolved.get('lng')
+        event.lat = resolved.get('lat')
+        event.save(_updateGeocache=False)
 
 class Event(models.Model):
     name = models.CharField(max_length=200)
@@ -39,7 +41,7 @@ class Event(models.Model):
             self.queue_geocache_update()
 
     def queue_geocache_update(self):
-        django_rq.enqueue(updateEventGeo, self.id)
+        updateEventGeo.delay(self.id)
 
     def __unicode__(self):
         return "%s (%s)"%(self.name, self.timestamp)
