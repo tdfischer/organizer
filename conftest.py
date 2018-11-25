@@ -92,10 +92,14 @@ def _mock_redis_markers(request):
     if marker:
         request.getfixturevalue("redis_server")
 
+@pytest.fixture
+def dummy_geocoder(request):
+    override = override_settings(GEOCODE_ADAPTOR='crm.geocache.DummyAdaptor')
+    override.enable()
+    request.addfinalizer(override.disable)
+
 @pytest.fixture(autouse=True)
 def _mock_geocoder(request):
     marker = request.node.get_closest_marker('mock_geocoder')
     if marker:
-        override = override_settings(GEOCODE_ADAPTOR='crm.geocache.DummyAdaptor')
-        override.enable()
-        request.addfinalizer(override.disable)
+        request.getfixturevalue('dummy_geocoder')

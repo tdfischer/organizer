@@ -11,6 +11,10 @@ class GeocodeAdaptor(object):
     def resolve(self, address):
         return self.geolocator.geocode(address, exactly_one=True)
 
+class DummyAdaptor(GeocodeAdaptor):
+    def resolve(self, address):
+        return Location(None, None, {})
+
 class GoogleAdaptor(GeocodeAdaptor):
     def __init__(self):
         self.geolocator = GoogleV3(settings.GOOGLE_MAPS_KEY)
