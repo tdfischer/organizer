@@ -3,11 +3,11 @@ from __future__ import unicode_literals
 
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
-from organizer.admin import admin_site
+from organizer.admin import admin_site, OrganizerModelAdmin
 
 from . import models, importing
 
-class DonationAdmin(ImportExportModelAdmin):
+class DonationAdmin(ImportExportModelAdmin, OrganizerModelAdmin):
     resource_class = importing.DonationResource
 
     list_display = (

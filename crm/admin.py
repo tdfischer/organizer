@@ -23,7 +23,7 @@ from filtering.models import FilterNode
 from django.core.mail import send_mail
 from django.conf import settings
 from address.models import Locality
-from organizer.admin import admin_site
+from organizer.admin import admin_site, OrganizerModelAdmin
 import StringIO
 
 def onboard_people(modeladmin, request, queryset):
@@ -115,7 +115,7 @@ class NamedFilterFilter(admin.SimpleListFilter):
             return FilterNode.objects.named().get(pk=self.value()).apply(queryset)
         return queryset
 
-class PersonAdmin(ImportExportModelAdmin):
+class PersonAdmin(ImportExportModelAdmin, OrganizerModelAdmin):
     resource_class = importing.PersonResource
     search_fields = [
         'name', 'email', 'address__raw', 'address__locality__name',
@@ -234,7 +234,7 @@ class PersonAdmin(ImportExportModelAdmin):
 class NeighborNotificationInline(admin.TabularInline):
     model = models.Turf.notification_targets.through
 
-class TurfAdmin(admin.ModelAdmin):
+class TurfAdmin(OrganizerModelAdmin):
     list_display = [
         'name', 'locality', 'member_count', 'has_notification'
     ]

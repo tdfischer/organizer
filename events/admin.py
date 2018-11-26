@@ -3,10 +3,10 @@ from __future__ import unicode_literals
 
 from django.contrib import admin
 from . import models
-from organizer.admin import admin_site
+from organizer.admin import admin_site, OrganizerModelAdmin
 from rangefilter.filter import DateTimeRangeFilter
 
-class EventAdmin(admin.ModelAdmin):
+class EventAdmin(OrganizerModelAdmin):
     search_fields = [
         'name', 'location__raw'
     ]

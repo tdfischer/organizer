@@ -5,7 +5,7 @@ from django.contrib import admin
 from . import models
 from crm.models import Person, PersonState
 from events.models import Event
-from organizer.admin import admin_site
+from organizer.admin import admin_site, OrganizerModelAdmin
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
 
@@ -26,7 +26,7 @@ class EventSignupResource(resources.ModelResource):
         fields = ('email', 'address', 'phone', 'event')
         import_id_fields = ('email', 'event')
 
-class SignupAdmin(ImportExportModelAdmin):
+class SignupAdmin(ImportExportModelAdmin, OrganizerModelAdmin):
     resource_class = EventSignupResource
 
     actions = [
@@ -73,5 +73,5 @@ admin.site.register(models.Signup, SignupAdmin)
 admin.site.register(models.OnboardingStatus, StatusAdmin)
 admin.site.register(models.OnboardingComponent, ComponentAdmin)
 
-admin_site.register(models.NewNeighborNotificationTarget)
+admin_site.register(models.NewNeighborNotificationTarget, OrganizerModelAdmin)
 admin_site.register(models.Signup, SignupAdmin)

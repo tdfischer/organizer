@@ -16,7 +16,7 @@ class OrganizerAdmin(admin.AdminSite):
         if request.user.is_anonymous:
             return False
         person, _ = Person.objects.get_or_create(email=request.user.email)
-        return person.is_captain
+        return request.user.is_staff or person.is_captain or len(request.user.get_all_permissions()) > 0
 
     def each_context(self, request):
         lastWeek = timezone.now() + timedelta(days=-7)
@@ -26,13 +26,21 @@ class OrganizerAdmin(admin.AdminSite):
             try:
                 adminLink = reverse('organizer-admin:%s_%s_changelist'%(f.content_type.app_label,
                     f.content_type.model)) + "?named_filter=%s"%(f.pk,)
-            except NoReverseMatch:
-                continue
-            filterResults.append({
-                'count': f.results.count(),
-                'name': f.name,
-                'link': adminLink
-            })
+            except Exception, e:
+                adminLink = reverse('admin:%s_%s_changelist'%(f.content_type.app_label,
+                    f.content_type.model)) + "?named_filter=%s"%(f.pk,)
+            try:
+                filterResults.append({
+                    'count': f.results.count(),
+                    'name': f.name,
+                    'link': adminLink
+                })
+            except Exception, e:
+                filterResults.append({
+                    'count': e.message,
+                    'name': f.name,
+                    'link': adminLink
+                })
         return {
             'recent_people': Person.objects.all().filter(created__gte=lastWeek).order_by('created'),
             'recent_onboardings': OnboardingStatus.objects.all().filter(created__gte=lastWeek).order_by('created'),
@@ -40,5 +48,26 @@ class OrganizerAdmin(admin.AdminSite):
             'filters': filterResults
         }
 
-admin_site = OrganizerAdmin(name='organizer-admin')
+class OrganizerModelAdmin(admin.ModelAdmin):
+    def has_permission(self, request):
+        if request.user.is_anonymous:
+            return False
+        person, _ = Person.objects.get_or_create(email=request.user.email)
+        return request.user.is_staff or person.is_captain
 
+    def has_module_permission(self, request):
+        return self.has_permission(request)
+
+    def has_view_permission(self, request, obj=None):
+        return self.has_permission(request)
+
+    def has_add_permission(self, request):
+        return self.has_permission(request)
+
+    def has_change_permission(self, request, obj=None):
+        return self.has_permission(request)
+
+    def has_delete_permission(self, request, obj=None):
+        return self.has_permission(request)
+
+admin_site = OrganizerAdmin(name='organizer-admin')
