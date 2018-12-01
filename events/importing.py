@@ -125,8 +125,11 @@ class GoogleCalendarImporter(DatasetImporter):
         dataset = tablib.Dataset(headers=('uid', 'instance_id', 'timestamp',
         'end_timestamp', 'name', 'location'))
         for event in self.eventPages.next():
-            timestamp = self.grab_datetime(event.get('start'))
-            end_timestamp = self.grab_datetime(event.get('end'))
+            try:
+                timestamp = self.grab_datetime(event.get('start'))
+                end_timestamp = self.grab_datetime(event.get('end'))
+            except:
+                continue
             name = event.get('summary')
             location = event.get('location')
             icalUID = event.get('iCalUID')
