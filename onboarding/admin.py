@@ -4,7 +4,10 @@ from __future__ import unicode_literals
 from django.contrib import admin
 from . import models
 from crm.models import Person, PersonState
+from events.models import Event
 from organizer.admin import admin_site
+from import_export.admin import ImportExportModelAdmin
+from import_export import resources
 
 def signup_approver(modeladmin, request, queryset):
     for signup in queryset:
@@ -17,7 +20,15 @@ def signup_approver(modeladmin, request, queryset):
         signup.save()
 signup_approver.short_description = "Approve selected signups"
 
-class SignupAdmin(admin.ModelAdmin):
+class EventSignupResource(resources.ModelResource):
+    class Meta:
+        model = models.Signup
+        fields = ('email', 'address', 'phone', 'event')
+        import_id_fields = ('email', 'event')
+
+class SignupAdmin(ImportExportModelAdmin):
+    resource_class = EventSignupResource
+
     actions = [
         signup_approver
     ]
