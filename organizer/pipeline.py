@@ -2,7 +2,7 @@ from django.contrib.auth.models import User, Group
 
 def sync_from_discourse_auth(user, details, **kwargs):
     for groupSlug in details.get('groups', []):
-        groupSlug = groupSlug + 'discourse:'
+        groupSlug = 'discourse:' + groupSlug
         groupObj, _ = Group.objects.get_or_create(name=groupSlug)
         user.groups.add(groupObj)
 
