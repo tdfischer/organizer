@@ -25,3 +25,7 @@ will automatically include the required addons and worker processes.
 Documentation is available on https://organizer-crm.readthedocs.io/.
 
 [![Read The Docs](https://readthedocs.org/projects/organizer-crm/badge/?version=latest)](https://organizer-crm.readthedocs.io/en/latest/?badge=latest)
+
+## Development
+
+Want to [hack on organizer](https://organizer-crm.readthedocs.io/en/latest/docs/development.html)? Pull requests welcome!
