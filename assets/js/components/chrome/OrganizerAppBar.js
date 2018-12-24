@@ -9,6 +9,7 @@ import MenuItem from '@material-ui/core/MenuItem'
 import Divider from '@material-ui/core/Divider'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
+import Chip from '@material-ui/core/Chip'
 import { withStyles } from '@material-ui/core/styles'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -19,10 +20,11 @@ import Logo from './Logo'
 
 import { library as faLibrary } from '@fortawesome/fontawesome'
 import faSignOutAlt from '@fortawesome/fontawesome-free-solid/faSignOutAlt'
+import faCalendar from '@fortawesome/fontawesome-free-solid/faCalendar'
 import faBug from '@fortawesome/fontawesome-free-solid/faBug'
 import faExternalLinkAlt from '@fortawesome/fontawesome-free-solid/faExternalLinkAlt'
 
-faLibrary.add(faSignOutAlt, faBug, faExternalLinkAlt)
+faLibrary.add(faSignOutAlt, faBug, faExternalLinkAlt, faCalendar)
 
 import BusyIndicator from './BusyIndicator'
 import { logout } from '../../actions'
@@ -88,10 +90,15 @@ export const OrganizerAppBar = (props) => (
                 {(props.logged_in) ? (
                     <React.Fragment>
                         <Typography color="inherit" variant="title">{props.currentPerson.name || ''}</Typography>
-                        <Typography color="inherit" variant="subheading">{props.current_user.email} - {props.currentPerson.twelve_month_event_count} events</Typography>
+                        <Typography color="inherit" variant="subheading">{props.current_user.email}</Typography>
                     </React.Fragment>
                 ) : (<Typography color="inherit" variant="title">{(window.ORG_METADATA || {}).name}</Typography>)}
             </div>
+            {(props.logged_in) ? (
+                <div className={props.classes.flex}>
+                    <Chip color="secondary" label={props.currentPerson.twelve_month_event_count} avatar={<Avatar><FontAwesomeIcon icon={['fas', 'calendar']} /></Avatar>}/>
+                </div>
+            ) : null}
             <BusyIndicator />
         </Toolbar>
     </AppBar>
