@@ -9,6 +9,7 @@ import Typography from '@material-ui/core/Typography'
 import NoEvents from './NoEvents'
 import Logo from '../chrome/Logo'
 import importedComponent from 'react-imported-component'
+import { withCurrentLocation } from '../../actions/geocache'
 
 const EventCard = importedComponent(() => import('./EventCard'))
 const SigninBox = importedComponent(() => import('../chrome/SigninBox'))
@@ -77,4 +78,4 @@ const style = {
     }
 }
 
-export default withStyles(style)(withTheme()(withModelData(mapPropsToModels)(connect(mapStateToProps)(AnonEventCheckin))))
+export default withCurrentLocation(withStyles(style)(withTheme()(withModelData(mapPropsToModels)(connect(mapStateToProps)(AnonEventCheckin)))))
