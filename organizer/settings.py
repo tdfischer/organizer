@@ -300,7 +300,15 @@ RAVEN_CONFIG = {
 
 DEFAULT_CHARSET="utf-8"
 
-GEOCODE_ADAPTOR = 'crm.geocache.GoogleAdaptor'
+if DEBUG:
+    DEFAULT_GEOCODE_ADAPTOR = 'crm.geocache.DummyAdaptor'
+else:
+    DEFAULT_GEOCODE_ADAPTOR = 'crm.geocache.GoogleAdaptor'
+
+GEOCODE_ADAPTOR = os.environ.get('GEOCODE_ADAPTOR', DEFAULT_GEOCODE_ADAPTOR)
+
+DUMMY_GEOCODE_CENTER = [float(os.environ.get('DUMMY_GEOCODE_LAT', '0')),
+float(os.environ.get('DUMMY_GEOCODE_LNG', '0'))]
 
 MAILCHIMP_SECRET_KEY = os.environ.get('MAILCHIMP_SECRET_KEY', None)
 MAILCHIMP_LIST_ID = os.environ.get('MAILCHIMP_LIST_ID', None)

@@ -13,7 +13,7 @@ class GeocodeAdaptor(object):
 
 class DummyAdaptor(GeocodeAdaptor):
     def resolve(self, address):
-        return Location(None, None, {})
+        return Location(settings.DUMMY_GEOCODE_CENTER, None, {})
 
 class GoogleAdaptor(GeocodeAdaptor):
     def __init__(self):
