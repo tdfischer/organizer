@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [dev-packages]
-hypothesis = {version = "*", extras = ["django"]}
+hypothesis = {version = "*",extras = ["django"]}
 django-dotenv = "*"
 pytest-cov = "*"
 pytest-django = "*"
@@ -30,14 +30,14 @@ pytz = "==2017.2"
 requests = "*"
 six = "==1.10.0"
 webencodings = "==0.5.1"
-whitenoise = {version = "*", extras = ["brotli"]}
+whitenoise = {version = "*",extras = ["brotli"]}
 gunicorn = "*"
 "mailchimp3" = "*"
 raven = "*"
 djangorestframework = "==3.6.3"
 django-webpack-loader = "*"
-django-rq = "*"
-django-redis-cache = "*"
+django-rq = "==1.2.0"
+django-redis-cache = "==1.8.0"
 airtable-python-wrapper = "==0.11.0"
 social-auth-core = "*"
 social-auth-app-django = "*"
@@ -59,6 +59,8 @@ django-request-id = "*"
 stripe = "*"
 "psycopg2-binary" = "*"
 django-admin-rangefilter = "*"
+redis = "==2.10.6"
+rq = "==0.12.0"
 
 [requires]
 python_version = "2.7"
