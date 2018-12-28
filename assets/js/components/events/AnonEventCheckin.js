@@ -1,5 +1,5 @@
 import React from 'react'
-import { getEventsWithLocation, isWithinWindow } from '../../selectors/events'
+import { getEventsWithLocation } from '../../selectors/events'
 import { withModelData } from '../../store'
 import { withStyles, withTheme } from '@material-ui/core/styles'
 import { connect } from 'react-redux'
@@ -9,9 +9,11 @@ import Typography from '@material-ui/core/Typography'
 import NoEvents from './NoEvents'
 import Logo from '../chrome/Logo'
 import importedComponent from 'react-imported-component'
+import { withState } from 'recompose'
 import { withCurrentLocation } from '../../actions/geocache'
 
 const EventCard = importedComponent(() => import('./EventCard'))
+const Carousel = importedComponent(() => import('../Carousel'))
 const SigninBox = importedComponent(() => import('../chrome/SigninBox'))
 
 const Description = props => (
@@ -34,12 +36,20 @@ const Description = props => (
     </Grid>
 )
 
-export const AnonEventCheckin = props => (
+export const AnonEventCheckin = withState('index', 'setIndex', 0)(props => (
     <React.Fragment>
-        <Grid container justify="center" style={{padding: '1rem'}} spacing={8}>
-            <Grid xs={12} sm={7} md={8} item style={{marginBottom: '1rem'}}>{props.nearbyEvent ? <EventCard event_id={props.nearbyEvent.id} /> : <NoEvents /> }</Grid>
-            <Grid xs={12} sm={5} md={4} item>
-                <SigninBox isSaving={props.isSaving} event={props.nearbyEvent} />
+        <Grid container justify="center" style={{marginTop: '1rem'}} spacing={8}>
+            <Grid xs={12} sm={7} md={8} item>
+                {props.nearbyEvents.count() > 0 ? null : <NoEvents /> }
+                <Carousel
+                    index={props.index}
+                    setIndex={props.setIndex}
+                    style={{padding: '4rem'}}>
+                    {props.nearbyEvents.map(evt => <EventCard style={{margin: '0.2rem'}} key={evt.id} event_id={evt.id} />).toList().toJS()}
+                </Carousel>
+            </Grid>
+            <Grid xs={12} sm={5} md={4} item style={{paddingLeft: '1rem', paddingRight: '1rem'}}>
+                <SigninBox isSaving={props.isSaving} event={props.nearbyEvents.get(props.index)} />
             </Grid>
             <Grid xs={12} item>
                 <p>{props.nearbyEvent ? props.nearbyEvent.description : undefined}</p>
@@ -47,11 +57,11 @@ export const AnonEventCheckin = props => (
         </Grid>
         <Description className={props.classes.whatItIs} />
     </React.Fragment>
-)
+))
 
 const mapPropsToModels = _props => {
     //FIXME: Fine tune query to only search by timestamp and geolocation
-    const start = moment().add(-1, 'hour')
+    const start = moment().add(-3, 'days')
     const end = moment().add(1, 'month')
     return {
         events: {
@@ -62,12 +72,12 @@ const mapPropsToModels = _props => {
 }
 
 const mapStateToProps = state => {
-    const nearbyEvent = getEventsWithLocation(state)
-        .filter(isWithinWindow(moment().add(-1, 'week'), moment().add(1, 'week')))
-        .sort((a, b) => Math.abs(a.relevance) - Math.abs(b.relevance))
-        .first()
+    const nearbyEvents = getEventsWithLocation(state)
+        .sortBy(a => -a.relevance)
+        .slice(0, 10)
+        .toIndexedSeq()
     return {
-        nearbyEvent
+        nearbyEvents
     }
 }
 
