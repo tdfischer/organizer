@@ -31,21 +31,21 @@ export const IntroText = props => {
             return (
                 <React.Fragment>
                     <Typography variant="headline">Is this what you&apos;re for?</Typography>
-                    <p>Sign up now to join {orgName} and collect an event point for this!</p>
+                    <p>Sign up now to join {orgName} and collect an event point for this.</p>
                 </React.Fragment>
             )
         } else if (props.event.checkIn.isInPast) {
             return (
                 <React.Fragment>
                     <Typography variant="headline">You just missed this event.</Typography>
-                    <p>Sign up to join {orgName} and learn about future events like this!</p>
+                    <p>Sign up to join {orgName} and learn about future events like this.</p>
                 </React.Fragment>
             )
         } else if (props.event.checkIn.hasNotStarted) {
             return (
                 <React.Fragment>
                     <Typography variant="headline">This event hasn&apos;t started yet.</Typography>
-                    <p>Sign up to join {orgName} and learn about future events like this, or come back later!</p>
+                    <p>Sign up to join {orgName} and learn about future events like this, or come back later.</p>
                 </React.Fragment>
             )
         } else if (props.event.checkIn.isNearby) {
@@ -56,7 +56,12 @@ export const IntroText = props => {
                 </React.Fragment>
             )
         } else {
-            return null
+            return (
+                <React.Fragment>
+                    <Typography variant="headline">This event is happening right now.</Typography>
+                    <p>Sign up to join {orgName} and learn about future events like this.</p>
+                </React.Fragment>
+            )
         }
     } else {
         return null
@@ -76,7 +81,7 @@ export const SigninBox = props => (
                         <React.Fragment>
                             <Grid item><IntroText event={props.event} /></Grid>
                             <Grid item><MaterialFormText fullWidth label="E-Mail" field="email" validate={v => (v && v.indexOf('@') != -1) ? null : 'Please enter your e-mail address.'}/></Grid>
-                            <Grid item><Button fullWidth variant="contained" color="primary" type="submit">Request to join</Button></Grid>
+                            <Grid item><Button fullWidth variant="contained" color="primary" type="submit">Sign up</Button></Grid>
                             <Grid item style={{marginTop: '1rem'}} container alignItems="center">
                                 <Grid item xs><Divider /></Grid>
                                 <Grid item xs={4} style={{textAlign: 'center'}}><em>Or login</em></Grid>
