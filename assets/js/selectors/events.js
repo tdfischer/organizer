@@ -68,10 +68,12 @@ const cookEventWithLocation = (currentLocation, evt, now) => {
     const isInPast = endTimeFromNow <= -60
     const canCheckIn = isNearby && !isInPast && !hasNotStarted
     const relevance = distanceFromHere + timeFromNow
+    const walktime = (evt.distance * 1000) / 84
     return {
         ...evt,
         distance: distanceFromHere,
         relevance,
+        walktime,
         checkIn: {
             isNearby,
             isInPast,
