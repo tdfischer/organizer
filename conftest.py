@@ -6,6 +6,7 @@ import crm.models
 from django.test import override_settings
 from rest_framework.test import APITestCase, APIClient
 from django.contrib.auth.models import User
+import subprocess
 
 settings.register_profile("ci", max_examples=300)
 settings.register_profile("dev", max_examples=10)
@@ -20,9 +21,32 @@ DUMMY_CACHE_CONFIG = {
     },
 }
 
+DUMMY_SERVER_CONFIG = {
+    'CACHES': {
+        'default': {
+            'BACKEND': 'redis_cache.RedisCache',
+            'LOCATION': 'redis://localhost:6379/0'
+        }
+    },
+    'RQ_QUEUES': {
+        'default': {
+            'USE_REDIS_CACHE': 'default',
+            'ASYNC': False
+        }
+    }
+}
+
 @pytest.fixture
 def default_personstate():
     return crm.models.PersonState.objects.get_or_create(name='Default')[0]
+
+@pytest.fixture(scope="session")
+def redis_server(request):
+    proc = subprocess.Popen('redis-server')
+    override = override_settings(**DUMMY_SERVER_CONFIG)
+    override.enable()
+    request.addfinalizer(proc.kill)
+    request.addfinalizer(override.disable)
 
 @pytest.fixture
 def redis_queue(request):
@@ -59,15 +83,23 @@ def _disable_ssl(request):
     return None
 
 @pytest.fixture(autouse=True)
-def _mock_redis_marker(request):
+def _mock_redis_markers(request):
     marker = request.node.get_closest_marker('mock_redis')
     if marker:
         request.getfixturevalue("redis_queue")
+
+    marker = request.node.get_closest_marker('redis_server')
+    if marker:
+        request.getfixturevalue("redis_server")
+
+@pytest.fixture
+def dummy_geocoder(request):
+    override = override_settings(GEOCODE_ADAPTOR='crm.geocache.DummyAdaptor')
+    override.enable()
+    request.addfinalizer(override.disable)
 
 @pytest.fixture(autouse=True)
 def _mock_geocoder(request):
     marker = request.node.get_closest_marker('mock_geocoder')
     if marker:
-        override = override_settings(GEOCODE_ADAPTOR='crm.geocache.DummyAdaptor')
-        override.enable()
-        request.addfinalizer(override.disable)
+        request.getfixturevalue('dummy_geocoder')

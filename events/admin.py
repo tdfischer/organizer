@@ -17,8 +17,7 @@ class EventAdmin(admin.ModelAdmin):
 
     list_filter = (
         ('timestamp', DateTimeRangeFilter),
-        ('end_timestamp', DateTimeRangeFilter),
-        'location'
+        ('end_timestamp', DateTimeRangeFilter)
     )
 
     fieldsets = (

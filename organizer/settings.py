@@ -210,13 +210,14 @@ DATABASES = {
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',
     'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.auth_allowed',
     'social_core.pipeline.social_auth.social_user',
     'social_core.pipeline.user.get_username',
+    'social_core.pipeline.social_auth.associate_by_email',
     'social_core.pipeline.user.create_user',
     'social_core.pipeline.social_auth.associate_user',
     'social_core.pipeline.social_auth.load_extra_data',
     'social_core.pipeline.user.user_details',
-    'social_core.pipeline.social_auth.associate_by_email',
     'crm.pipeline.ensure_person_for_email',
     'organizer.pipeline.sync_from_discourse_auth',
     'organizer.pipeline.sync_backend_group',
@@ -299,7 +300,15 @@ RAVEN_CONFIG = {
 
 DEFAULT_CHARSET="utf-8"
 
-GEOCODE_ADAPTOR = 'crm.geocache.GoogleAdaptor'
+if DEBUG:
+    DEFAULT_GEOCODE_ADAPTOR = 'crm.geocache.DummyAdaptor'
+else:
+    DEFAULT_GEOCODE_ADAPTOR = 'crm.geocache.GoogleAdaptor'
+
+GEOCODE_ADAPTOR = os.environ.get('GEOCODE_ADAPTOR', DEFAULT_GEOCODE_ADAPTOR)
+
+DUMMY_GEOCODE_CENTER = [float(os.environ.get('DUMMY_GEOCODE_LAT', '0')),
+float(os.environ.get('DUMMY_GEOCODE_LNG', '0'))]
 
 MAILCHIMP_SECRET_KEY = os.environ.get('MAILCHIMP_SECRET_KEY', None)
 MAILCHIMP_LIST_ID = os.environ.get('MAILCHIMP_LIST_ID', None)

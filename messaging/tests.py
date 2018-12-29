@@ -21,7 +21,7 @@ def turf(locality):
     return Turf.objects.create(name='Turf', locality=locality)
 
 @pytest.fixture
-def people(redis_queue, default_personstate):
+def people(redis_server, default_personstate):
     return list([Person.objects.create(email="%s@example.com"%(i),
         state=default_personstate) for i in range(0, 10)])
 

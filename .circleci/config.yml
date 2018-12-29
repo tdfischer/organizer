@@ -49,6 +49,8 @@ jobs:
       - run:
           name: Install dependencies
           command: |
+            sudo apt-get update
+            sudo apt-get install redis-server
             pipenv install --dev
       - run:
           name: Run tests
