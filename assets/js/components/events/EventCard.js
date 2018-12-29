@@ -82,41 +82,41 @@ export const CheckInButton = props => {
     if (haveCheckedIn) {
         return (
             <React.Fragment>
-                <Grid item><Badge color="primary" badgeContent={<FontAwesomeIcon icon={['fa', 'calendar-check']} />}><Avatar src={gravatar.url(props.currentUser.email, {s:32, d: 'retro'})} className={props.classes.checkedInBadge} /></Badge></Grid>
-                <Grid item><p>You and {attendeeCount} others checked in.</p></Grid>
+                <Grid item xs={2} style={{textAlign: 'center'}}><Badge color="primary" badgeContent={<FontAwesomeIcon icon={['fa', 'calendar-check']} />}><Avatar src={gravatar.url(props.currentUser.email, {s:32, d: 'retro'})} className={props.classes.checkedInBadge} /></Badge></Grid>
+                <Grid item xs><p>You and {attendeeCount} others checked in.</p></Grid>
             </React.Fragment>
         )
     } else if (props.event.checkIn.canCheckIn) {
         return (
             <React.Fragment>
-                <Grid item><Button style={{backgroundColor: buttonHasher.hex(props.event.uid)}} variant="outlined" size="large" className={props.classes.checkInButton} onClick={() => props.onCheckIn(props.event)}>
+                <Grid item xs={2} style={{textAlign: 'center'}}><Button style={{backgroundColor: buttonHasher.hex(props.event.uid)}} variant="outlined" size="large" className={props.classes.checkInButton} onClick={() => props.onCheckIn(props.event)}>
                     <FontAwesomeIcon icon={['fa', 'calendar']} />
                 </Button></Grid>
-                <Grid item><p><em>{attendeeCount > 0 ? attendeeCount + ' other people checked in.' : 'Be the first to check in!'}</em></p></Grid>
+                <Grid item xs><p><em>{attendeeCount > 0 ? attendeeCount + ' other people checked in.' : 'Be the first to check in!'}</em></p></Grid>
             </React.Fragment>
         )
     } else if (props.event.checkIn.isInPast) {
         return (
             <React.Fragment>
-                <Grid item><Badge color="error" badgeContent={<FontAwesomeIcon icon={['fa', 'calendar-times']} />}><Avatar src={gravatar.url(props.currentUser.email, {s:32, d: 'retro'})} className={props.classes.checkedInBadge} /></Badge></Grid>
-                <Grid item><p>This event already happened. {attendeeCount} people checked in without you.</p></Grid>
+                <Grid item xs={2} style={{textAlign: 'center'}}><Badge color="error" badgeContent={<FontAwesomeIcon icon={['fa', 'calendar-times']} />}><Avatar src={gravatar.url(props.currentUser.email, {s:32, d: 'retro'})} className={props.classes.checkedInBadge} /></Badge></Grid>
+                <Grid item xs><p>This event already happened. {attendeeCount} people checked in without you.</p></Grid>
             </React.Fragment>
         )
     } else if (props.event.checkIn.hasNotStarted) {
         return (
             <React.Fragment>
-                <Grid item><Badge color="secondary" badgeContent={<FontAwesomeIcon icon={['fa', 'hourglass']} />}><Avatar src={gravatar.url(props.currentUser.email, {s:32, d: 'retro'})} className={props.classes.checkedInBadge} /></Badge></Grid>
-                <Grid item><p>This event hasn&apos;t started yet.</p></Grid>
+                <Grid item xs={2} style={{textAlign: 'center'}}><Badge color="secondary" badgeContent={<FontAwesomeIcon icon={['fa', 'hourglass']} />}><Avatar src={gravatar.url(props.currentUser.email, {s:32, d: 'retro'})} className={props.classes.checkedInBadge} /></Badge></Grid>
+                <Grid item xs><p>This event hasn&apos;t started yet.</p></Grid>
             </React.Fragment>
         )
     } else {
         const eventBearing = props.currentLocation ? bearing(props.currentLocation, props.event.geo) - 45 : 0
         return (
             <React.Fragment>
-                <Grid item><Avatar className={props.classes.eventLocator}>
+                <Grid item xs={2} style={{textAlign: 'center'}}><Avatar className={props.classes.eventLocator}>
                     <FontAwesomeIcon icon={['fa', 'location-arrow']}  style={{transform: 'rotate('+eventBearing+'deg)'}}/>
                 </Avatar></Grid>
-                <Grid item><p>{attendeeCount > 0 ? attendeeCount + ' people are checked in here.' : 'You are too far away to check in.'}</p></Grid>
+                <Grid item xs><p>{attendeeCount > 0 ? attendeeCount + ' people are checked in here.' : 'You are too far away to check in.'}</p></Grid>
             </React.Fragment>
         )
     }
@@ -147,7 +147,7 @@ export const EventCard = props => {
                 </Grid>
             </CardContent>
             <CardActions>
-                <Grid spacing={8} container><CheckInButton {...props} /></Grid>
+                <Grid spacing={8} container alignItems="center" justify="flex-start" ><CheckInButton {...props} /></Grid>
             </CardActions>
         </Card>
     )

@@ -5,6 +5,8 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { withState } from 'recompose'
 import Carousel from '../Carousel'
+import Typography from '@material-ui/core/Typography'
+import Grid from '@material-ui/core/Grid'
 
 import EventCard from './EventCard'
 import NoEvents from './NoEvents'
@@ -16,15 +18,16 @@ export const EventCarousel = withState('index', 'setIndex', 0)(Carousel)
 export const EventList = props => {
     const upcomingEvents = props.upcomingEvents.entrySeq().flatMap(([weekDelta, events]) => {
         const header = (
-            <div
+            <Grid
+                item
                 key={'week-'+weekDelta}
                 className={props.classes.headerCard}>
-                <h3 className={props.classes.timeHeader}>{DAY_BREAKPOINTS.getValue(weekDelta)}</h3>
-            </div>
+                <Typography variant="headline" className={props.classes.timeHeader}>{DAY_BREAKPOINTS.getValue(weekDelta)}</Typography>
+            </Grid>
         )
-        return [header, <EventCarousel key={weekDelta} >{events.sortBy(e => -e.relevance).map(evt => (
+        return [header, <Grid item container style={{paddingLeft: 0, paddingRight: 0}} direction="column" key={weekDelta}><EventCarousel className={props.classes.eventCarousel} >{events.sortBy(e => -e.relevance).map(evt => (
             <EventCard className={props.classes.eventCard} key={evt.id} event_id={evt.id} onCheckIn={props.onCheckIn} />
-        )).toJS()}</EventCarousel>]
+        )).toJS()}</EventCarousel></Grid>]
     })
 
     return (!upcomingEvents.isEmpty()) ? <React.Fragment>{upcomingEvents.toArray()}</React.Fragment> : <NoEvents />
@@ -41,21 +44,21 @@ const mapStateToProps = () => {
 
 const styles = {
     headerCard: {
-        marginTop: '1rem',
-        marginBottom: '0.5rem',
-        padding: '0.25rem',
         backgroundColor: '#fff',
         borderBottom: '1px solid black',
-        flex: 1,
+    },
+    eventCarousel: {
+        paddingLeft: '1rem',
+        paddingRight: '1rem',
     },
     timeHeader: {
         paddingLeft: '1rem',
         margin: '0.3rem'
     },
     eventCard: {
-        marginLeft: '1rem',
-        marginRight: '1rem',
-        marginBottom: '1rem'
+        marginLeft: '0.5rem',
+        marginRight: '0.5rem',
+        marginBottom: '3rem'
     }
 }
 
