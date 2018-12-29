@@ -186,9 +186,10 @@ def testDecoder(response):
 @pytest.mark.django_db
 @given(response=locations())
 @pytest.mark.filterwarnings("ignore::django.core.cache.backends.base.CacheKeyWarning")
-def testUpdatePersonGeo(response, db, person):
+def testUpdatePersonGeo(response, db, person, settings):
     """Test that processing a user's geocode result updates lat/lng properly"""
-    with patch('geopy.geocoders.GoogleV3.geocode') as patched:
+    settings.GEOCODE_ADAPTOR = str('crm.geocache.DummyAdaptor')
+    with patch('crm.geocache.DummyAdaptor.resolve') as patched:
         patched.return_value = response
         note('Raw: %r' % (response.raw,))
         note('Address: %r' % (response.address,))
