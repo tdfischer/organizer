@@ -1,32 +1,30 @@
 import React from 'react'
 import { withStyles } from '@material-ui/core/styles'
-import Card from '@material-ui/core/Card'
 import moment from 'moment'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
+import { withState } from 'recompose'
+import Carousel from '../Carousel'
 
 import EventCard from './EventCard'
 import NoEvents from './NoEvents'
-import { makeGetUpcomingEvents, DAY_BREAKPOINTS, WALKTIME_BREAKPOINTS } from '../../selectors/events'
+import { makeGetUpcomingEvents, DAY_BREAKPOINTS } from '../../selectors/events'
 import { withModelData } from '../../store'
+
+const EventCarousel = withState('index', 'setIndex', 0)(Carousel)
 
 export const EventList = props => {
     const upcomingEvents = props.upcomingEvents.entrySeq().flatMap(([weekDelta, events]) => {
         const header = (
-            <Card
+            <div
                 key={'week-'+weekDelta}
                 className={props.classes.headerCard}>
-                <h1 className={props.classes.timeHeader}>{DAY_BREAKPOINTS.getValue(weekDelta)}</h1>
-            </Card>
+                <h3 className={props.classes.timeHeader}>{DAY_BREAKPOINTS.getValue(weekDelta)}</h3>
+            </div>
         )
-        return [header, ...events.entrySeq().flatMap(([walkTime, events]) => {
-            const walkHeader = (
-                <h2 key={'walk-'+walkTime+weekDelta}>{WALKTIME_BREAKPOINTS.getValue(walkTime)}</h2>
-            )
-            return [walkHeader, ...events.map(evt => (
-                <EventCard className={props.classes.eventCard} key={evt.id} event_id={evt.id} onCheckIn={props.onCheckIn} />
-            ))]
-        })]
+        return [header, <EventCarousel key={weekDelta} >{events.sortBy(e => -e.relevance).map(evt => (
+            <EventCard className={props.classes.eventCard} key={evt.id} event_id={evt.id} onCheckIn={props.onCheckIn} />
+        )).toJS()}</EventCarousel>]
     })
 
     return (!upcomingEvents.isEmpty()) ? <React.Fragment>{upcomingEvents.toArray()}</React.Fragment> : <NoEvents />
@@ -43,17 +41,21 @@ const mapStateToProps = () => {
 
 const styles = {
     headerCard: {
-        marginLeft: '-1rem',
-        marginRight: '-1rem',
-        position: 'sticky',
-        top: 0,
-        zIndex: 100
+        marginTop: '1rem',
+        marginBottom: '0.5rem',
+        padding: '0.25rem',
+        backgroundColor: '#fff',
+        borderBottom: '1px solid black',
+        flex: 1,
     },
     timeHeader: {
-        paddingLeft: '1rem'
+        paddingLeft: '1rem',
+        margin: '0.3rem'
     },
     eventCard: {
-        marginBottom: '2rem'
+        marginLeft: '1rem',
+        marginRight: '1rem',
+        marginBottom: '1rem'
     }
 }
 
