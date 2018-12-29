@@ -11,7 +11,7 @@ import NoEvents from './NoEvents'
 import { makeGetUpcomingEvents, DAY_BREAKPOINTS } from '../../selectors/events'
 import { withModelData } from '../../store'
 
-const EventCarousel = withState('index', 'setIndex', 0)(Carousel)
+export const EventCarousel = withState('index', 'setIndex', 0)(Carousel)
 
 export const EventList = props => {
     const upcomingEvents = props.upcomingEvents.entrySeq().flatMap(([weekDelta, events]) => {
