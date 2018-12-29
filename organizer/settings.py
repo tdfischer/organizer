@@ -118,7 +118,8 @@ INSTALLED_APPS = [
     'onboarding',
     'messaging',
     'events',
-    'donations'
+    'donations',
+    'filtering'
 ]
 
 #Force SSL if debug is disabled
@@ -153,6 +154,8 @@ RQ_QUEUES = {
         'ASYNC': not DEBUG
     }
 }
+
+AUTOMATIC_ONBOARDING = 'AUTOMATIC_ONBOARDING' in os.environ
 
 RQ_SHOW_ADMIN_LINK = True
 
@@ -333,6 +336,7 @@ DEFAULT_PERSON_STATE = os.environ.get('DEFAULT_PERSON_STATE', 'Default')
 
 DISCOURSE_BASE_URL = os.environ.get('DISCOURSE_BASE_URL', None)
 DISCOURSE_SSO_SECRET = os.environ.get('DISCOURSE_SSO_SECRET', None)
+DISCOURSE_API_KEY = os.environ.get('DISCOURSE_API_KEY', None)
 
 SOCIAL_AUTH_SLACK_KEY = os.environ.get('SLACK_KEY', None)
 SOCIAL_AUTH_SLACK_SECRET = os.environ.get('SLACK_SECRET', None)

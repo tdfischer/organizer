@@ -1,0 +1,188 @@
+- model: filtering.annotation
+  pk: 1
+  fields: {prop_name: event_count, operator: count, field_name: events, filter: 1}
+- model: filtering.annotation
+  pk: 2
+  fields: {prop_name: donation_count, operator: count, field_name: donations, filter: null}
+- model: filtering.filternode
+  pk: 1
+  fields:
+    parent: null
+    name: Events within the last year
+    prop_name: timestamp
+    operator: gte
+    value: -1y
+    content_type: 24
+    lft: 1
+    rght: 2
+    tree_id: 1
+    level: 0
+    annotations: []
+- model: filtering.filternode
+  pk: 2
+  fields:
+    parent: 4
+    name: Attended at least one event within the last year
+    prop_name: event_count
+    operator: gte
+    value: '1'
+    content_type: 20
+    lft: 6
+    rght: 7
+    tree_id: 13
+    level: 3
+    annotations: [1]
+- model: filtering.filternode
+  pk: 3
+  fields:
+    parent: 4
+    name: At least one donation in the last year
+    prop_name: donation_count
+    operator: gte
+    value: '1'
+    content_type: 20
+    lft: 4
+    rght: 5
+    tree_id: 13
+    level: 3
+    annotations: [2]
+- model: filtering.filternode
+  pk: 4
+  fields:
+    parent: 12
+    name: Is a member
+    prop_name: null
+    operator: or
+    value: null
+    content_type: 20
+    lft: 3
+    rght: 8
+    tree_id: 13
+    level: 2
+    annotations: []
+- model: filtering.filternode
+  pk: 5
+  fields:
+    parent: null
+    name: Is a voting member
+    prop_name: event_count
+    operator: gte
+    value: '3'
+    content_type: 20
+    lft: 1
+    rght: 2
+    tree_id: 5
+    level: 0
+    annotations: [1]
+- model: filtering.filternode
+  pk: 6
+  fields:
+    parent: 8
+    name: null
+    prop_name: timestamp
+    operator: lte
+    value: +14d
+    content_type: 24
+    lft: 4
+    rght: 5
+    tree_id: 8
+    level: 1
+    annotations: []
+- model: filtering.filternode
+  pk: 7
+  fields:
+    parent: 8
+    name: null
+    prop_name: timestamp
+    operator: gte
+    value: -0d
+    content_type: 24
+    lft: 2
+    rght: 3
+    tree_id: 8
+    level: 1
+    annotations: []
+- model: filtering.filternode
+  pk: 8
+  fields:
+    parent: null
+    name: Events in the next 14 days
+    prop_name: null
+    operator: and
+    value: null
+    content_type: 24
+    lft: 1
+    rght: 6
+    tree_id: 8
+    level: 0
+    annotations: []
+- model: filtering.filternode
+  pk: 9
+  fields:
+    parent: null
+    name: All people
+    prop_name: null
+    operator: and
+    value: null
+    content_type: 20
+    lft: 1
+    rght: 2
+    tree_id: 9
+    level: 0
+    annotations: []
+- model: filtering.filternode
+  pk: 10
+  fields:
+    parent: null
+    name: Turf Captains
+    prop_name: is_captain
+    operator: isTrue
+    value: null
+    content_type: 19
+    lft: 1
+    rght: 2
+    tree_id: 10
+    level: 0
+    annotations: []
+- model: filtering.filternode
+  pk: 11
+  fields:
+    parent: 13
+    name: People created in the last 3 months
+    prop_name: created
+    operator: gte
+    value: -90d
+    content_type: 20
+    lft: 10
+    rght: 11
+    tree_id: 13
+    level: 1
+    annotations: []
+- model: filtering.filternode
+  pk: 12
+  fields:
+    parent: 13
+    name: Is not a member
+    prop_name: null
+    operator: not
+    value: null
+    content_type: 20
+    lft: 2
+    rght: 9
+    tree_id: 13
+    level: 1
+    annotations: []
+- model: filtering.filternode
+  pk: 13
+  fields:
+    parent: null
+    name: Newbies
+    prop_name: null
+    operator: and
+    value: null
+    content_type: 20
+    lft: 1
+    rght: 12
+    tree_id: 13
+    level: 0
+    annotations: []

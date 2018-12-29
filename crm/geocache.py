@@ -12,8 +12,17 @@ class GeocodeAdaptor(object):
         return self.geolocator.geocode(address, exactly_one=True)
 
 class DummyAdaptor(GeocodeAdaptor):
+    def __init__(self):
+        self.response = None
+
+    def set_response(self, response):
+        self.response = response
+
     def resolve(self, address):
-        return Location(settings.DUMMY_GEOCODE_CENTER, None, {})
+        if self.response is not None:
+            return self.response
+        else:
+            return Location(settings.DUMMY_GEOCODE_CENTER, None, {})
 
 class GoogleAdaptor(GeocodeAdaptor):
     def __init__(self):
@@ -36,13 +45,13 @@ def decode_response(response):
         'lng': response.longitude,
     }
 
+def get_adaptor():
+    module, cls = settings.GEOCODE_ADAPTOR.rsplit('.', 1)
+    Adaptor = getattr(importlib.import_module(module), cls)
+    return Adaptor()
+
 def geocode(address):
-    if type(settings.GEOCODE_ADAPTOR) is str:
-        module, cls = settings.GEOCODE_ADAPTOR.rsplit('.', 1)
-        Adaptor = getattr(importlib.import_module(module), cls)
-        adaptor = Adaptor()
-    else:
-        adaptor = settings.GEOCODE_ADAPTOR
+    adaptor = get_adaptor()
     geocache = caches['default']
     cachedAddr = geocache.get('geocache:' + address)
     if cachedAddr is None:
