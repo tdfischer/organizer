@@ -37,12 +37,9 @@ def decode_response(response):
     }
 
 def geocode(address):
-    if type(settings.GEOCODE_ADAPTOR) is str:
-        module, cls = settings.GEOCODE_ADAPTOR.rsplit('.', 1)
-        Adaptor = getattr(importlib.import_module(module), cls)
-        adaptor = Adaptor()
-    else:
-        adaptor = settings.GEOCODE_ADAPTOR
+    module, cls = settings.GEOCODE_ADAPTOR.rsplit('.', 1)
+    Adaptor = getattr(importlib.import_module(module), cls)
+    adaptor = Adaptor()
     geocache = caches['default']
     cachedAddr = geocache.get('geocache:' + address)
     if cachedAddr is None:
