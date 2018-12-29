@@ -17,8 +17,10 @@ import { getCoords } from '@turf/invariant'
 import { withStyles } from '@material-ui/core/styles'
 import PropTypes from 'prop-types'
 import faCalendar from '@fortawesome/fontawesome-free-solid/faCalendar'
+import faHourglass from '@fortawesome/fontawesome-free-solid/faHourglass'
 import faClock from '@fortawesome/fontawesome-free-solid/faClock'
 import faCalendarCheck from '@fortawesome/fontawesome-free-solid/faCalendarCheck'
+import faCalendarTimes from '@fortawesome/fontawesome-free-solid/faCalendarTimes'
 import faLocationArrow from '@fortawesome/fontawesome-free-solid/faLocationArrow'
 import importedComponent from 'react-imported-component'
 import gravatar from 'gravatar'
@@ -32,7 +34,7 @@ import { WALKTIME_BREAKPOINTS, getEventsWithLocation } from '../../selectors/eve
 import { withModelData } from '../../store'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-faLibrary.add(faCalendar, faCalendarCheck, faLocationArrow, faClock)
+faLibrary.add(faHourglass, faCalendarTimes, faCalendar, faCalendarCheck, faLocationArrow, faClock)
 
 const hasher = new ColorHash({lightness: 0.8})
 const buttonHasher = new ColorHash()
@@ -94,9 +96,19 @@ export const CheckInButton = props => {
             </React.Fragment>
         )
     } else if (props.event.checkIn.isInPast) {
-        return <Grid item><p>This event already happened.</p></Grid>
+        return (
+            <React.Fragment>
+                <Grid item><Badge color="error" badgeContent={<FontAwesomeIcon icon={['fa', 'calendar-times']} />}><Avatar src={gravatar.url(props.currentUser.email, {s:32, d: 'retro'})} className={props.classes.checkedInBadge} /></Badge></Grid>
+                <Grid item><p>This event already happened. {attendeeCount} people checked in without you.</p></Grid>
+            </React.Fragment>
+        )
     } else if (props.event.checkIn.hasNotStarted) {
-        return <Grid item><p>This event hasn&apos;t started yet.</p></Grid>
+        return (
+            <React.Fragment>
+                <Grid item><Badge color="secondary" badgeContent={<FontAwesomeIcon icon={['fa', 'hourglass']} />}><Avatar src={gravatar.url(props.currentUser.email, {s:32, d: 'retro'})} className={props.classes.checkedInBadge} /></Badge></Grid>
+                <Grid item><p>This event hasn&apos;t started yet.</p></Grid>
+            </React.Fragment>
+        )
     } else {
         const eventBearing = props.currentLocation ? bearing(props.currentLocation, props.event.geo) - 45 : 0
         return (
