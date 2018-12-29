@@ -1,5 +1,5 @@
 import React from 'react'
-import { shallow } from 'enzyme'
+import { shallow, render } from 'enzyme'
 import { EventCard, CheckInButton } from './EventCard'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '@material-ui/core/Button'
@@ -60,8 +60,8 @@ describe('CheckInButton', () => {
             checkedIn: false,
             currentLocation: point([-10, 0]),
         }
-        const rendered = shallow(<CheckInButton {...props} />)
-        expect(rendered.dive().dive().text()).toContain('This event already happened.')
+        const rendered = render(<CheckInButton {...props} />)
+        expect(rendered.text()).toMatchSnapshot()
     })
 
     it('should render a message when it is far in the future', () => {
@@ -85,8 +85,8 @@ describe('CheckInButton', () => {
             checkedIn: false,
             currentLocation: point([-10, 0]),
         }
-        const rendered = shallow(<CheckInButton {...props} />)
-        expect(rendered.dive().dive().text()).toContain('This event hasn\'t started yet.')
+        const rendered = render(<CheckInButton {...props} />)
+        expect(rendered.text()).toMatchSnapshot()
     })
 
     it('should allow you to check in when you can check in', () => {

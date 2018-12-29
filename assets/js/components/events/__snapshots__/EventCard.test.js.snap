@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CheckInButton should render a message when it is far in the future 1`] = `"This event hasn't started yet."`;
+
+exports[`CheckInButton should render a message when it was a long time ago 1`] = `"This event already happened. 0 people checked in without you."`;
