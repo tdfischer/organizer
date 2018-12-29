@@ -65,10 +65,12 @@ const cookEventWithLocation = (currentLocation, evt, now) => {
     const timeFromNow = evt.timestamp.diff(now, 'minutes')
     const endTimeFromNow = evt.end_timestamp.diff(now, 'minutes')
     const hasNotStarted = timeFromNow >= 30
-    const isInPast = endTimeFromNow <= -60
+    const isInPast = endTimeFromNow <= -120
     const canCheckIn = isNearby && !isInPast && !hasNotStarted
-    const relevance = distanceFromHere + timeFromNow
-    const walktime = (evt.distance * 1000) / 84
+    const walktime = (distanceFromHere * 1000) / 84
+    // Five minutes is about how long it takes someone to decide and get out the door
+    const absoluteRelevance = (timeFromNow/15) - (walktime / 45)
+    const relevance = 1 / Math.log10(Math.abs(absoluteRelevance))
     return {
         ...evt,
         distance: distanceFromHere,
