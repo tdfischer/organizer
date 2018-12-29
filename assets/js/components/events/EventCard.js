@@ -17,30 +17,59 @@ import { getCoords } from '@turf/invariant'
 import { withStyles } from '@material-ui/core/styles'
 import PropTypes from 'prop-types'
 import faCalendar from '@fortawesome/fontawesome-free-solid/faCalendar'
+import faClock from '@fortawesome/fontawesome-free-solid/faClock'
 import faCalendarCheck from '@fortawesome/fontawesome-free-solid/faCalendarCheck'
 import faLocationArrow from '@fortawesome/fontawesome-free-solid/faLocationArrow'
 import importedComponent from 'react-imported-component'
 import gravatar from 'gravatar'
+import Breakpoint from '../../Breakpoint'
 
 const MarkerMap = importedComponent(() => import('../mapping/MarkerMap'))
 
 import { getCurrentLocation } from '../../selectors/geocache'
 import { getCurrentUser } from '../../selectors/auth'
-import { getEventsWithLocation } from '../../selectors/events'
+import { WALKTIME_BREAKPOINTS, getEventsWithLocation } from '../../selectors/events'
 import { withModelData } from '../../store'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-faLibrary.add(faCalendar, faCalendarCheck, faLocationArrow)
+faLibrary.add(faCalendar, faCalendarCheck, faLocationArrow, faClock)
 
 const hasher = new ColorHash({lightness: 0.8})
 const buttonHasher = new ColorHash()
 const colorForEvent = evt => hasher.hex(evt.uid || '')
 
+const SEGMENT = (360 / 8)
+const OFFSET = SEGMENT / 2
+
+const COMPASS_BREAKPOINTS = new Breakpoint([
+    [-OFFSET, 'North'],
+    [SEGMENT - OFFSET, 'Northeast'],
+    [SEGMENT*2 - OFFSET, 'East'],
+    [SEGMENT*3 - OFFSET, 'Southeast'],
+    [SEGMENT*4 - OFFSET, 'South'],
+    [SEGMENT*5 - OFFSET, 'Southwest'],
+    [SEGMENT*6 - OFFSET, 'West'],
+    [SEGMENT*7 - OFFSET, 'North West'],
+    [undefined, 'North'],
+])
+
 const locationDisplay = (evt, currentLocation) => {
     if (currentLocation) {
-        return evt.location.raw + ' - ' + Math.round(distance(currentLocation, evt.geo, {units: 'miles'})) + ' miles'
+        const distanceDisplay = Math.round(distance(currentLocation, evt.geo, {units: 'miles'})) + ' miles'
+        const compassDisplay = COMPASS_BREAKPOINTS.getValue(bearing(currentLocation, evt.geo))
+        const walktimeDisplay = WALKTIME_BREAKPOINTS.getValue(evt.walktime)
+        const relativeDisplay = walktimeDisplay + ': ' + distanceDisplay + ' ' + compassDisplay
+        if (evt.location) {
+            return evt.location.raw + ' - ' + relativeDisplay
+        } else {
+            return relativeDisplay
+        }
     } else {
-        return evt.location.raw
+        if (evt.location) {
+            return evt.location.raw
+        } else {
+            return ''
+        }
     }
 }
 
@@ -88,7 +117,7 @@ export const EventCard = props => {
     const background = '-webkit-linear-gradient(left, ' + cardColor + ' 0%, ' + cardColor + 'aa 70%, ' + cardColor + '00 100%)'
 
     return (
-        <Card className={props.className} style={{backgroundColor: cardColor, color: textColor}}>
+        <Card className={props.className} style={{backgroundColor: cardColor, color: textColor, ...props.style}}>
             <CardContent style={{position: 'relative', zIndex: 1}}>
                 <div style={{width: '175%', height: '100%', overflow: 'hidden', top: 0, left: 0, flex: 'auto', display: 'flex', position: 'absolute', zIndex: -1}}>
                     {props.event.geo ? <MarkerMap position={getCoords(props.event.geo)} center={getCoords(props.event.geo)} /> : null}
@@ -97,7 +126,10 @@ export const EventCard = props => {
                 <Grid style={{flexWrap: 'nowrap'}} direction="row" spacing={8} alignItems="stretch" container>
                     <Grid xs item>
                         <Typography variant="headline">{props.event.name}</Typography>
-                        <Typography variant="subheading">{props.event.timestamp.calendar()} - {props.event.end_timestamp.calendar()}</Typography>
+                        <Typography variant="subheading">
+                            <FontAwesomeIcon icon={['fa', 'clock']} />
+                            &nbsp;{props.event.timestamp.calendar()} - {props.event.end_timestamp.calendar()}
+                        </Typography>
                         <p>{locationDisplay(props.event, props.currentLocation)}</p>
                     </Grid>
                 </Grid>
@@ -115,7 +147,8 @@ EventCard.propTypes = {
 }
 
 EventCard.defaultProps = {
-    classes: {}
+    classes: {},
+    style: {}
 }
 
 const mapStateToProps = (state, props) => {
