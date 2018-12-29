@@ -99,16 +99,18 @@ export const getEventsWithLocation = createSelector(
     )
 )
 
+const groupByTime = now => (evt) => DAY_BREAKPOINTS.getPoint(evt.timestamp.diff(now, 'days'))
+
 export const makeGetUpcomingEvents = () => createSelector(
     getNow,
     getEventsWithLocation,
     (now, relevantEvents) => {
         return relevantEvents.toIndexedSeq()
-            .map(evt => ({...evt, walktime: (evt.distance * 1000) / 84}))
-            .groupBy(evt => DAY_BREAKPOINTS.getPoint(evt.timestamp.diff(now, 'days'))).toKeyedSeq()
-            .map(events => 
-                events.groupBy(evt => WALKTIME_BREAKPOINTS.getPoint(evt.walktime))
-                    .sort((a, b) => a.distance - b.distance))
+            .groupBy(groupByTime(now)).toKeyedSeq()
+            .sortBy((_v, k) => k)
+            .sort((a, b) => a-b)
+            .map(eventsInRange => 
+                eventsInRange.sort((a, b) => a.distance - b.distance))
             .cacheResult()
     }
 )

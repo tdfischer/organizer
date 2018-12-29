@@ -114,7 +114,6 @@ const mapDispatchToProps = dispatch => {
 
 const styles = {
     root: {
-        padding: '1rem',
         width: '100%',
         margin: 0
     },
