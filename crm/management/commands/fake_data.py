@@ -75,10 +75,12 @@ class Command(BaseCommand): # pragma: no cover
                 evt.save()
 
 def fakeLatitude():
-    return random.triangular(37, 38)
+    return random.triangular(settings.DUMMY_GEOCODE_CENTER[0]-0.01,
+            settings.DUMMY_GEOCODE_CENTER[0]+0.01)
 
 def fakeLongitude():
-    return random.triangular(-123, -122)
+    return random.triangular(settings.DUMMY_GEOCODE_CENTER[1]-0.01,
+            settings.DUMMY_GEOCODE_CENTER[1]+0.01)
 
 def fakeAddress(template={}):
     street = getattr(template, 'street', fake.name() + ' Street')
