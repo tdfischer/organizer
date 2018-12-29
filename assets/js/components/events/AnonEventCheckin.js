@@ -38,14 +38,14 @@ const Description = props => (
 
 export const AnonEventCheckin = withState('index', 'setIndex', 0)(props => (
     <React.Fragment>
-        <Grid container justify="center" style={{marginTop: '1rem'}} spacing={8}>
-            <Grid xs={12} sm={7} md={8} item>
+        <Grid container justify="space-evenly" alignItems="stretch" style={{marginTop: '1rem'}} spacing={8}>
+            <Grid xs={12} sm={7} md={8} item container direction="column" style={{flexWrap: 'nowrap', paddingLeft: 0, paddingRight: 0}}>
                 {props.nearbyEvents.count() > 0 ? null : <NoEvents /> }
                 <Carousel
                     index={props.index}
                     setIndex={props.setIndex}
-                    style={{padding: '4rem'}}>
-                    {props.nearbyEvents.map(evt => <EventCard style={{margin: '0.2rem'}} key={evt.id} event_id={evt.id} />).toList().toJS()}
+                    className={props.classes.eventCarousel} >
+                    {props.nearbyEvents.map(evt => <EventCard className={props.classes.eventCard} key={evt.id} event_id={evt.id} />).toList().toJS()}
                 </Carousel>
             </Grid>
             <Grid xs={12} sm={5} md={4} item style={{paddingLeft: '1rem', paddingRight: '1rem'}}>
@@ -85,6 +85,15 @@ const style = {
     whatItIs: {
         backgroundColor: '#ddd',
         padding: '1rem'
+    },
+    eventCarousel: {
+        paddingLeft: '1rem',
+        paddingRight: '1rem'
+    },
+    eventCard: {
+        marginLeft: '0.5rem',
+        marginRight: '0.5rem',
+        marginBottom: '1rem'
     }
 }
 
