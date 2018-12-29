@@ -12,7 +12,7 @@ export const STATUS_UNAVAILABLE = 2
 export const STATUS_TIMEOUT = 3
 
 export const updateCurrentLocationFromBrowserPosition = pos => {
-    return updateCurrentLocation([pos.coords.latitude, pos.coords.longitude])
+    return updateCurrentLocation([pos.coords.latitude, pos.coords.longitude], pos.coords.accuracy)
 }
 
 export const setLocationStatus = status => {
@@ -22,10 +22,11 @@ export const setLocationStatus = status => {
     }
 }
 
-export const updateCurrentLocation = coords => {
+export const updateCurrentLocation = (coords, accuracy=0) => {
     return dispatch => {
         dispatch({
             type: UPDATE_CURRENT_LOCATION,
+            accuracy: accuracy,
             geo: coords
         })
     }

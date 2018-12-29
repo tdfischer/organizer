@@ -3,7 +3,7 @@ import { Model } from '../store'
 import distance from '@turf/distance'
 import moment from 'moment'
 import Breakpoint from '../Breakpoint'
-import { getCurrentLocation } from './geocache'
+import { getCurrentLocation, getAccuracy } from './geocache'
 
 const Events = new Model('events')
 
@@ -59,8 +59,8 @@ export const getEventsInWindow = (state, {start, end} = {}) => (
         .filter(isWithinWindow(start, end))
 )
 
-const cookEventWithLocation = (currentLocation, evt, now) => {
-    const distanceFromHere = distance(currentLocation ? currentLocation : evt.geo, evt.geo)
+const cookEventWithLocation = (currentLocation, accuracy, evt, now) => {
+    const distanceFromHere = Math.max(0, distance(currentLocation ? currentLocation : evt.geo, evt.geo, 'meters') - accuracy) / 1000
     const isNearby = distanceFromHere <= 0.25
     const timeFromNow = evt.timestamp.diff(now, 'minutes')
     const endTimeFromNow = evt.end_timestamp.diff(now, 'minutes')
@@ -91,11 +91,12 @@ const getNow = () => moment()
 export const getEventsWithLocation = createSelector(
     getNow,
     getCurrentLocation,
+    getAccuracy,
     getEvents,
-    (now, currentLocation, allEvents) => (
+    (now, currentLocation, accuracy, allEvents) => (
         allEvents
             .filter(evt => evt.geo != undefined)
-            .map(evt => cookEventWithLocation(currentLocation, evt, now))
+            .map(evt => cookEventWithLocation(currentLocation, accuracy, evt, now))
     )
 )
 
