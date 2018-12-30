@@ -59,7 +59,7 @@ export const getEventsInWindow = (state, {start, end} = {}) => (
         .filter(isWithinWindow(start, end))
 )
 
-const cookEventWithLocation = (currentLocation, accuracy, evt, now) => {
+export const cookEventWithLocation = (currentLocation, accuracy, evt, now) => {
     const distanceFromHere = Math.max(0, distance(currentLocation ? currentLocation : evt.geo, evt.geo, 'meters') - accuracy) / 1000
     const isNearby = distanceFromHere <= 0.25
     const timeFromNow = evt.timestamp.diff(now, 'minutes')
