@@ -16,4 +16,8 @@ const Carousel = props => (
     </React.Fragment>
 )
 
+Carousel.defaultProps = {
+    children: []
+}
+
 export default Carousel
