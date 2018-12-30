@@ -1,6 +1,6 @@
 import React from 'react'
 import { shallow, render } from 'enzyme'
-import { EventCard, CheckInButton } from './EventCard'
+import { EventCard, CheckInButton, locationDisplay } from './EventCard'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '@material-ui/core/Button'
 import Avatar from '@material-ui/core/Avatar'
@@ -9,6 +9,51 @@ import moment from 'moment'
 
 it('should safely render defaults', () => {
     shallow(<EventCard event={{attendees: [], timestamp: moment(), end_timestamp: moment(), location: {}, geo: point([0, 0])}} />)
+})
+
+describe('locationDisplay', () => {
+    describe('with current location', () => {
+        const here = point([1, 0])
+
+        it('should render a location description', () => {
+            const eventProps = {
+                geo: point([0, 0]),
+                location: {
+                    raw: 'LOCATION'
+                }
+            }
+            expect(locationDisplay(eventProps, here)).toMatchSnapshot()
+        })
+
+        it('should render a location description without event location', () => {
+            const eventProps = {
+                geo: point([0, 0]),
+                location: undefined
+            }
+            expect(locationDisplay(eventProps, point([1, 0]))).toMatchSnapshot()
+        })
+    })
+    describe('without current location', () => {
+        const here = undefined
+
+        it('should render a location description', () => {
+            const eventProps = {
+                geo: point([0, 0]),
+                location: {
+                    raw: 'LOCATION'
+                }
+            }
+            expect(locationDisplay(eventProps, here)).toMatchSnapshot()
+        })
+
+        it('should render a location description without event location', () => {
+            const eventProps = {
+                geo: point([0, 0]),
+                location: undefined
+            }
+            expect(locationDisplay(eventProps, point([1, 0]))).toMatchSnapshot()
+        })
+    })
 })
 
 describe('CheckInButton', () => {

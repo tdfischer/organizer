@@ -55,7 +55,7 @@ const COMPASS_BREAKPOINTS = new Breakpoint([
     [undefined, 'North'],
 ])
 
-const locationDisplay = (evt, currentLocation) => {
+export const locationDisplay = (evt, currentLocation) => {
     if (currentLocation) {
         const distanceDisplay = Math.round(distance(currentLocation, evt.geo, {units: 'miles'})) + ' miles'
         const compassDisplay = COMPASS_BREAKPOINTS.getValue(bearing(currentLocation, evt.geo))

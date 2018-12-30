@@ -3,3 +3,11 @@
 exports[`CheckInButton should render a message when it is far in the future 1`] = `"This event hasn't started yet."`;
 
 exports[`CheckInButton should render a message when it was a long time ago 1`] = `"This event already happened. 0 people checked in without you."`;
+
+exports[`locationDisplay with current location should render a location description 1`] = `"LOCATION - Far away: 69 miles North"`;
+
+exports[`locationDisplay with current location should render a location description without event location 1`] = `"Far away: 69 miles North"`;
+
+exports[`locationDisplay without current location should render a location description 1`] = `"LOCATION"`;
+
+exports[`locationDisplay without current location should render a location description without event location 1`] = `"Far away: 69 miles North"`;
