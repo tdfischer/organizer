@@ -1,14 +1,16 @@
 import React from 'react'
-import { shallow, render } from 'enzyme'
+import { shallow } from 'enzyme'
 import { EventCard, CheckInButton, locationDisplay } from './EventCard'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '@material-ui/core/Button'
-import Avatar from '@material-ui/core/Avatar'
+import UserAvatar from '../UserAvatar'
 import { point } from '@turf/helpers'
 import moment from 'moment'
 
+const testTime = moment.utc(1318781876406)
+
 it('should safely render defaults', () => {
-    shallow(<EventCard event={{attendees: [], timestamp: moment(), end_timestamp: moment(), location: {}, geo: point([0, 0])}} />)
+    shallow(<EventCard event={{attendees: [], timestamp: testTime, end_timestamp: testTime, location: {}, geo: point([0, 0])}} />)
 })
 
 describe('locationDisplay', () => {
@@ -61,8 +63,8 @@ describe('CheckInButton', () => {
         const props = {
             event: {
                 geo: point([0, 0]),
-                timestamp: moment(),
-                end_timestamp: moment().add(1, 'hour'),
+                timestamp: testTime,
+                end_timestamp: testTime.clone().add(1, 'hour'),
                 checkIn: {
                     isNearby: false,
                     isInPast: false,
@@ -88,8 +90,8 @@ describe('CheckInButton', () => {
         const props = {
             event: {
                 geo: point([0, 0]),
-                timestamp: moment().add(-1, 'month'),
-                end_timestamp: moment().add(-1, 'month').add(1, 'hour'),
+                timestamp: testTime.clone().add(-1, 'month'),
+                end_timestamp: testTime.clone().add(-1, 'month').add(1, 'hour'),
                 checkIn: {
                     isNearby: false,
                     isInPast: true,
@@ -105,16 +107,16 @@ describe('CheckInButton', () => {
             checkedIn: false,
             currentLocation: point([-10, 0]),
         }
-        const rendered = render(<CheckInButton {...props} />)
-        expect(rendered.text()).toMatchSnapshot()
+        const rendered = shallow(<CheckInButton {...props} />)
+        expect(rendered).toMatchSnapshot()
     })
 
     it('should render a message when it is far in the future', () => {
         const props = {
             event: {
                 geo: point([0, 0]),
-                timestamp: moment().add(45, 'minutes'),
-                end_timestamp: moment().add(1, 'hour'),
+                timestamp: testTime.clone().add(45, 'minutes'),
+                end_timestamp: testTime.clone().add(1, 'hour'),
                 checkIn: {
                     isNearby: false,
                     isInPast: false,
@@ -130,16 +132,16 @@ describe('CheckInButton', () => {
             checkedIn: false,
             currentLocation: point([-10, 0]),
         }
-        const rendered = render(<CheckInButton {...props} />)
-        expect(rendered.text()).toMatchSnapshot()
+        const rendered = shallow(<CheckInButton {...props} />)
+        expect(rendered).toMatchSnapshot()
     })
 
     it('should allow you to check in when you can check in', () => {
         const props = {
             event: {
                 geo: point([0, 0]),
-                timestamp: moment(),
-                end_timestamp: moment().add(1, 'hour'),
+                timestamp: testTime,
+                end_timestamp: testTime.clone().add(1, 'hour'),
                 checkIn: {
                     isNearby: true,
                     isInPast: false,
@@ -166,8 +168,8 @@ describe('CheckInButton', () => {
         const props = {
             event: {
                 geo: point([0, 0]),
-                timestamp: moment(),
-                end_timestamp: moment().add(1, 'hour'),
+                timestamp: testTime,
+                end_timestamp: testTime.clone().add(1, 'hour'),
                 checkIn: {
                     isNearby: true,
                     isInPast: false,
@@ -194,8 +196,8 @@ describe('CheckInButton', () => {
         const props = {
             event: {
                 geo: point([0, 0]),
-                timestamp: moment(),
-                end_timestamp: moment().add(1, 'hour'),
+                timestamp: testTime,
+                end_timestamp: testTime.clone().add(1, 'hour'),
                 attendees: []
             },
             currentUser: {
@@ -206,6 +208,6 @@ describe('CheckInButton', () => {
             currentLocation: point([0, 0]),
         }
         const rendered = shallow(<CheckInButton {...props} />)
-        expect(rendered.find(Avatar)).toHaveLength(1)
+        expect(rendered.find(UserAvatar)).toHaveLength(1)
     })
 })
