@@ -1,6 +1,5 @@
 import React from 'react'
 import Grid from '@material-ui/core/Grid'
-import _ from 'lodash'
 import FormControl from '@material-ui/core/FormControl'
 import InputLabel from '@material-ui/core/InputLabel'
 import MenuItem from '@material-ui/core/MenuItem'
@@ -17,6 +16,8 @@ import MaterialFormModelSelect from '../MaterialFormModelSelect'
 import MaterialFormText from '../MaterialFormText'
 import BooleanSelect from './BooleanSelect'
 
+const getLocality = obj => obj.locality || {name: '', postal_code: ''}
+
 const WidgetForField = withFieldState('property')(props => {
     switch(props.fieldState.value) {
     case 'state':
@@ -30,7 +31,7 @@ const WidgetForField = withFieldState('property')(props => {
         return (
             <FormControl fullWidth>
                 <InputLabel>Turf</InputLabel>
-                <MaterialFormModelSelect value={t => t.id} display={t => (t.name + ', ' + _.get(t, 'locality.name') + ' ' + _.get(t, 'locality.postal_code'))} model="turfs" field="value" />
+                <MaterialFormModelSelect value={t => t.id} display={t => (t.name + ', ' + getLocality(t).name + ' ' + getLocality(t).postal_code)} model="turfs" field="value" />
             </FormControl>
         )
     case 'geo.properties.city':

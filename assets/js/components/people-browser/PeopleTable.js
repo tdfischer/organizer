@@ -1,6 +1,5 @@
 import React from 'react'
 import ImmutablePropTypes from 'react-immutable-proptypes'
-import _ from 'lodash'
 import { connect } from 'react-redux'
 import Chip from '@material-ui/core/Chip'
 import Typography from '@material-ui/core/Typography'
@@ -18,7 +17,7 @@ const PeopleSelector = new Selectable('people')
 const PeopleFilter = new Filterable('people', matchPattern)
 
 const TagList = props => (
-    _.map(props.tags, tag => <Chip key={tag} className="tag" label={tag} />)
+    props.tags.map(tag => <Chip key={tag} className="tag" label={tag} />)
 )
 
 const renderCheckboxCell = props => (
@@ -26,13 +25,17 @@ const renderCheckboxCell = props => (
 )
 
 const renderCheckboxHeader = props => (
-    <Checkbox checked={props.people.reduce((prev, person) => prev && person.selected, true)} onChange={(_e, newValue) => props.people.map(_.property('email')).forEach(newValue ? props.selector.add : props.selector.remove)} />
+    <Checkbox checked={props.people.reduce((prev, person) => prev && person.selected, true)} onChange={(_e, newValue) => props.people.map(obj => obj.email).forEach(newValue ? props.selector.add : props.selector.remove)} />
 )
+
+const getCurrentTurf = obj => obj.current_turf || {}
+
+const getLocality = obj => getCurrentTurf(obj).locality || {name: '', postal_code: ''}
 
 const renderNameCell = props => (
     <React.Fragment>
         {props.rowData.name} <TagList tags={props.rowData.tags} />
-        <Typography variant="caption">{props.rowData.email} - {_.get(props.rowData, 'current_turf.name')}, {_.get(props.rowData, 'current_turf.locality.name')} {_.get(props.rowData, 'current_turf.locality.postal_code')}</Typography>
+        <Typography variant="caption">{props.rowData.email} - {getCurrentTurf(props.rowData).name}, {getLocality(props.rowData.name)} {getLocality(props.rowData.postal_code)}</Typography>
     </React.Fragment>
 )
 
