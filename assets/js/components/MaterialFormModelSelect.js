@@ -1,5 +1,4 @@
 import React from 'react'
-import _ from 'lodash'
 import { connect } from 'react-redux'
 import MenuItem from '@material-ui/core/MenuItem'
 import PropTypes from 'prop-types'
@@ -14,9 +13,9 @@ const mapStateToProps = (state, props) => {
     }
 }
 
-const MaterialFormModelSelect = props => (
-    <MaterialFormSelect {..._.omit(props, 'display', 'value', 'dispatch', 'rows')}>
-        {props.rows.map(row=> (<MenuItem key={row.id} value={props.value(row)}>{props.display(row)}</MenuItem>)).toArray()}
+const MaterialFormModelSelect = ({display, value, dispatch: _dispatch, rows: _rows, ...props}) => (
+    <MaterialFormSelect {...props}>
+        {props.rows.map(row=> (<MenuItem key={row.id} value={value(row)}>{display(row)}</MenuItem>)).toArray()}
     </MaterialFormSelect>
 )
 
