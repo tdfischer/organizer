@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Selectable , Filterable, Model } from '../store'
-import _ from 'lodash'
 import { Form } from 'informed'
 import Button from '@material-ui/core/Button'
 import Grid from '@material-ui/core/Grid'
@@ -34,7 +33,7 @@ const mapDispatchToProps = dispatch => {
         states: States.bindActionCreators(dispatch),
         filter: PeopleFilter.bindActionCreators(dispatch),
         importPeople: people => {
-            return Promise.all(_.map(people, person => dispatch(People.updateAndSave(person.email, person))))
+            return Promise.all(people.map(person => dispatch(People.updateAndSave(person.email, person))))
         }
     }
 }
@@ -47,7 +46,7 @@ const mapTaggerDispatchToProps = dispatch => {
                 return Promise.all(selectedPeople.map(email => People.immutableSelect(getState()).get(email)).map(person => {
                     dispatch(People.updateAndSave(person.id, person => ({
                         ...person,
-                        tags: _.without(person.tags, formApi.getValue('tag'))
+                        tags: person.tags.filter(tag => tag != formApi.getValue('tag'))
                     })))
                 }).toArray())
             })
