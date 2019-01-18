@@ -25,7 +25,7 @@ export const EventList = props => {
                 <Typography variant="headline" className={props.classes.timeHeader}>{DAY_BREAKPOINTS.getValue(weekDelta)}</Typography>
             </Grid>
         )
-        return [header, <Grid item container style={{paddingLeft: 0, paddingRight: 0}} direction="column" key={weekDelta}><EventCarousel className={props.classes.eventCarousel} >{events.sortBy(e => -e.relevance).map(evt => (
+        return [header, <Grid item container style={{paddingLeft: 0, paddingRight: 0}} direction="column" key={weekDelta}><EventCarousel className={props.classes.eventCarousel} >{events.map(evt => (
             <EventCard className={props.classes.eventCard} key={evt.id} event_id={evt.id} onCheckIn={props.onCheckIn} />
         )).toJS()}</EventCarousel></Grid>]
     })

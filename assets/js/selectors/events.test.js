@@ -10,7 +10,7 @@ it('should add required properties to the event', () => {
       timestamp: now,
       end_timestamp: now,
     }
-    const evt = cookEventWithLocation(point([0, 0]), 0, eventSkeleton, moment())
+    const evt = cookEventWithLocation(point([0, 0]), 0, eventSkeleton, moment(), [])
     expect(evt).toMatchObject({
         distance: expect.any(Number),
         relevance: expect.any(Number),

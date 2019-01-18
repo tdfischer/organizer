@@ -1,6 +1,7 @@
 import React from 'react'
 import { shallow } from 'enzyme'
-import { EventCard, CheckInButton, locationDisplay } from './EventCard'
+import { EventCard, CheckInButton } from './EventCard'
+import { locationDisplay } from '../../selectors/events'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Button from '@material-ui/core/Button'
 import UserAvatar from '../UserAvatar'
@@ -19,7 +20,7 @@ describe('locationDisplay', () => {
 
         it('should render a location description', () => {
             const eventProps = {
-                geo: point([0, 0]),
+                distance: 0,
                 location: {
                     raw: 'LOCATION'
                 }
@@ -29,7 +30,7 @@ describe('locationDisplay', () => {
 
         it('should render a location description without event location', () => {
             const eventProps = {
-                geo: point([0, 0]),
+                distance: 0,
                 location: undefined
             }
             expect(locationDisplay(eventProps, point([1, 0]))).toMatchSnapshot()
@@ -40,7 +41,7 @@ describe('locationDisplay', () => {
 
         it('should render a location description', () => {
             const eventProps = {
-                geo: point([0, 0]),
+                distance: 0,
                 location: {
                     raw: 'LOCATION'
                 }
@@ -50,7 +51,7 @@ describe('locationDisplay', () => {
 
         it('should render a location description without event location', () => {
             const eventProps = {
-                geo: point([0, 0]),
+                distance: 0,
                 location: undefined
             }
             expect(locationDisplay(eventProps, point([1, 0]))).toMatchSnapshot()
@@ -63,6 +64,7 @@ describe('CheckInButton', () => {
         const props = {
             event: {
                 geo: point([0, 0]),
+                bearing: 90,
                 timestamp: testTime,
                 end_timestamp: testTime.clone().add(1, 'hour'),
                 checkIn: {
@@ -90,6 +92,7 @@ describe('CheckInButton', () => {
         const props = {
             event: {
                 geo: point([0, 0]),
+                distance: 0,
                 timestamp: testTime.clone().add(-1, 'month'),
                 end_timestamp: testTime.clone().add(-1, 'month').add(1, 'hour'),
                 checkIn: {
@@ -115,6 +118,7 @@ describe('CheckInButton', () => {
         const props = {
             event: {
                 geo: point([0, 0]),
+                distance: 0,
                 timestamp: testTime.clone().add(45, 'minutes'),
                 end_timestamp: testTime.clone().add(1, 'hour'),
                 checkIn: {
@@ -140,7 +144,8 @@ describe('CheckInButton', () => {
         const props = {
             event: {
                 geo: point([0, 0]),
-                timestamp: testTime,
+                distance: 0,
+                timestamp: testTime.clone(),
                 end_timestamp: testTime.clone().add(1, 'hour'),
                 checkIn: {
                     isNearby: true,
@@ -168,7 +173,8 @@ describe('CheckInButton', () => {
         const props = {
             event: {
                 geo: point([0, 0]),
-                timestamp: testTime,
+                distance: 0,
+                timestamp: testTime.clone(),
                 end_timestamp: testTime.clone().add(1, 'hour'),
                 checkIn: {
                     isNearby: true,
@@ -196,15 +202,18 @@ describe('CheckInButton', () => {
         const props = {
             event: {
                 geo: point([0, 0]),
+                distance: 0,
                 timestamp: testTime,
                 end_timestamp: testTime.clone().add(1, 'hour'),
-                attendees: []
+                attendees: [],
+                checkIn: {
+                    hasCheckedIn: true
+                },
             },
             currentUser: {
                 email: ''
             },
             classes: {},
-            checkedIn: true,
             currentLocation: point([0, 0]),
         }
         const rendered = shallow(<CheckInButton {...props} />)

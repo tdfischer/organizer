@@ -33,6 +33,7 @@ ShallowWrapper {
           "isInPast": false,
           "isNearby": false,
         },
+        "distance": 0,
         "end_timestamp": "2011-10-16T17:17:56.406Z",
         "geo": Object {
           "geometry": Object {
@@ -59,18 +60,54 @@ ShallowWrapper {
   Symbol(enzyme.__node__): Object {
     "instance": null,
     "key": undefined,
-    "nodeType": "function",
+    "nodeType": "class",
     "props": Object {
-      "children": Array [
-        <WithStyles(Grid)
-          item={true}
-          style={
-            Object {
-              "textAlign": "center",
-            }
+      "children": <UNDEFINED>
+        <WithStyles(Badge)
+          badgeContent={
+            <FontAwesomeIcon
+              border={false}
+              className=""
+              fixedWidth={false}
+              flip={null}
+              icon={
+                Array [
+                  "fa",
+                  "hourglass",
+                ]
+              }
+              inverse={false}
+              listItem={false}
+              mask={null}
+              pull={null}
+              pulse={false}
+              rotation={null}
+              size={null}
+              spin={false}
+              symbol={false}
+              transform={null}
+            />
           }
-          xs={2}
+          color="secondary"
         >
+          <Connect(Component)
+            className={undefined}
+          />
+        </WithStyles(Badge)>
+        RSVP
+      </UNDEFINED>,
+      "className": undefined,
+      "onClick": [Function],
+      "size": "large",
+      "variant": "outlined",
+    },
+    "ref": null,
+    "rendered": Object {
+      "instance": null,
+      "key": undefined,
+      "nodeType": "function",
+      "props": Object {
+        "children": Array [
           <WithStyles(Badge)
             badgeContent={
               <FontAwesomeIcon
@@ -101,64 +138,13 @@ ShallowWrapper {
             <Connect(Component)
               className={undefined}
             />
-          </WithStyles(Badge)>
-        </WithStyles(Grid)>,
-        <WithStyles(Grid)
-          item={true}
-          xs={true}
-        >
-          <p>
-            This event hasn't started yet.
-          </p>
-        </WithStyles(Grid)>,
-      ],
-    },
-    "ref": null,
-    "rendered": Array [
-      Object {
-        "instance": null,
-        "key": undefined,
-        "nodeType": "class",
-        "props": Object {
-          "children": <WithStyles(Badge)
-            badgeContent={
-              <FontAwesomeIcon
-                border={false}
-                className=""
-                fixedWidth={false}
-                flip={null}
-                icon={
-                  Array [
-                    "fa",
-                    "hourglass",
-                  ]
-                }
-                inverse={false}
-                listItem={false}
-                mask={null}
-                pull={null}
-                pulse={false}
-                rotation={null}
-                size={null}
-                spin={false}
-                symbol={false}
-                transform={null}
-              />
-            }
-            color="secondary"
-          >
-            <Connect(Component)
-              className={undefined}
-            />
           </WithStyles(Badge)>,
-          "item": true,
-          "style": Object {
-            "textAlign": "center",
-          },
-          "xs": 2,
-        },
-        "ref": null,
-        "rendered": Object {
+          "RSVP",
+        ],
+      },
+      "ref": null,
+      "rendered": Array [
+        Object {
           "instance": null,
           "key": undefined,
           "nodeType": "class",
@@ -204,52 +190,64 @@ ShallowWrapper {
           },
           "type": [Function],
         },
-        "type": [Function],
-      },
-      Object {
-        "instance": null,
-        "key": undefined,
-        "nodeType": "class",
-        "props": Object {
-          "children": <p>
-            This event hasn't started yet.
-          </p>,
-          "item": true,
-          "xs": true,
-        },
-        "ref": null,
-        "rendered": Object {
-          "instance": null,
-          "key": undefined,
-          "nodeType": "host",
-          "props": Object {
-            "children": "This event hasn't started yet.",
-          },
-          "ref": null,
-          "rendered": "This event hasn't started yet.",
-          "type": "p",
-        },
-        "type": [Function],
-      },
-    ],
-    "type": Symbol(react.fragment),
+        "RSVP",
+      ],
+      "type": Symbol(react.fragment),
+    },
+    "type": [Function],
   },
   Symbol(enzyme.__nodes__): Array [
     Object {
       "instance": null,
       "key": undefined,
-      "nodeType": "function",
+      "nodeType": "class",
       "props": Object {
-        "children": Array [
-          <WithStyles(Grid)
-            item={true}
-            style={
-              Object {
-                "textAlign": "center",
-              }
+        "children": <UNDEFINED>
+          <WithStyles(Badge)
+            badgeContent={
+              <FontAwesomeIcon
+                border={false}
+                className=""
+                fixedWidth={false}
+                flip={null}
+                icon={
+                  Array [
+                    "fa",
+                    "hourglass",
+                  ]
+                }
+                inverse={false}
+                listItem={false}
+                mask={null}
+                pull={null}
+                pulse={false}
+                rotation={null}
+                size={null}
+                spin={false}
+                symbol={false}
+                transform={null}
+              />
             }
-            xs={2}
+            color="secondary"
           >
+            <Connect(Component)
+              className={undefined}
+            />
+          </WithStyles(Badge)>
+          RSVP
+        </UNDEFINED>,
+        "className": undefined,
+        "onClick": [Function],
+        "size": "large",
+        "variant": "outlined",
+      },
+      "ref": null,
+      "rendered": Object {
+        "instance": null,
+        "key": undefined,
+        "nodeType": "function",
+        "props": Object {
+          "children": Array [
             <WithStyles(Badge)
               badgeContent={
                 <FontAwesomeIcon
@@ -280,64 +278,13 @@ ShallowWrapper {
               <Connect(Component)
                 className={undefined}
               />
-            </WithStyles(Badge)>
-          </WithStyles(Grid)>,
-          <WithStyles(Grid)
-            item={true}
-            xs={true}
-          >
-            <p>
-              This event hasn't started yet.
-            </p>
-          </WithStyles(Grid)>,
-        ],
-      },
-      "ref": null,
-      "rendered": Array [
-        Object {
-          "instance": null,
-          "key": undefined,
-          "nodeType": "class",
-          "props": Object {
-            "children": <WithStyles(Badge)
-              badgeContent={
-                <FontAwesomeIcon
-                  border={false}
-                  className=""
-                  fixedWidth={false}
-                  flip={null}
-                  icon={
-                    Array [
-                      "fa",
-                      "hourglass",
-                    ]
-                  }
-                  inverse={false}
-                  listItem={false}
-                  mask={null}
-                  pull={null}
-                  pulse={false}
-                  rotation={null}
-                  size={null}
-                  spin={false}
-                  symbol={false}
-                  transform={null}
-                />
-              }
-              color="secondary"
-            >
-              <Connect(Component)
-                className={undefined}
-              />
             </WithStyles(Badge)>,
-            "item": true,
-            "style": Object {
-              "textAlign": "center",
-            },
-            "xs": 2,
-          },
-          "ref": null,
-          "rendered": Object {
+            "RSVP",
+          ],
+        },
+        "ref": null,
+        "rendered": Array [
+          Object {
             "instance": null,
             "key": undefined,
             "nodeType": "class",
@@ -383,35 +330,11 @@ ShallowWrapper {
             },
             "type": [Function],
           },
-          "type": [Function],
-        },
-        Object {
-          "instance": null,
-          "key": undefined,
-          "nodeType": "class",
-          "props": Object {
-            "children": <p>
-              This event hasn't started yet.
-            </p>,
-            "item": true,
-            "xs": true,
-          },
-          "ref": null,
-          "rendered": Object {
-            "instance": null,
-            "key": undefined,
-            "nodeType": "host",
-            "props": Object {
-              "children": "This event hasn't started yet.",
-            },
-            "ref": null,
-            "rendered": "This event hasn't started yet.",
-            "type": "p",
-          },
-          "type": [Function],
-        },
-      ],
-      "type": Symbol(react.fragment),
+          "RSVP",
+        ],
+        "type": Symbol(react.fragment),
+      },
+      "type": [Function],
     },
   ],
   Symbol(enzyme.__options__): Object {
@@ -469,6 +392,7 @@ ShallowWrapper {
           "isInPast": true,
           "isNearby": false,
         },
+        "distance": 0,
         "end_timestamp": "2011-09-16T17:17:56.406Z",
         "geo": Object {
           "geometry": Object {
@@ -495,18 +419,54 @@ ShallowWrapper {
   Symbol(enzyme.__node__): Object {
     "instance": null,
     "key": undefined,
-    "nodeType": "function",
+    "nodeType": "class",
     "props": Object {
-      "children": Array [
-        <WithStyles(Grid)
-          item={true}
-          style={
-            Object {
-              "textAlign": "center",
-            }
+      "children": <UNDEFINED>
+        <WithStyles(Badge)
+          badgeContent={
+            <FontAwesomeIcon
+              border={false}
+              className=""
+              fixedWidth={false}
+              flip={null}
+              icon={
+                Array [
+                  "fa",
+                  "calendar-times",
+                ]
+              }
+              inverse={false}
+              listItem={false}
+              mask={null}
+              pull={null}
+              pulse={false}
+              rotation={null}
+              size={null}
+              spin={false}
+              symbol={false}
+              transform={null}
+            />
           }
-          xs={2}
+          color="error"
         >
+          <Connect(Component)
+            className={undefined}
+          />
+        </WithStyles(Badge)>
+        I was here!
+      </UNDEFINED>,
+      "className": undefined,
+      "onClick": [Function],
+      "size": "large",
+      "variant": "outlined",
+    },
+    "ref": null,
+    "rendered": Object {
+      "instance": null,
+      "key": undefined,
+      "nodeType": "function",
+      "props": Object {
+        "children": Array [
           <WithStyles(Badge)
             badgeContent={
               <FontAwesomeIcon
@@ -537,68 +497,15 @@ ShallowWrapper {
             <Connect(Component)
               className={undefined}
             />
-          </WithStyles(Badge)>
-        </WithStyles(Grid)>,
-        <WithStyles(Grid)
-          item={true}
-          xs={true}
-        >
-          <p>
-            This event already happened. 
-            0
-             people checked in without you.
-          </p>
-        </WithStyles(Grid)>,
-      ],
-    },
-    "ref": null,
-    "rendered": Array [
-      Object {
-        "instance": null,
-        "key": undefined,
-        "nodeType": "class",
-        "props": Object {
-          "children": <WithStyles(Badge)
-            badgeContent={
-              <FontAwesomeIcon
-                border={false}
-                className=""
-                fixedWidth={false}
-                flip={null}
-                icon={
-                  Array [
-                    "fa",
-                    "calendar-times",
-                  ]
-                }
-                inverse={false}
-                listItem={false}
-                mask={null}
-                pull={null}
-                pulse={false}
-                rotation={null}
-                size={null}
-                spin={false}
-                symbol={false}
-                transform={null}
-              />
-            }
-            color="error"
-          >
-            <Connect(Component)
-              className={undefined}
-            />
           </WithStyles(Badge)>,
-          "item": true,
-          "style": Object {
-            "textAlign": "center",
-          },
-          "xs": 2,
-        },
-        "ref": null,
-        "rendered": Object {
+          "I was here!",
+        ],
+      },
+      "ref": null,
+      "rendered": Array [
+        Object {
           "instance": null,
-          "key": undefined,
+          "key": "badge",
           "nodeType": "class",
           "props": Object {
             "badgeContent": <FontAwesomeIcon
@@ -642,62 +549,64 @@ ShallowWrapper {
           },
           "type": [Function],
         },
-        "type": [Function],
-      },
-      Object {
-        "instance": null,
-        "key": undefined,
-        "nodeType": "class",
-        "props": Object {
-          "children": <p>
-            This event already happened. 
-            0
-             people checked in without you.
-          </p>,
-          "item": true,
-          "xs": true,
-        },
-        "ref": null,
-        "rendered": Object {
-          "instance": null,
-          "key": undefined,
-          "nodeType": "host",
-          "props": Object {
-            "children": Array [
-              "This event already happened. ",
-              0,
-              " people checked in without you.",
-            ],
-          },
-          "ref": null,
-          "rendered": Array [
-            "This event already happened. ",
-            0,
-            " people checked in without you.",
-          ],
-          "type": "p",
-        },
-        "type": [Function],
-      },
-    ],
-    "type": Symbol(react.fragment),
+        "I was here!",
+      ],
+      "type": Symbol(react.fragment),
+    },
+    "type": [Function],
   },
   Symbol(enzyme.__nodes__): Array [
     Object {
       "instance": null,
       "key": undefined,
-      "nodeType": "function",
+      "nodeType": "class",
       "props": Object {
-        "children": Array [
-          <WithStyles(Grid)
-            item={true}
-            style={
-              Object {
-                "textAlign": "center",
-              }
+        "children": <UNDEFINED>
+          <WithStyles(Badge)
+            badgeContent={
+              <FontAwesomeIcon
+                border={false}
+                className=""
+                fixedWidth={false}
+                flip={null}
+                icon={
+                  Array [
+                    "fa",
+                    "calendar-times",
+                  ]
+                }
+                inverse={false}
+                listItem={false}
+                mask={null}
+                pull={null}
+                pulse={false}
+                rotation={null}
+                size={null}
+                spin={false}
+                symbol={false}
+                transform={null}
+              />
             }
-            xs={2}
+            color="error"
           >
+            <Connect(Component)
+              className={undefined}
+            />
+          </WithStyles(Badge)>
+          I was here!
+        </UNDEFINED>,
+        "className": undefined,
+        "onClick": [Function],
+        "size": "large",
+        "variant": "outlined",
+      },
+      "ref": null,
+      "rendered": Object {
+        "instance": null,
+        "key": undefined,
+        "nodeType": "function",
+        "props": Object {
+          "children": Array [
             <WithStyles(Badge)
               badgeContent={
                 <FontAwesomeIcon
@@ -728,68 +637,15 @@ ShallowWrapper {
               <Connect(Component)
                 className={undefined}
               />
-            </WithStyles(Badge)>
-          </WithStyles(Grid)>,
-          <WithStyles(Grid)
-            item={true}
-            xs={true}
-          >
-            <p>
-              This event already happened. 
-              0
-               people checked in without you.
-            </p>
-          </WithStyles(Grid)>,
-        ],
-      },
-      "ref": null,
-      "rendered": Array [
-        Object {
-          "instance": null,
-          "key": undefined,
-          "nodeType": "class",
-          "props": Object {
-            "children": <WithStyles(Badge)
-              badgeContent={
-                <FontAwesomeIcon
-                  border={false}
-                  className=""
-                  fixedWidth={false}
-                  flip={null}
-                  icon={
-                    Array [
-                      "fa",
-                      "calendar-times",
-                    ]
-                  }
-                  inverse={false}
-                  listItem={false}
-                  mask={null}
-                  pull={null}
-                  pulse={false}
-                  rotation={null}
-                  size={null}
-                  spin={false}
-                  symbol={false}
-                  transform={null}
-                />
-              }
-              color="error"
-            >
-              <Connect(Component)
-                className={undefined}
-              />
             </WithStyles(Badge)>,
-            "item": true,
-            "style": Object {
-              "textAlign": "center",
-            },
-            "xs": 2,
-          },
-          "ref": null,
-          "rendered": Object {
+            "I was here!",
+          ],
+        },
+        "ref": null,
+        "rendered": Array [
+          Object {
             "instance": null,
-            "key": undefined,
+            "key": "badge",
             "nodeType": "class",
             "props": Object {
               "badgeContent": <FontAwesomeIcon
@@ -833,45 +689,11 @@ ShallowWrapper {
             },
             "type": [Function],
           },
-          "type": [Function],
-        },
-        Object {
-          "instance": null,
-          "key": undefined,
-          "nodeType": "class",
-          "props": Object {
-            "children": <p>
-              This event already happened. 
-              0
-               people checked in without you.
-            </p>,
-            "item": true,
-            "xs": true,
-          },
-          "ref": null,
-          "rendered": Object {
-            "instance": null,
-            "key": undefined,
-            "nodeType": "host",
-            "props": Object {
-              "children": Array [
-                "This event already happened. ",
-                0,
-                " people checked in without you.",
-              ],
-            },
-            "ref": null,
-            "rendered": Array [
-              "This event already happened. ",
-              0,
-              " people checked in without you.",
-            ],
-            "type": "p",
-          },
-          "type": [Function],
-        },
-      ],
-      "type": Symbol(react.fragment),
+          "I was here!",
+        ],
+        "type": Symbol(react.fragment),
+      },
+      "type": [Function],
     },
   ],
   Symbol(enzyme.__options__): Object {
@@ -896,10 +718,10 @@ ShallowWrapper {
 }
 `;
 
-exports[`locationDisplay with current location should render a location description 1`] = `"LOCATION - Far away: 69 miles North"`;
+exports[`locationDisplay with current location should render a location description 1`] = `"LOCATION - Far away: 0 miles North"`;
 
-exports[`locationDisplay with current location should render a location description without event location 1`] = `"Far away: 69 miles North"`;
+exports[`locationDisplay with current location should render a location description without event location 1`] = `"Far away: 0 miles North"`;
 
 exports[`locationDisplay without current location should render a location description 1`] = `"LOCATION"`;
 
-exports[`locationDisplay without current location should render a location description without event location 1`] = `"Far away: 69 miles North"`;
+exports[`locationDisplay without current location should render a location description without event location 1`] = `"Far away: 0 miles North"`;

@@ -73,7 +73,6 @@ const mapPropsToModels = _props => {
 
 const mapStateToProps = state => {
     const nearbyEvents = getEventsWithLocation(state)
-        .sortBy(a => -a.relevance)
         .slice(0, 10)
         .toIndexedSeq()
     return {

@@ -11,8 +11,6 @@ import { connect } from 'react-redux'
 import ColorHash from 'color-hash'
 import fontColorContrast from 'font-color-contrast'
 import { library as faLibrary } from '@fortawesome/fontawesome'
-import distance from '@turf/distance'
-import bearing from '@turf/bearing'
 import { getCoords } from '@turf/invariant'
 import { withStyles } from '@material-ui/styles'
 import PropTypes from 'prop-types'
@@ -23,118 +21,122 @@ import faCalendarCheck from '@fortawesome/fontawesome-free-solid/faCalendarCheck
 import faCalendarTimes from '@fortawesome/fontawesome-free-solid/faCalendarTimes'
 import faLocationArrow from '@fortawesome/fontawesome-free-solid/faLocationArrow'
 import importedComponent from 'react-imported-component'
-import Breakpoint from '../../Breakpoint'
 import UserAvatar from '../UserAvatar'
 
 const MarkerMap = importedComponent(() => import('../mapping/MarkerMap'))
 
-import { getCurrentLocation } from '../../selectors/geocache'
-import { getCurrentUser } from '../../selectors/auth'
-import { WALKTIME_BREAKPOINTS, getEventsWithLocation } from '../../selectors/events'
+import { getEventsWithLocation } from '../../selectors/events'
 import { withModelData } from '../../store'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 faLibrary.add(faHourglass, faCalendarTimes, faCalendar, faCalendarCheck, faLocationArrow, faClock)
 
-const hasher = new ColorHash({lightness: 0.8})
-const buttonHasher = new ColorHash()
-const colorForEvent = evt => hasher.hex(evt.uid || '')
+const CheckInPanel = props => {
+    return (
+        <Grid style={{textAlign: 'center'}} spacing={8} container alignItems="center" justify="flex-start" >
+            <Grid item xs={12} md={4}><CheckInButton {...props} /></Grid>
+            <Grid item xs><CheckInFlavor {...props} /></Grid>
+        </Grid>
+    )
+}
 
-const SEGMENT = (360 / 8)
-const OFFSET = SEGMENT / 2
+const CheckInFlavor = props => {
+    const attendeeCount = props.event.attendee_count - (props.event.checkIn.hasCheckedIn ? 1 : 0)
 
-const COMPASS_BREAKPOINTS = new Breakpoint([
-    [-OFFSET, 'North'],
-    [SEGMENT - OFFSET, 'Northeast'],
-    [SEGMENT*2 - OFFSET, 'East'],
-    [SEGMENT*3 - OFFSET, 'Southeast'],
-    [SEGMENT*4 - OFFSET, 'South'],
-    [SEGMENT*5 - OFFSET, 'Southwest'],
-    [SEGMENT*6 - OFFSET, 'West'],
-    [SEGMENT*7 - OFFSET, 'North West'],
-    [undefined, 'North'],
-])
-
-export const locationDisplay = (evt, currentLocation) => {
-    if (currentLocation) {
-        const distanceDisplay = Math.round(distance(currentLocation, evt.geo, {units: 'miles'})) + ' miles'
-        const compassDisplay = COMPASS_BREAKPOINTS.getValue(bearing(currentLocation, evt.geo))
-        const walktimeDisplay = WALKTIME_BREAKPOINTS.getValue(evt.walktime)
-        const relativeDisplay = walktimeDisplay + ': ' + distanceDisplay + ' ' + compassDisplay
-        if (evt.location) {
-            return evt.location.raw + ' - ' + relativeDisplay
-        } else {
-            return relativeDisplay
-        }
+    if (props.event.checkIn.hasCheckedIn) {
+        return (
+            <p>You and {attendeeCount} others checked in.</p>
+        )
+    } else if (props.event.checkIn.canCheckIn) {
+        return (
+            <p><em>{attendeeCount > 0 ? attendeeCount + ' other people checked in.' : 'Be the first to check in!'}</em></p>
+        )
+    } else if (props.event.checkIn.isInPast) {
+        return (
+            <p>This event already happened. {attendeeCount} people checked in without you.</p>
+        )
+    } else if (props.event.checkIn.hasNotStarted) {
+        return (
+            <p>This event hasn&apos;t started yet.</p>
+        )
     } else {
-        if (evt.location) {
-            return evt.location.raw
-        } else {
-            return ''
-        }
+        return (
+            <p>{attendeeCount > 0 ? attendeeCount + ' people are checked in here.' : 'You are too far away to check in.'}</p>
+        )
     }
 }
 
 export const CheckInButton = props => {
-    const haveCheckedIn = props.checkedIn
-    const attendeeCount = props.event.attendees.length - (haveCheckedIn ? 1 : 0)
+    const haveCheckedIn = props.event.checkIn.hasCheckedIn
+    const doCheckIn = () => props.onCheckIn(props.event)
+    var buttonContents = null
 
     if (haveCheckedIn) {
         return (
-            <React.Fragment>
-                <Grid item xs={2} style={{textAlign: 'center'}}><Badge color="primary" badgeContent={<FontAwesomeIcon icon={['fa', 'calendar-check']} />}><UserAvatar className={props.classes.checkedInBadge} /></Badge></Grid>
-                <Grid item xs><p>You and {attendeeCount} others checked in.</p></Grid>
-            </React.Fragment>
+            <Badge
+                color="primary"
+                badgeContent={<FontAwesomeIcon icon={['fa', 'calendar-check']} />}>
+                <UserAvatar className={props.classes.checkedInBadge} />
+            </Badge>
         )
     } else if (props.event.checkIn.canCheckIn) {
-        return (
+        buttonContents = (
             <React.Fragment>
-                <Grid item xs={2} style={{textAlign: 'center'}}><Button style={{backgroundColor: buttonHasher.hex(props.event.uid)}} variant="outlined" size="large" className={props.classes.checkInButton} onClick={() => props.onCheckIn(props.event)}>
-                    <FontAwesomeIcon icon={['fa', 'calendar']} />
-                </Button></Grid>
-                <Grid item xs><p><em>{attendeeCount > 0 ? attendeeCount + ' other people checked in.' : 'Be the first to check in!'}</em></p></Grid>
+                <FontAwesomeIcon icon={['fa', 'calendar']} />
+                Check in!
             </React.Fragment>
         )
     } else if (props.event.checkIn.isInPast) {
-        return (
+        buttonContents = (
             <React.Fragment>
-                <Grid item xs={2} style={{textAlign: 'center'}}><Badge color="error" badgeContent={<FontAwesomeIcon icon={['fa', 'calendar-times']} />}><UserAvatar className={props.classes.checkedInBadge} /></Badge></Grid>
-                <Grid item xs><p>This event already happened. {attendeeCount} people checked in without you.</p></Grid>
+                <Badge
+                    key='badge'
+                    color="error"
+                    badgeContent={<FontAwesomeIcon icon={['fa', 'calendar-times']} />}>
+                    <UserAvatar className={props.classes.checkedInBadge} />
+                </Badge>
+                I was here!
             </React.Fragment>
         )
     } else if (props.event.checkIn.hasNotStarted) {
-        return (
+        buttonContents = (
             <React.Fragment>
-                <Grid item xs={2} style={{textAlign: 'center'}}><Badge color="secondary" badgeContent={<FontAwesomeIcon icon={['fa', 'hourglass']} />}><UserAvatar className={props.classes.checkedInBadge} /></Badge></Grid>
-                <Grid item xs><p>This event hasn&apos;t started yet.</p></Grid>
+                <Badge
+                    color="secondary"
+                    badgeContent={<FontAwesomeIcon icon={['fa', 'hourglass']} />}>
+                    <UserAvatar className={props.classes.checkedInBadge} />
+                </Badge>
+                RSVP
             </React.Fragment>
         )
     } else {
-        const eventBearing = props.currentLocation ? bearing(props.currentLocation, props.event.geo) - 45 : 0
-        return (
-            <React.Fragment>
-                <Grid item xs={2} style={{textAlign: 'center'}}><Avatar className={props.classes.eventLocator}>
-                    <FontAwesomeIcon icon={['fa', 'location-arrow']}  style={{transform: 'rotate('+eventBearing+'deg)'}}/>
-                </Avatar></Grid>
-                <Grid item xs><p>{attendeeCount > 0 ? attendeeCount + ' people are checked in here.' : 'You are too far away to check in.'}</p></Grid>
-            </React.Fragment>
+        const eventBearing = props.event.bearing - 45
+        buttonContents = (
+            <Avatar className={props.classes.eventLocator}>
+                <FontAwesomeIcon icon={['fa', 'location-arrow']}  style={{transform: 'rotate('+eventBearing+'deg)'}}/>
+            </Avatar>
         )
     }
+
+    return (
+        <Button
+            variant="outlined"
+            size="large"
+            onClick={doCheckIn}
+            className={props.classes.checkInButton} >
+            {buttonContents}
+        </Button>
+    )
 }
 
 export const EventCard = props => {
-    const cardColor = colorForEvent(props.event)
-    const textColor = fontColorContrast(cardColor)
-
-    const background = '-webkit-linear-gradient(left, ' + cardColor + ' 0%, ' + cardColor + 'aa 70%, ' + cardColor + '00 100%)'
-
     return (
-        <Card className={props.className} style={{backgroundColor: cardColor, color: textColor, ...props.style}}>
+        <Card className={props.classes.root + ' ' + props.className} >
             <CardContent style={{position: 'relative', zIndex: 1}}>
-                <div style={{width: '175%', height: '100%', overflow: 'hidden', top: 0, left: 0, flex: 'auto', display: 'flex', position: 'absolute', zIndex: -1}}>
+                <div className={props.classes.markerBackground}>
                     {props.event.geo ? <MarkerMap position={getCoords(props.event.geo)} center={getCoords(props.event.geo)} /> : null}
                 </div>
-                <div style={{width: '100%', height: '100%', top: 0, left: 0, position: 'absolute', zIndex: -1, background: background}} />
+                <div className={props.classes.markerBackgroundOverlay} />
                 <Grid style={{flexWrap: 'nowrap'}} direction="row" spacing={8} alignItems="stretch" container>
                     <Grid xs item>
                         <Typography variant="headline">{props.event.name}</Typography>
@@ -142,12 +144,12 @@ export const EventCard = props => {
                             <FontAwesomeIcon icon={['fa', 'clock']} />
                             &nbsp;{props.event.timestamp.calendar()} - {props.event.end_timestamp.calendar()}
                         </Typography>
-                        <p>{locationDisplay(props.event, props.currentLocation)}</p>
+                        <p>{props.event.locationDisplay}</p>
                     </Grid>
                 </Grid>
             </CardContent>
             <CardActions>
-                <Grid spacing={8} container alignItems="center" justify="flex-start" ><CheckInButton {...props} /></Grid>
+                <CheckInPanel {...props} />
             </CardActions>
         </Card>
     )
@@ -155,35 +157,61 @@ export const EventCard = props => {
 
 EventCard.propTypes = {
     event: PropTypes.object.isRequired,
-    currentLocation: PropTypes.object
 }
 
 EventCard.defaultProps = {
     classes: {},
-    style: {}
+    style: {},
+    className: ''
 }
 
 const mapStateToProps = (state, props) => {
-    const currentUser = getCurrentUser(state)
-    const evt = getEventsWithLocation(state).get(props.event_id)
-    const checkedIn = evt.attendees.indexOf(currentUser.email) != -1
-    const currentLocation = getCurrentLocation(state)
+    const evt = getEventsWithLocation(state, {event_id: props.event_id}).get(props.event_id)
     return {
-        currentUser,
         event: evt,
-        checkedIn,
-        currentLocation
     }
 }
 
+const buttonHasher = new ColorHash()
+const hasher = new ColorHash({lightness: 0.8})
+
+const cardColor = event => hasher.hex(event.uid || '')
+const buttonColor = event => buttonHasher.hex(event.uid || '')
+const textColor = event => fontColorContrast(cardColor(event))
+const fade = event => '-webkit-linear-gradient(left, ' + cardColor(event) + ' 0%, ' + cardColor(event) + 'aa 70%, ' + cardColor(event) + '00 100%)'
+
 const styles = {
+    root: {
+        background: props => cardColor(props.event || {}),
+        color: props => textColor(props.event || {})
+    },
+    markerBackgroundOverlay: {
+        width: '100%',
+        height: '100%',
+        top: 0,
+        left: 0,
+        position: 'absolute',
+        zIndex: -1,
+        background: props => fade(props.event || {})
+    },
+    markerBackground: {
+        width: '175%',
+        height: '100%',
+        overflow: 'hidden',
+        top: 0,
+        left: 0,
+        flex: 'auto',
+        display: 'flex',
+        position: 'absolute',
+        zIndex: -1
+    },
     checkedInBadge: {
         backgroundColor: '#3a5',
         minWidth: 0
     },
     checkInButton: {
-        backgroundColor: '#ddd',
-        minWidth: 0
+        minWidth: 0,
+        backgroundColor: props => buttonColor(props.event || {})
     },
     eventLocator: {
         backgroundColor: '#33f',
@@ -192,8 +220,16 @@ const styles = {
 }
 
 const mapPropsToModels = props => {
-    return {
-        events: props.event_id
+    const events = {
+        events: props.event_id,
+    }
+    if (props.event && !props.event.checkIn.hasCheckedIn) {
+        return {
+            ...events,
+            signups: {event: props.event_id}
+        }
+    } else {
+        return events
     }
 }
 
