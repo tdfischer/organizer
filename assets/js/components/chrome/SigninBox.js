@@ -6,7 +6,7 @@ import Divider from '@material-ui/core/Divider'
 import Typography from '@material-ui/core/Typography'
 import CircularProgress from '@material-ui/core/CircularProgress'
 import { connect } from 'react-redux'
-import { withTheme } from '@material-ui/core/styles'
+import { withTheme } from '@material-ui/styles'
 import { Form } from 'informed'
 import { withState } from 'recompose'
 

@@ -6,7 +6,7 @@ import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails'
 import Grid from '@material-ui/core/Grid'
 import { connect } from 'react-redux'
 import moment from 'moment'
-import { withStyles } from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/styles'
 
 import MessageCard from './MessageCard'
 import { getCurrentUser } from '../selectors/auth'

@@ -18,7 +18,7 @@ import InputLabel from '@material-ui/core/InputLabel'
 import MenuItem from '@material-ui/core/MenuItem'
 import FormControl from '@material-ui/core/FormControl'
 import Placeholder from 'react-placeholder'
-import { withStyles } from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/styles'
 import moment from 'moment'
 
 import MaterialFormText from './MaterialFormText'
@@ -221,4 +221,4 @@ const mapPropsToModels = props => {
     }
 }
 
-export default withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(withModelData(mapPropsToModels)(CaptainIndex)))
+export default withStyles(styles)(withModelData(mapPropsToModels)(connect(mapStateToProps, mapDispatchToProps)(CaptainIndex)))

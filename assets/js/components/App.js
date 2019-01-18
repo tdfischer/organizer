@@ -2,10 +2,13 @@ import React from 'react'
 import importedComponent from 'react-imported-component'
 import { hot } from 'react-hot-loader'
 
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles'
+import { ThemeProvider, jssPreset, createGenerateClassName } from '@material-ui/styles'
+import JssProvider from 'react-jss/lib/JssProvider'
+import { create } from 'jss'
 import { library as faLibrary } from '@fortawesome/fontawesome'
 import faTimes from '@fortawesome/fontawesome-free-solid/faTimes'
 import AppBar from '@material-ui/core/AppBar'
+import { createMuiTheme } from '@material-ui/core/styles'
 import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
 import Logo from './chrome/Logo'
@@ -34,7 +37,7 @@ const OrganizerBottomNav = importedComponent(() => import('./chrome/OrganizerBot
 
 
 export const App = _props => (
-    <MuiThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
         <div className="the-app">
             <OrganizerAppBar />
             <div className="viewport" id="viewport">
@@ -44,12 +47,14 @@ export const App = _props => (
             </div>
             <OrganizerBottomNav />
         </div>
-    </MuiThemeProvider>
+    </ThemeProvider>
 )
 
+const jss = create(jssPreset())
+const generateClassName = createGenerateClassName()
 
 const RouterApp = (props) => (
-    <ErrorWrapper><App {...props} /></ErrorWrapper>
+    <JssProvider jss={jss} generateClassName={generateClassName} ><ErrorWrapper><App {...props} /></ErrorWrapper></JssProvider>
 )
 
 export default hot(module)(RouterApp)
