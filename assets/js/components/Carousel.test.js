@@ -10,7 +10,7 @@ it('should render defaults safely', () => {
 
 it('should execute callbacks when buttons are clicked', () => {
     const setIndex = jest.fn()
-    const rendered = mount(<Carousel index={1} setIndex={setIndex}><p /><p /><p /></Carousel>)
+    const rendered = mount(<Carousel index={1} onIndexChanged={setIndex}><p /><p /><p /></Carousel>)
     const buttons = rendered.find(Button)
     expect(buttons).toHaveLength(2)
     buttons.first().simulate('click')
