@@ -26,21 +26,6 @@ const COMPASS_BREAKPOINTS = new Breakpoint([
     [undefined, 'North'],
 ])
 
-export const DAY_BREAKPOINTS = new Breakpoint([
-    [-60, 'Forever ago'],
-    [-30, 'Earlier this year'],
-    [-14, 'Earlier this month'],
-    [-7, 'Last week'],
-    [-1, 'Yesterday'],
-    [0, 'Today'],
-    [1, 'Tomorrow'],
-    [7, 'This week'],
-    [14, 'Next week'],
-    [7 * 4, 'Later this month'],
-    [7 * 6, 'Later this year'],
-    [undefined, 'In the distant future']
-])
-
 export const WALKTIME_BREAKPOINTS = new Breakpoint([
     [5, 'Nearby'],
     [15, 'By bike'],
@@ -161,18 +146,4 @@ export const getEventsWithLocation = createSelector(
             .map(evt => cookEventWithLocation(currentLocation, accuracy, evt, now, signups))
             .sort(evt => -evt.relevance)
     )
-)
-
-const groupByTime = now => (evt) => DAY_BREAKPOINTS.getPoint(evt.timestamp.diff(now, 'days'))
-
-export const makeGetUpcomingEvents = () => createSelector(
-    getNow,
-    getEventsWithLocation,
-    (now, relevantEvents) => {
-        return relevantEvents.toIndexedSeq()
-            .groupBy(groupByTime(now)).toKeyedSeq()
-            .sortBy((_v, k) => k)
-            .sort((a, b) => a-b)
-            .cacheResult()
-    }
 )

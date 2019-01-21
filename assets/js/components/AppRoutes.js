@@ -9,12 +9,9 @@ import LoadingSpinner from './chrome/LoadingSpinner'
 
 
 const MapIndex = importedComponent(() => import('./MapIndex'))
-const OrganizerDashboard = importedComponent(() => import('./OrganizerDashboard'), {
-    LoadingComponent: LoadingSpinner
-})
 const PeopleIndex = importedComponent(() => import('./PeopleIndex'))
 const CaptainIndex = importedComponent(() => import('./CaptainIndex'))
-const AnonEventCheckin = importedComponent(() => import('./events/AnonEventCheckin'), {
+const EventCheckin = importedComponent(() => import('./activities/checkin'), {
     LoadingComponent: LoadingSpinner
 })
 
@@ -25,10 +22,10 @@ export const AppRoutes = props => (
                 <Route exact path="/map" component={MapIndex} />
                 <Route exact path="/people" component={PeopleIndex} />
                 <Route exact path="/captain" component={CaptainIndex} />
-                <Route component={OrganizerDashboard} />
+                <Route component={EventCheckin} />
             </Switch>
         </ConnectedRouter>
-    ) : <AnonEventCheckin />
+    ) : <EventCheckin />
 )
 
 

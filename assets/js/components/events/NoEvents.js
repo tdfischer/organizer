@@ -7,12 +7,18 @@ import { withStyles } from '@material-ui/styles'
 faLibrary.add(faCalendar)
 
 export const NoEvents = props => (
-    <div className={props.classes.root}>
-        <FontAwesomeIcon icon={['fa', 'calendar']}  size="4x" />
-        <p>No events.</p>
-        <p><em>Go make some trouble.</em></p>
-    </div>
+    (props.show ? props.children : (
+        <div className={props.classes.root}>
+            <FontAwesomeIcon icon={['fa', 'calendar']}  size="4x" />
+            <p>No events.</p>
+            <p><em>Go make some trouble.</em></p>
+        </div>
+    ))
 )
+
+NoEvents.defaultProps = {
+    show: false
+}
 
 const styles = {
     root: {

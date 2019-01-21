@@ -8,7 +8,7 @@ const Carousel = props => (
     <React.Fragment>
         <Grid item><SwipeableViews className={props.className} index={props.index} onChangeIndex={idx => props.onIndexChanged(idx)} enableMouseEvents>{props.children}</SwipeableViews></Grid>
         <Grid item><MobileStepper
-            steps={props.children.length || 0} 
+            steps={props.children.length || (props.children.size || 0)} 
             position="static"
             activeStep={props.index}
             nextButton={<Button size="small" disabled={props.index >= (props.children.length || props.children.size) - 1} onClick={() => props.onIndexChanged(props.index+1)} >Next</Button>}
