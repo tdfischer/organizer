@@ -102,6 +102,8 @@ export default class Model {
         return (dispatch, getState) => {
             if (!this.immutableSelect(getState()).has(id)) {
                 return dispatch(this.fetchOne(id))
+            } else {
+                return Promise.resolve()
             }
         }
     }
@@ -113,8 +115,10 @@ export default class Model {
             return queuedFetch('/api/'+this.name+'/'+id+'/', {credentials: 'include'})
                 .then(response => response.json())
                 .then(json => {
-                    if (Object.keys(json).length > 0)
-                        return dispatch(this.receive([json]))
+                    if (Object.keys(json).length > 0) {
+                        dispatch(this.receive([json]))
+                    }
+                    return Promise.resolve()
                 })
         }
     }
@@ -138,7 +142,8 @@ export default class Model {
                         dispatch(this.receive(json.results))
                         return ret
                     } else {
-                        return dispatch(this.receive(json.results))
+                        dispatch(this.receive(json.results))
+                        return Promise.resolve()
                     }
                 })
         }
