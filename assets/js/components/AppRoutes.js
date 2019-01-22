@@ -5,20 +5,17 @@ import importedComponent from 'react-imported-component'
 import { history, withProvider } from '../store'
 import { getLoggedIn } from '../selectors/auth'
 import { connect } from 'react-redux'
-import CircularProgress from '@material-ui/core/CircularProgress'
+import LoadingSpinner from './chrome/LoadingSpinner'
 
-const LoadingDisplay = _props => (
-    <CircularProgress style={{width: '3rem', height: '3rem'}} />
-)
 
 const MapIndex = importedComponent(() => import('./MapIndex'))
 const OrganizerDashboard = importedComponent(() => import('./OrganizerDashboard'), {
-    LoadingComponent: LoadingDisplay
+    LoadingComponent: LoadingSpinner
 })
 const PeopleIndex = importedComponent(() => import('./PeopleIndex'))
 const CaptainIndex = importedComponent(() => import('./CaptainIndex'))
 const AnonEventCheckin = importedComponent(() => import('./events/AnonEventCheckin'), {
-    LoadingComponent: LoadingDisplay
+    LoadingComponent: LoadingSpinner
 })
 
 export const AppRoutes = props => (
