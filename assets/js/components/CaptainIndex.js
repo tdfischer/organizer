@@ -91,10 +91,10 @@ const mapDestinationPropsToModels = props => {
     }
 }
 
-const DestinationEditor = connect(destinationStateToProps)(withStyles(destinationStyles)(withFormState((withModelData(mapDestinationPropsToModels)(props => {
-    const selectedTurf = _.get(props.formState.values, props.field + '.turf')
-    const turf = _.find(props.turfs, _.matchesProperty('turf', selectedTurf))
-    const turfName = _.get(turf, 'name')
+const DestinationEditor = withStyles(destinationStyles)(withFormState((withModelData(mapDestinationPropsToModels)(connect(destinationStateToProps)(props => {
+    const selectedTurf = props.formState.values[props.field].turf
+    const turf = props.turfs.find(obj => obj.turf == selectedTurf) || {}
+    const turfName = turf.name
 
     const neighbors = _.map(props.people, neighbor => (
         <Chip
