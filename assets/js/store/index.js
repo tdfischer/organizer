@@ -41,6 +41,13 @@ export const persistor = persistStore(store)
 
 export const withModelData = mapModelToFetch => WrappedComponent => {
     return connect()(class Fetcher extends React.PureComponent {
+        constructor(params) {
+            super(params)
+            this.state = {
+                fetchErrors: {}
+            }
+        }
+
         componentDidMount() {
             this.fetch()
         }
@@ -52,18 +59,23 @@ export const withModelData = mapModelToFetch => WrappedComponent => {
         }
 
         fetch() {
-            Object.entries(mapModelToFetch(this.props)).forEach(([modelName, params]) => {
+            return Promise.all(Object.entries(mapModelToFetch(this.props)).map(([modelName, params]) => {
                 const model = new Model(modelName)
-                if (typeof(params) == 'object') {
-                    this.props.dispatch(model.fetchAll(params))
-                } else {
-                    this.props.dispatch(model.fetchIfNeeded(params))
+                const catcher = err => {
+                    this.setState(oldState => ({...oldState, [modelName]: err}))
+                    console.error("Failed to fetch %s %o", modelName, params, err)
+                    return err
                 }
-            })
+                if (typeof(params) == 'object') {
+                    return this.props.dispatch(model.fetchAll(params)).catch(catcher)
+                } else {
+                    return this.props.dispatch(model.fetchIfNeeded(params)).catch(catcher)
+                }
+            }))
         }
 
         render() {
-            return <WrappedComponent {...this.props} />
+            return <WrappedComponent {...this.state} {...this.props} />
         }
     })
 }
