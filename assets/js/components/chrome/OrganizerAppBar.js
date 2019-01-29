@@ -13,7 +13,6 @@ import Chip from '@material-ui/core/Chip'
 import { withStyles } from '@material-ui/core/styles'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import gravatar from 'gravatar'
 import Raven from 'raven-js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Logo from './Logo'
@@ -31,6 +30,7 @@ import { logout } from '../../actions'
 import { getCurrentUser, getLoggedIn } from '../../selectors/auth'
 import { withProvider, Model } from '../../store'
 import DialogOpener from '../DialogOpener'
+import UserAvatar from '../UserAvatar'
 
 const People = new Model('people')
 
@@ -78,7 +78,7 @@ export const OrganizerAppBar = (props) => (
                 {(doOpen, doClose, isOpen) => (
                     <React.Fragment>
                         {(props.logged_in) ? (
-                            <IconButton onClick={doOpen}><Avatar src={gravatar.url(props.current_user.email, {s: 32, d: 'retro'})}/></IconButton>
+                            <IconButton onClick={doOpen}><UserAvatar /></IconButton>
                         ) : (
                             <IconButton onClick={doOpen}><Logo style={{width: 'auto', height: '2rem', marginRight: '1rem'}}/></IconButton>
                         )}

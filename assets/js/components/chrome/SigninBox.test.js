@@ -22,12 +22,12 @@ it('should accept an email', () => {
 })
 
 it('should render a spinner while it is saving', () => {
-    const rendered = mount(<SigninBox isSaving={true} />)
+    const rendered = shallow(<SigninBox isSaving={true} />)
     expect(rendered.find(CircularProgress)).toHaveLength(1)
 })
 
 it('should render a thank you after it has saved', () => {
-    const rendered = mount(<SigninBox hasSaved={true} />)
+    const rendered = shallow(<SigninBox hasSaved={true} />)
     expect(rendered.find('Thanks')).toHaveLength(1)
 })
 

@@ -23,8 +23,8 @@ import faCalendarCheck from '@fortawesome/fontawesome-free-solid/faCalendarCheck
 import faCalendarTimes from '@fortawesome/fontawesome-free-solid/faCalendarTimes'
 import faLocationArrow from '@fortawesome/fontawesome-free-solid/faLocationArrow'
 import importedComponent from 'react-imported-component'
-import gravatar from 'gravatar'
 import Breakpoint from '../../Breakpoint'
+import UserAvatar from '../UserAvatar'
 
 const MarkerMap = importedComponent(() => import('../mapping/MarkerMap'))
 
@@ -82,7 +82,7 @@ export const CheckInButton = props => {
     if (haveCheckedIn) {
         return (
             <React.Fragment>
-                <Grid item xs={2} style={{textAlign: 'center'}}><Badge color="primary" badgeContent={<FontAwesomeIcon icon={['fa', 'calendar-check']} />}><Avatar src={gravatar.url(props.currentUser.email, {s:32, d: 'retro'})} className={props.classes.checkedInBadge} /></Badge></Grid>
+                <Grid item xs={2} style={{textAlign: 'center'}}><Badge color="primary" badgeContent={<FontAwesomeIcon icon={['fa', 'calendar-check']} />}><UserAvatar className={props.classes.checkedInBadge} /></Badge></Grid>
                 <Grid item xs><p>You and {attendeeCount} others checked in.</p></Grid>
             </React.Fragment>
         )
@@ -98,14 +98,14 @@ export const CheckInButton = props => {
     } else if (props.event.checkIn.isInPast) {
         return (
             <React.Fragment>
-                <Grid item xs={2} style={{textAlign: 'center'}}><Badge color="error" badgeContent={<FontAwesomeIcon icon={['fa', 'calendar-times']} />}><Avatar src={gravatar.url(props.currentUser.email, {s:32, d: 'retro'})} className={props.classes.checkedInBadge} /></Badge></Grid>
+                <Grid item xs={2} style={{textAlign: 'center'}}><Badge color="error" badgeContent={<FontAwesomeIcon icon={['fa', 'calendar-times']} />}><UserAvatar className={props.classes.checkedInBadge} /></Badge></Grid>
                 <Grid item xs><p>This event already happened. {attendeeCount} people checked in without you.</p></Grid>
             </React.Fragment>
         )
     } else if (props.event.checkIn.hasNotStarted) {
         return (
             <React.Fragment>
-                <Grid item xs={2} style={{textAlign: 'center'}}><Badge color="secondary" badgeContent={<FontAwesomeIcon icon={['fa', 'hourglass']} />}><Avatar src={gravatar.url(props.currentUser.email, {s:32, d: 'retro'})} className={props.classes.checkedInBadge} /></Badge></Grid>
+                <Grid item xs={2} style={{textAlign: 'center'}}><Badge color="secondary" badgeContent={<FontAwesomeIcon icon={['fa', 'hourglass']} />}><UserAvatar className={props.classes.checkedInBadge} /></Badge></Grid>
                 <Grid item xs><p>This event hasn&apos;t started yet.</p></Grid>
             </React.Fragment>
         )
