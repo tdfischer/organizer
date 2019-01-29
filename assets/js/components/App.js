@@ -8,7 +8,8 @@ import { library as faLibrary } from '@fortawesome/fontawesome'
 import faTimes from '@fortawesome/fontawesome-free-solid/faTimes'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
-import CircularProgress from '@material-ui/core/CircularProgress'
+import Typography from '@material-ui/core/Typography'
+import Logo from './chrome/Logo'
 
 faLibrary.add(faTimes)
 
@@ -18,9 +19,13 @@ const theme = createMuiTheme({
 
 const EmptyAppBar = _props => (
     <AppBar style={{position: 'initial'}}>
-        <Toolbar><CircularProgress /> Organizer</Toolbar>
+        <Toolbar>
+            <Logo style={{width: 'auto', height: '2rem', marginRight: '1rem'}} />
+            <Typography variant="title">{(window.ORG_METADATA || {}).name}</Typography>
+        </Toolbar>
     </AppBar>
 )
+
 const Button = importedComponent(() => import('@material-ui/core/Button'))
 const AppRoutes = importedComponent(() => import('./AppRoutes'))
 const OrganizerAppBar = importedComponent(() => import('./chrome/OrganizerAppBar'), {
