@@ -63,7 +63,7 @@ export const withModelData = mapModelToFetch => WrappedComponent => {
                 const model = new Model(modelName)
                 const catcher = err => {
                     this.setState(oldState => ({...oldState, [modelName]: err}))
-                    console.error("Failed to fetch %s %o", modelName, params, err)
+                    console.error('Failed to fetch %s %o', modelName, params, err)
                     return err
                 }
                 if (typeof(params) == 'object') {
