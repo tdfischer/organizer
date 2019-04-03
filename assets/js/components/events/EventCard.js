@@ -44,9 +44,15 @@ const CheckInFlavor = props => {
     const attendeeCount = props.event.attendee_count - (props.event.checkIn.hasCheckedIn ? 1 : 0)
 
     if (props.event.checkIn.hasCheckedIn) {
-        return (
-            <p>You and {attendeeCount} others checked in.</p>
-        )
+        if (props.event.checkIn.hasNotStarted) {
+            return (
+                <p>You and {attendeeCount} others have RSVP&quot;d!</p>
+            )
+        } else {
+            return (
+                <p>You and {attendeeCount} others checked in.</p>
+            )
+        }
     } else if (props.event.checkIn.canCheckIn) {
         return (
             <p><em>{attendeeCount > 0 ? attendeeCount + ' other people checked in.' : 'Be the first to check in!'}</em></p>
@@ -72,11 +78,12 @@ export const CheckInButton = props => {
     var buttonContents = null
 
     if (haveCheckedIn) {
-        return (
+        buttonContents = (
             <Badge
                 color="primary"
-                badgeContent={<FontAwesomeIcon icon={['fa', 'calendar-check']} />}>
-                <UserAvatar className={props.classes.checkedInBadge} />
+                badgeContent={<FontAwesomeIcon icon={['fa', 'calendar-check']} />}
+                classes={{badge: props.classes.checkedInBadge}}>
+                <UserAvatar className={props.classes.checkInAvatar} />
             </Badge>
         )
     } else if (props.event.checkIn.canCheckIn) {
@@ -90,10 +97,9 @@ export const CheckInButton = props => {
         buttonContents = (
             <React.Fragment>
                 <Badge
-                    key='badge'
                     color="error"
                     badgeContent={<FontAwesomeIcon icon={['fa', 'calendar-times']} />}>
-                    <UserAvatar className={props.classes.checkedInBadge} />
+                    <UserAvatar className={props.classes.checkInAvatar} />
                 </Badge>
                 I was here!
             </React.Fragment>
@@ -104,7 +110,7 @@ export const CheckInButton = props => {
                 <Badge
                     color="secondary"
                     badgeContent={<FontAwesomeIcon icon={['fa', 'hourglass']} />}>
-                    <UserAvatar className={props.classes.checkedInBadge} />
+                    <UserAvatar className={props.classes.checkInAvatar} />
                 </Badge>
                 RSVP
             </React.Fragment>
@@ -185,6 +191,18 @@ const styles = {
         background: props => cardColor(props.event || {}),
         color: props => textColor(props.event || {})
     },
+    '@keyframes swirl-in-bck': {
+        '0%': {
+            transform: 'rotate(540deg) scale(5)',
+            transformOrigin: '0% 100%',
+            opacity: 0
+        },
+        '100%': {
+            transform: 'rotate(0) scale(1)',
+            transformOrigin: '0% 100%',
+            opacity: 1
+        }
+    },
     markerBackgroundOverlay: {
         width: '100%',
         height: '100%',
@@ -205,9 +223,15 @@ const styles = {
         position: 'absolute',
         zIndex: -1
     },
-    checkedInBadge: {
+    checkInAvatar: {
         backgroundColor: '#3a5',
-        minWidth: 0
+        minWidth: 0,
+    },
+    checkedInBadge: {
+        animationName: '$swirl-in-bck',
+        animationDuration: '0.65s',
+        animationTimingFunction: 'ease-out',
+        animationFillMode: 'both'
     },
     checkInButton: {
         minWidth: 0,
