@@ -144,6 +144,6 @@ export const getEventsWithLocation = createSelector(
         allEvents
             .filter(evt => evt.geo != undefined)
             .map(evt => cookEventWithLocation(currentLocation, accuracy, evt, now, signups))
-            .sort(evt => -evt.relevance)
+            .sortBy(evt => -evt.relevance)
     )
 )
