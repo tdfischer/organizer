@@ -7,6 +7,9 @@ import importedComponent from 'react-imported-component'
 import moment from 'moment'
 import DialogContent from '@material-ui/core/DialogContent'
 import DialogTitle from '@material-ui/core/DialogTitle'
+import Typography from '@material-ui/core/Typography'
+import Avatar from '@material-ui/core/Avatar'
+import Button from '@material-ui/core/Button'
 
 const LoadingDisplay = _props => (
     <React.Fragment>
@@ -27,6 +30,7 @@ import { withCurrentLocation } from '../../../actions/geocache'
 import NoEvents from '../../events/NoEvents'
 import { withModelData, Model } from '../../../store'
 import Grid from '@material-ui/core/Grid'
+import EventCard from '../../events/EventCard.js'
 
 const Signups = new Model('signups')
 
@@ -39,21 +43,7 @@ const carouselStyles = {
         animationDirection: 'alternate',
         animationTimingFunction: 'ease-out',
         height: '14rem',
-        margin: '2rem'
-    },
-    sliderBar: {
-        backgroundColor: '#fafafa',
-        height: '4rem'
-    },
-    button: {
-        backgroundColor: '#ddd',
-        marginLeft: '1rem',
-        marginRight: '1rem',
-    },
-    indicator: {
-        backgroundColor: '#333',
-        borderRadius: '13px',
-        height: '0.5rem'
+        margin: '1rem'
     },
     '@keyframes fade': {
         from: {
@@ -66,26 +56,92 @@ const carouselStyles = {
 }
 
 const LoadingCarousel = withStyles(carouselStyles)(props => (
-    <Grid container spacing={8} direction="column" >
-        <Grid item xs={12} className={props.classes.card} />
-        <Grid item container alignItems="center" justify="space-between" xs={12} className={props.classes.sliderBar}>
-            <Grid item xs={2} className={props.classes.button} />
-            <Grid item xs={4} className={props.classes.indicator} />
-            <Grid item xs={2} className={props.classes.button} />
-        </Grid>
+    <Grid item container spacing={8} centerItems="stretch" direction="column">
+        <Grid item className={props.classes.card} />
+        <Grid item className={props.classes.card} />
     </Grid>
 ))
 
 const SignupForm = importedComponent(() => import('./SignupForm.js'), {
     LoadingComponent: LoadingDisplay
 })
-const EventCarousel = importedComponent(() => import('../../events/EventCarousel'), {
-    LoadingComponent: LoadingCarousel
-})
+
+const listStyles = {
+    container: {
+    },
+    card: {
+        margin: '1rem',
+    }
+}
+
+const grouper = evt => evt.timestamp.format('D MMM, ddd')
+const mapGroupContents = (events, onCheckIn, className) => events.map(evt => (
+    <Grid key={evt.id} item>
+        <EventCard className={className} onCheckIn={onCheckIn} event_id={evt.id} />
+    </Grid>
+))
+const mapEntries = (onCheckIn, className) => ([groupKey, contents], idx, fullSet) => {
+    const positionals = {
+        previous: idx > 0 ? idx - 1 : undefined,
+        next: idx < fullSet.size ? idx + 1 : undefined,
+        index: idx
+    }
+    return [
+        <GroupHeader {...positionals} size={contents.size} key={groupKey} timestamp={contents.first().timestamp} />,
+        ...mapGroupContents(contents, onCheckIn, className)
+    ]
+}
+
+const headerStyles = {
+    container: {
+        borderTop: '1px solid #ddd',
+        marginTop: '1rem',
+        position: 'sticky',
+        top: 0,
+        left: 0,
+        zIndex: 1000,
+        backgroundColor: '#eee',
+        padding: '1rem'
+    },
+    day: {
+        backgroundColor: props => props.timestamp.isBefore(moment(), 'day') ? '#aaa' : (props.timestamp.isSame(moment(), 'day') ? '#33a' : '#a33'),
+        margin: 'auto'
+    },
+    dayText: {
+        marginRight: '1rem'
+    }
+}
+
+const GroupHeader = withStyles(headerStyles)(props => (
+    <Grid className={props.classes.container} item container alignItems="center" id={props.index}>
+        <Grid item xs={2}>
+            <Avatar className={props.classes.day} >{props.timestamp.format('D')}</Avatar>
+        </Grid>
+        <Grid item xs>
+            <Typography className={props.classes.dayText} variant="subheadline">{props.timestamp.format('MMM, ddd')}</Typography>
+            <Typography variant="caption">{props.size} event{props.size == 1 ? null : 's'} {props.timestamp.calendar(null, {sameDay: '[today]', nextDay: '[tomorrow]', lastDay: '[yesterday]', lastWeek: '[last] dddd', nextWeek: '[this] dddd' })}</Typography>
+        </Grid>
+        <Grid item xs={2}>{props.previous != undefined ? <a href={'#'+props.previous}><Button size="small" variant="outlined">&laquo;</Button></a> : null}</Grid>
+        <Grid item xs={2}>{props.next != undefined ? <a href={'#'+props.next}><Button size="small" variant="outlined">&raquo;</Button></a> : null}</Grid>
+    </Grid>
+))
+
+const EventList = withStyles(listStyles)(props => (
+    <div className={props.classes.container}>
+        <Grid direction="column" container>
+            {props.events
+                .groupBy(grouper)
+                .entrySeq()
+                .flatMap(mapEntries(props.onCheckIn, props.classes.card))
+                .toArray()}
+        </Grid>
+    </div>
+))
 
 export const EventPanel = props => {
-    const eventID = props.nearbyEvents.get(props.index, {}).id
-    const doCheckIn = () => {
+    const eventID = props.eventID
+    const doCheckIn = (eventID) => {
+        props.setIndex(eventID)
         if (props.loggedIn) {
             props.createSignup({email: props.currentUser.email}, eventID)
         } else {
@@ -96,11 +152,9 @@ export const EventPanel = props => {
         props.hasFetched ? (
             <React.Fragment>
                 <NoEvents show={props.nearbyEvents.count() > 0}>
-                    <EventCarousel
+                    <EventList
                         events={props.nearbyEvents}
-                        index={props.index}
-                        onCheckIn={doCheckIn}
-                        onIndexChanged={props.setIndex} />
+                        onCheckIn={doCheckIn} />
                 </NoEvents>
                 <Dialog open={props.isOpen} onClose={() => props.setOpen(false)}>
                     <SignupForm createSignup={props.createSignup} event_id={eventID} />
@@ -148,4 +202,4 @@ const mapPropsToModels = _props => {
     }
 }
 
-export default withCurrentLocation(withModelData(mapPropsToModels)(withState('isOpen', 'setOpen', false)(withState('index', 'setIndex', 0)(connect(mapStateToProps, mapDispatchToProps)(EventPanel)))))
+export default withCurrentLocation(withModelData(mapPropsToModels)(withState('isOpen', 'setOpen', false)(withState('index', 'setIndex', -1)(connect(mapStateToProps, mapDispatchToProps)(EventPanel)))))

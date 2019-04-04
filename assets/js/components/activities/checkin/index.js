@@ -3,7 +3,6 @@ import { withStyles } from '@material-ui/styles'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 import Divider from '@material-ui/core/Divider'
-import moment from 'moment'
 import { connect } from 'react-redux'
 
 import LoginButtons from '../../chrome/LoginButtons'
@@ -71,7 +70,7 @@ const IntroPanel = connect(mapIntroStateToProps)(withModelData(propsToModels)(pr
     <React.Fragment>
         <Typography variant="headline">What&apos;s happening?</Typography>
         {props.loggedIn ? (
-            <Typography variant="subheading">{props.currentPerson ? 'Hello, '+props.currentPerson.name+'!' : null} It is {moment().calendar()}.</Typography>
+            <Typography variant="subheading">{props.currentPerson ? 'Hello, '+props.currentPerson.name+'!' : null}</Typography>
         ) : (
             <Typography variant="subheading">Sign up to join an event with {orgName} and <em>get organized</em>.</Typography>
         )}
@@ -81,11 +80,11 @@ const IntroPanel = connect(mapIntroStateToProps)(withModelData(propsToModels)(pr
 export const EventCheckin = props => {
     return (
         <React.Fragment>
-            <Grid container justify="space-evenly" alignItems="stretch" style={{marginTop: '1rem'}} spacing={8}>
+            <Grid container justify="space-evenly" alignItems="stretch" style={{marginTop: '1rem'}}>
                 <Grid xs={12} sm={5} md={4} item style={{paddingLeft: '1rem', paddingRight: '1rem'}}>
                     <IntroPanel />
                 </Grid>
-                <Grid xs={12} sm={7} md={8} item container direction="column" style={{flexWrap: 'nowrap', paddingLeft: 0, paddingRight: 0}}>
+                <Grid xs={12} sm={7} md={8} item container direction="column">
                     <EventPanel />
                 </Grid>
                 {props.loggedIn ? null : <Description className={props.classes.whatItIs} />}
