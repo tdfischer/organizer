@@ -180,16 +180,17 @@ const mapStateToProps = (state, props) => {
 
 const buttonHasher = new ColorHash()
 const hasher = new ColorHash({lightness: 0.8})
+const pastHasher = new ColorHash({lightness: 0.8, saturation: 0.1})
 
-const cardColor = event => hasher.hex(event.uid || '')
+const cardColor = event => (event.checkIn && event.checkIn.isInPast) ? pastHasher.hex(event.uid || '') : hasher.hex(event.uid || '')
 const buttonColor = event => buttonHasher.hex(event.uid || '')
 const textColor = event => fontColorContrast(cardColor(event))
 const fade = event => '-webkit-linear-gradient(left, ' + cardColor(event) + ' 0%, ' + cardColor(event) + 'aa 70%, ' + cardColor(event) + '00 100%)'
 
 const styles = {
     root: {
-        background: props => cardColor(props.event || {}),
-        color: props => textColor(props.event || {})
+        background: props => cardColor(props.event || {checkIn:{}}),
+        color: props => textColor(props.event || {checkIn:{}})
     },
     '@keyframes swirl-in-bck': {
         '0%': {
@@ -244,17 +245,9 @@ const styles = {
 }
 
 const mapPropsToModels = props => {
-    const events = {
+    return {
         events: props.event_id,
-    }
-    if (props.event && !props.event.checkIn.hasCheckedIn) {
-        return {
-            ...events,
-            signups: {event: props.event_id}
-        }
-    } else {
-        return events
     }
 }
 
-export default withStyles(styles)(connect(mapStateToProps)(withModelData(mapPropsToModels)(EventCard)))
+export default connect(mapStateToProps)(withModelData(mapPropsToModels)(withStyles(styles)(EventCard)))
