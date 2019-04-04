@@ -1,7 +1,9 @@
+import React from 'react'
 import { createSelector } from 'reselect'
 import { bindActionCreators } from 'redux'
 import { point } from '@turf/helpers'
 import { getCoord } from '@turf/invariant'
+import { connect } from 'react-redux'
 
 import { csrftoken } from '../Django'
 import Queue from 'promise-queue'
@@ -235,4 +237,50 @@ export default class Model {
             models: results || []
         }
     }
+}
+
+export const withModelData = mapModelToFetch => WrappedComponent => {
+    return connect()(class Fetcher extends React.Component {
+        constructor(props) {
+            super(props)
+            this.state = {
+                hasFetched: false,
+                fetchErrors: {}
+            }
+        }
+
+        componentDidMount() {
+            this.fetch()
+        }
+
+        componentDidUpdate(prevProps) {
+            if (prevProps.model != this.props.model) {
+                this.fetch()
+            }
+        }
+
+        fetch() {
+            return Promise.all(Object.entries(mapModelToFetch(this.props)).map(([modelName, params]) => {
+                const model = new Model(modelName)
+                const catcher = err => {
+                    this.setState(oldState => ({...oldState, [modelName]: err}))
+                    console.error('Failed to fetch %s %o', modelName, params, err)
+                    return err
+                }
+                if (typeof(params) == 'object') {
+                    this.props.dispatch(model.fetchAll(params)).catch(catcher).then(() => {
+                        this.setState({hasFetched: true})
+                    })
+                } else {
+                    this.props.dispatch(model.fetchIfNeeded(params)).catch(catcher).then(() => {
+                        this.setState({hasFetched: true})
+                    })
+                }
+            }))
+        }
+
+        render() {
+            return <WrappedComponent {...this.state} {...this.props} />
+        }
+    })
 }
