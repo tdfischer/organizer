@@ -131,7 +131,7 @@ export const cookEventWithLocation = (currentLocation, accuracy, evt, now, signu
     }
 }
 
-const getNow = () => moment()
+const getNow = () => Date.now()
 
 // FIXME: This won't update event check in status as time marches forward
 export const getEventsWithLocation = createSelector(
