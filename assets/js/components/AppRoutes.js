@@ -5,14 +5,13 @@ import importedComponent from 'react-imported-component'
 import { history, withProvider } from '../store'
 import { getLoggedIn } from '../selectors/auth'
 import { connect } from 'react-redux'
-import LoadingSpinner from './chrome/LoadingSpinner'
+import Skeleton from './activities/checkin/Skeleton'
 
-
-const MapIndex = importedComponent(() => import('./MapIndex'))
-const PeopleIndex = importedComponent(() => import('./PeopleIndex'))
-const CaptainIndex = importedComponent(() => import('./CaptainIndex'))
-const EventCheckin = importedComponent(() => import('./activities/checkin'), {
-    LoadingComponent: LoadingSpinner
+const MapIndex = importedComponent(() => import(/* webpackChunkName:'map' */ './MapIndex'))
+const PeopleIndex = importedComponent(() => import(/* webpackChunkName:'people' */ './PeopleIndex'))
+const CaptainIndex = importedComponent(() => import(/* webpackChunkName:'captain' */'./CaptainIndex'))
+const EventCheckin = importedComponent(() =>import(/* webpackChunkName:'checkin' */ './activities/checkin'), {
+    LoadingComponent: Skeleton
 })
 
 export const AppRoutes = props => (
