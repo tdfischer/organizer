@@ -505,7 +505,7 @@ ShallowWrapper {
       "rendered": Array [
         Object {
           "instance": null,
-          "key": "badge",
+          "key": undefined,
           "nodeType": "class",
           "props": Object {
             "badgeContent": <FontAwesomeIcon
@@ -645,7 +645,7 @@ ShallowWrapper {
         "rendered": Array [
           Object {
             "instance": null,
-            "key": "badge",
+            "key": undefined,
             "nodeType": "class",
             "props": Object {
               "badgeContent": <FontAwesomeIcon

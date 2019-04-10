@@ -148,7 +148,7 @@ export const EventCard = props => {
                         <Typography variant="headline">{props.event.name}</Typography>
                         <Typography variant="subheading">
                             <FontAwesomeIcon icon={['fa', 'clock']} />
-                            &nbsp;{props.event.timestamp.calendar()} - {props.event.end_timestamp.calendar()}
+                            &nbsp;{props.event.timestamp.format('h:mm A')} - {props.event.end_timestamp.format('h:mm A')}
                         </Typography>
                         <p>{props.event.locationDisplay}</p>
                     </Grid>
