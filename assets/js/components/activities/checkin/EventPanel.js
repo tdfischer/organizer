@@ -31,38 +31,11 @@ import NoEvents from '../../events/NoEvents'
 import { withModelData, Model } from '../../../store'
 import Grid from '@material-ui/core/Grid'
 import EventCard from '../../events/EventCard.js'
+import Skeleton from './Skeleton'
 
 const Signups = new Model('signups')
 
-const carouselStyles = {
-    card: {
-        backgroundColor: '#eee',
-        animationName: '$fade',
-        animationDuration: '1s',
-        animationIterationCount: 'infinite',
-        animationDirection: 'alternate',
-        animationTimingFunction: 'ease-out',
-        height: '14rem',
-        margin: '1rem'
-    },
-    '@keyframes fade': {
-        from: {
-            backgroundColor: '#fafafa'
-        },
-        to: {
-            backgroundColor: '#ddd'
-        }
-    }
-}
-
-const LoadingCarousel = withStyles(carouselStyles)(props => (
-    <Grid item container spacing={8} centerItems="stretch" direction="column">
-        <Grid item className={props.classes.card} />
-        <Grid item className={props.classes.card} />
-    </Grid>
-))
-
-const SignupForm = importedComponent(() => import('./SignupForm.js'), {
+const SignupForm = importedComponent(() => import('./SignupForm'), {
     LoadingComponent: LoadingDisplay
 })
 
@@ -118,7 +91,7 @@ const GroupHeader = withStyles(headerStyles)(props => (
             <Avatar className={props.classes.day} >{props.timestamp.format('D')}</Avatar>
         </Grid>
         <Grid item xs>
-            <Typography className={props.classes.dayText} variant="subheadline">{props.timestamp.format('MMM, ddd')}</Typography>
+            <Typography className={props.classes.dayText} variant="caption">{props.timestamp.format('MMM, ddd')}</Typography>
             <Typography variant="caption">{props.size} event{props.size == 1 ? null : 's'} {props.timestamp.calendar(null, {sameDay: '[today]', nextDay: '[tomorrow]', lastDay: '[yesterday]', lastWeek: '[last] dddd', nextWeek: '[this] dddd' })}</Typography>
         </Grid>
         <Grid item xs={2}>{props.previous != undefined ? <a href={'#'+props.previous}><Button size="small" variant="outlined">&laquo;</Button></a> : null}</Grid>
@@ -132,8 +105,7 @@ const EventList = withStyles(listStyles)(props => (
             {props.events
                 .groupBy(grouper)
                 .entrySeq()
-                .flatMap(mapEntries(props.onCheckIn, props.classes.card))
-                .toArray()}
+                .flatMap(mapEntries(props.onCheckIn, props.classes.card))}
         </Grid>
     </div>
 ))
@@ -161,7 +133,7 @@ export const EventPanel = props => {
                 </Dialog>
             </React.Fragment>
         ) : (
-            <LoadingCarousel />
+            <Skeleton />
         )
     )
 }

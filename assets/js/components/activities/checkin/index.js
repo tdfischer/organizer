@@ -1,4 +1,5 @@
 import React from 'react'
+import importedComponent from 'react-imported-component'
 import { withStyles } from '@material-ui/styles'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
@@ -7,10 +8,14 @@ import { connect } from 'react-redux'
 
 import LoginButtons from '../../chrome/LoginButtons'
 import Logo from '../../chrome/Logo'
-import EventPanel from './EventPanel'
 import { getCurrentUser, getLoggedIn } from '../../../selectors/auth'
 import { getCurrentPerson } from '../../../selectors/people'
 import { withModelData } from '../../../store'
+import Skeleton from './Skeleton'
+
+const EventPanel = importedComponent(() => import('./EventPanel'), {
+    LoadingComponent: Skeleton
+})
 
 const Description = props => (
     <Grid xs={12} item container justify="center" spacing={8} {...props}>
