@@ -1,4 +1,5 @@
-export { store } from './store'
+import { store } from './store'
+export store
 export { default as Model, withModelData } from './model'
 export { default as Selectable } from './select'
 export { default as Filterable } from './filter'
