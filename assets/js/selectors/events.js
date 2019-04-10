@@ -106,9 +106,7 @@ export const cookEventWithLocation = (currentLocation, accuracy, evt, now, signu
     const isInPast = endTimeFromNow <= -120
     const canCheckIn = isNearby && !isInPast && !hasNotStarted
     const walktime = (distanceFromHere * 1000) / 84
-    // Five minutes is about how long it takes someone to decide and get out the door
-    const absoluteRelevance = (timeFromNow/15) - (walktime / 45)
-    const relevance = 1 / Math.log10(Math.abs(absoluteRelevance))
+    const relevance = -timeFromNow
     const hasCheckedIn = hasSignedUp || evt.user_has_checked_in
     const evtBearing = bearing(currentLocation ? currentLocation : evt.geo, evt.geo)
     const evtWithoutDisplay = {
