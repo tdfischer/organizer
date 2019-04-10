@@ -105,6 +105,7 @@
       [
         "env",
         {
+          "modules": false,
           "targets": {
             "node": "current"
           }
