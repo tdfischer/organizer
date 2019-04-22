@@ -31,7 +31,7 @@ const EmptyAppBar = _props => (
 
 const AppRoutes = importedComponent(() => import('./AppRoutes'))
 const OrganizerAppBar = importedComponent(() => import('./chrome/OrganizerAppBar'), {
-    LoadingComponent: EmptyAppBar
+    LoadingComponent: () => <EmptyAppBar />
 })
 const OrganizerBottomNav = importedComponent(() => import('./chrome/OrganizerBottomNav'))
 

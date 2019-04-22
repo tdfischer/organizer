@@ -11,7 +11,7 @@ const MapIndex = importedComponent(() => import(/* webpackChunkName:'map' */ './
 const PeopleIndex = importedComponent(() => import(/* webpackChunkName:'people' */ './PeopleIndex'))
 const CaptainIndex = importedComponent(() => import(/* webpackChunkName:'captain' */'./CaptainIndex'))
 const EventCheckin = importedComponent(() =>import(/* webpackChunkName:'checkin' */ './activities/checkin'), {
-    LoadingComponent: Skeleton
+    LoadingComponent: () => <Skeleton />
 })
 
 export const AppRoutes = props => (

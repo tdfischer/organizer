@@ -36,7 +36,7 @@ import Skeleton from './Skeleton'
 const Signups = new Model('signups')
 
 const SignupForm = importedComponent(() => import('./SignupForm'), {
-    LoadingComponent: LoadingDisplay
+    LoadingComponent: () => <LoadingDisplay />
 })
 
 const listStyles = {
