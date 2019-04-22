@@ -10,7 +10,7 @@ import MaterialFormText from '../../MaterialFormText'
 export const SignupForm = props => {
     const orgName = (window.ORG_METADATA || {}).name
     return (
-        <Form onSubmit={values => props.createSignup(values, props.event_id).then(() => props.setHasSaved(true))}>
+        <Form onSubmit={values => props.onSubmit(values).then(() => props.setHasSaved(true))}>
             {props.hasSaved ? (
                 <React.Fragment>
                     <DialogTitle>Thanks!</DialogTitle>

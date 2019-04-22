@@ -99,7 +99,7 @@ const GroupHeader = withStyles(headerStyles)(props => (
     </Grid>
 ))
 
-const EventList = withStyles(listStyles)(props => (
+export const EventListBase = props => (
     <div className={props.classes.container}>
         <Grid direction="column" container>
             {props.events
@@ -108,34 +108,41 @@ const EventList = withStyles(listStyles)(props => (
                 .flatMap(mapEntries(props.onCheckIn, props.classes.card))}
         </Grid>
     </div>
-))
+)
+
+export const EventList = withStyles(listStyles)(EventListBase)
 
 export const EventPanel = props => {
     const eventID = props.eventID
-    const doCheckIn = (eventID) => {
-        props.setIndex(eventID)
+    const submitSignup = (id) => props.createSignup({email: props.currentUser.email}, id)
+    const doCheckIn = (evt) => {
         if (props.loggedIn) {
-            props.createSignup({email: props.currentUser.email}, eventID)
+            submitSignup(evt.id)
         } else {
+            props.setEventID(evt.id)
             props.setOpen(true)
         }
     }
     return (
         props.hasFetched ? (
-            <React.Fragment>
-                <NoEvents show={props.nearbyEvents.count() > 0}>
-                    <EventList
-                        events={props.nearbyEvents}
-                        onCheckIn={doCheckIn} />
-                </NoEvents>
-                <Dialog open={props.isOpen} onClose={() => props.setOpen(false)}>
-                    <SignupForm createSignup={props.createSignup} event_id={eventID} />
-                </Dialog>
-            </React.Fragment>
+            <NoEvents show={props.nearbyEvents.count() > 0}>
+                <EventList
+                    events={props.nearbyEvents}
+                    onCheckIn={doCheckIn} />
+                    <Dialog open={props.isOpen} onClose={() => props.setOpen(false)}>
+                        <SignupForm onSubmit={() => submitSignup(eventID)} />
+                    </Dialog>
+            </NoEvents>
         ) : (
             <Skeleton />
         )
     )
+}
+
+EventPanel.defaultProps = {
+  currentUser: {},
+  loggedIn: false,
+  isOpen: false,
 }
 
 const mapDispatchToProps = (dispatch) => {
@@ -174,4 +181,4 @@ const mapPropsToModels = _props => {
     }
 }
 
-export default withCurrentLocation(withModelData(mapPropsToModels)(withState('isOpen', 'setOpen', false)(withState('index', 'setIndex', -1)(connect(mapStateToProps, mapDispatchToProps)(EventPanel)))))
+export default withCurrentLocation(withModelData(mapPropsToModels)(withState('isOpen', 'setOpen', false)(withState('eventID', 'setEventID', -1)(connect(mapStateToProps, mapDispatchToProps)(EventPanel)))))
