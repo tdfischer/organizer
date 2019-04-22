@@ -25,7 +25,7 @@ const carouselStyles = {
 }
 
 export const Skeleton = props => (
-    <Grid item container spacing={8} centerItems="stretch" direction="column">
+    <Grid item container spacing={8} alignItems="stretch" direction="column">
         <Grid item className={props.classes.card} />
         <Grid item className={props.classes.card} />
     </Grid>

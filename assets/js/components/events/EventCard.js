@@ -145,8 +145,8 @@ export const EventCard = props => {
                 <div className={props.classes.markerBackgroundOverlay} />
                 <Grid style={{flexWrap: 'nowrap'}} direction="row" spacing={8} alignItems="stretch" container>
                     <Grid xs item>
-                        <Typography variant="headline">{props.event.name}</Typography>
-                        <Typography variant="subheading">
+                        <Typography variant="h5">{props.event.name}</Typography>
+                        <Typography variant="subtitle1">
                             <FontAwesomeIcon icon={['fa', 'clock']} />
                             &nbsp;{props.event.timestamp.format('h:mm A')} - {props.event.end_timestamp.format('h:mm A')}
                         </Typography>

@@ -91,10 +91,10 @@ export const OrganizerAppBar = (props) => (
             <div className={props.classes.flex}>
                 {(props.logged_in) ? (
                     <React.Fragment>
-                        <Typography color="inherit" variant="title">{props.currentPerson.name || ''}</Typography>
-                        <Typography color="inherit" variant="subheading">{props.current_user.email}</Typography>
+                        <Typography color="inherit" variant="h6">{props.currentPerson.name || ''}</Typography>
+                        <Typography color="inherit" variant="subtitle1">{props.current_user.email}</Typography>
                     </React.Fragment>
-                ) : (<Typography color="inherit" variant="title">{(window.ORG_METADATA || {}).name}</Typography>)}
+                ) : (<Typography color="inherit" variant="h6">{(window.ORG_METADATA || {}).name}</Typography>)}
             </div>
             {(props.logged_in) ? (
                 <div className={props.classes.flex}>
