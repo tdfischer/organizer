@@ -67,12 +67,8 @@ module.exports = {
             skipWaiting: true,
             runtimeCaching: [
                 {
-                    urlPattern: new RegExp('https://fonts.(?:googleapis|gstatic).com/(.*)'),
+                    urlPattern: new RegExp('https?://www.gravatar.com/'),
                     handler: 'staleWhileRevalidate'
-                },
-                {
-                    urlPattern: new RegExp('https://cdn.ravenjs.com/(.*)'),
-                    handler: 'networkFirst'
                 },
                 {
                     urlPattern: new RegExp(/\/api\//),

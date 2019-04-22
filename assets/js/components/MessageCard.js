@@ -5,7 +5,7 @@ import CardContent from '@material-ui/core/CardContent'
 import Avatar from '@material-ui/core/Avatar'
 import { connect } from 'react-redux'
 import { Model, withModelData } from '../store'
-import { withStyles } from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/styles'
 import gravatar from 'gravatar'
 
 const Turfs = new Model('turfs')

@@ -28,7 +28,7 @@ class Signup(models.Model):
     phone = models.CharField(max_length=200, blank=True, null=True)
     created = models.DateField(auto_now_add=True)
     approved = models.BooleanField(default=False)
-    event = models.ForeignKey(Event, null=True, blank=True)
+    event = models.ForeignKey(Event, null=True, blank=True, related_name='signups')
 
     def __unicode__(self):
         return '%s: %s'%(self.email, self.event)

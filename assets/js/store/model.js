@@ -1,7 +1,9 @@
+import React from 'react'
 import { createSelector } from 'reselect'
 import { bindActionCreators } from 'redux'
 import { point } from '@turf/helpers'
 import { getCoord } from '@turf/invariant'
+import { connect } from 'react-redux'
 
 import { csrftoken } from '../Django'
 import Queue from 'promise-queue'
@@ -102,6 +104,8 @@ export default class Model {
         return (dispatch, getState) => {
             if (!this.immutableSelect(getState()).has(id)) {
                 return dispatch(this.fetchOne(id))
+            } else {
+                return Promise.resolve()
             }
         }
     }
@@ -113,8 +117,10 @@ export default class Model {
             return queuedFetch('/api/'+this.name+'/'+id+'/', {credentials: 'include'})
                 .then(response => response.json())
                 .then(json => {
-                    if (Object.keys(json).length > 0)
-                        return dispatch(this.receive([json]))
+                    if (Object.keys(json).length > 0) {
+                        dispatch(this.receive([json]))
+                    }
+                    return Promise.resolve()
                 })
         }
     }
@@ -138,7 +144,8 @@ export default class Model {
                         dispatch(this.receive(json.results))
                         return ret
                     } else {
-                        return dispatch(this.receive(json.results))
+                        dispatch(this.receive(json.results))
+                        return Promise.resolve()
                     }
                 })
         }
@@ -230,4 +237,64 @@ export default class Model {
             models: results || []
         }
     }
+}
+
+export const withModelData = mapModelToFetch => WrappedComponent => {
+    return connect()(class Fetcher extends React.Component {
+        constructor(props) {
+            super(props)
+            this.cancelled = false
+            this.state = {
+                hasFetched: false,
+                fetchErrors: {}
+            }
+        }
+
+        componentDidMount() {
+            this.fetch()
+        }
+
+        componentWillUnmount() {
+            this.cancelled = true
+        }
+
+        componentDidUpdate(prevProps) {
+            if (prevProps.model != this.props.model) {
+                this.fetch()
+            }
+        }
+
+        fetch() {
+            return Promise.all(Object.entries(mapModelToFetch(this.props)).map(([modelName, params]) => {
+                const model = new Model(modelName)
+                const catcher = err => {
+                    if (this.cancelled) {
+                        return
+                    }
+                    this.setState(oldState => ({...oldState, [modelName]: err}))
+                    console.error('Failed to fetch %s %o', modelName, params, err)
+                    return err
+                }
+                if (typeof(params) == 'object') {
+                    this.props.dispatch(model.fetchAll(params)).catch(catcher).then(() => {
+                        if (this.cancelled) {
+                            return
+                        }
+                        this.setState({hasFetched: true})
+                    })
+                } else {
+                    this.props.dispatch(model.fetchIfNeeded(params)).catch(catcher).then(() => {
+                        if (this.cancelled) {
+                            return
+                        }
+                        this.setState({hasFetched: true})
+                    })
+                }
+            }))
+        }
+
+        render() {
+            return <WrappedComponent {...this.state} {...this.props} />
+        }
+    })
 }

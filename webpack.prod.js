@@ -9,6 +9,7 @@ module.exports = merge(config, {
     plugins: [
         new MiniCssExtractPlugin()
     ],
+    devtool: 'source-map',
     module: {
         rules: [
             {

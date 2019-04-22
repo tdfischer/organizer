@@ -10,11 +10,12 @@ import Divider from '@material-ui/core/Divider'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import ListItemText from '@material-ui/core/ListItemText'
 import Chip from '@material-ui/core/Chip'
-import { withStyles } from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/styles'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import Raven from 'raven-js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import PopupState, { bindTrigger, bindMenu } from 'material-ui-popup-state'
 import Logo from './Logo'
 
 import { library as faLibrary } from '@fortawesome/fontawesome'
@@ -29,7 +30,6 @@ import BusyIndicator from './BusyIndicator'
 import { logout } from '../../actions'
 import { getCurrentUser, getLoggedIn } from '../../selectors/auth'
 import { withProvider, Model } from '../../store'
-import DialogOpener from '../DialogOpener'
 import UserAvatar from '../UserAvatar'
 
 const People = new Model('people')
@@ -54,7 +54,7 @@ const doReport = () => {
 }
 
 export const AppMenu = props => (
-    <Menu open={props.open} onClose={props.onClose}>
+    <Menu {...props.menuProps}>
         <MenuItem onClick={props.onLogout}>
             <ListItemIcon><FontAwesomeIcon icon={['fas', 'sign-out-alt']} /></ListItemIcon>
             <ListItemText>Logout</ListItemText>
@@ -74,25 +74,27 @@ export const AppMenu = props => (
 export const OrganizerAppBar = (props) => (
     <AppBar style={{position: 'initial'}}>
         <Toolbar>
-            <DialogOpener>
-                {(doOpen, doClose, isOpen) => (
+            <PopupState variant="popover">
+                {popupState => (
                     <React.Fragment>
-                        {(props.logged_in) ? (
-                            <IconButton onClick={doOpen}><UserAvatar /></IconButton>
-                        ) : (
-                            <IconButton onClick={doOpen}><Logo style={{width: 'auto', height: '2rem', marginRight: '1rem'}}/></IconButton>
-                        )}
-                        <AppMenu current_user={props.current_user} open={isOpen} onClose={doClose} onLogout={props.logout} />
+                        <IconButton {...bindTrigger(popupState)}>
+                            {(props.logged_in) ? (
+                                <UserAvatar />
+                            ) : (
+                                <Logo style={{width: 'auto', height: '2rem', marginRight: '1rem'}}/>
+                            )}
+                        </IconButton>
+                        <AppMenu current_user={props.current_user} menuProps={bindMenu(popupState)} onLogout={props.logout} />
                     </React.Fragment>
                 )}
-            </DialogOpener>
+            </PopupState>
             <div className={props.classes.flex}>
                 {(props.logged_in) ? (
                     <React.Fragment>
-                        <Typography color="inherit" variant="title">{props.currentPerson.name || ''}</Typography>
-                        <Typography color="inherit" variant="subheading">{props.current_user.email}</Typography>
+                        <Typography color="inherit" variant="h6">{props.currentPerson.name || ''}</Typography>
+                        <Typography color="inherit" variant="subtitle1">{props.current_user.email}</Typography>
                     </React.Fragment>
-                ) : (<Typography color="inherit" variant="title">{(window.ORG_METADATA || {}).name}</Typography>)}
+                ) : (<Typography color="inherit" variant="h6">{(window.ORG_METADATA || {}).name}</Typography>)}
             </div>
             {(props.logged_in) ? (
                 <div className={props.classes.flex}>

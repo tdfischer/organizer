@@ -9,7 +9,6 @@ import importedComponent from 'react-imported-component'
 import copy from 'copy-to-clipboard'
 
 import MaterialFormText from './MaterialFormText'
-import DialogOpener from './DialogOpener'
 import PeopleTable from './people-browser/PeopleTable'
 import Search from './people-browser/Search'
 
@@ -82,14 +81,25 @@ export class PeopleIndex extends Component {
         super(props)
         this.state = {
             currentState: 0,
-            copied: false
+            copied: false,
+            isOpen: false
         }
         this.onCopy = this.onCopy.bind(this)
+        this.doOpen = this.doOpen.bind(this)
+        this.doClose = this.doClose.bind(this)
     }
 
     onCopy() {
         this.setState({copied: true})
         copy(this.props.selection.join(', '))
+    }
+
+    doOpen() {
+        this.setState({isOpen: true})
+    }
+
+    doClose() {
+        this.setState({isOpen: true})
     }
 
     render() {
@@ -99,14 +109,8 @@ export class PeopleIndex extends Component {
                 <Snackbar open={this.state.copied} onClose={() => this.setState({copied: false})} message={'Copied '+this.props.selection.size+' e-mails'}/>
                 <Grid container spacing={24}>
                     <Grid item xs={3}>
-                        <DialogOpener>
-                            {(open, close, isOpen) => (
-                                <React.Fragment>
-                                    <Button color="primary" onClick={open}>Import Spreadsheet</Button>
-                                    <ImportDialog onImport={props.importPeople} open={isOpen} onClose={close} />
-                                </React.Fragment>
-                            )}
-                        </DialogOpener>
+                        <Button color="primary" onClick={this.doDpen}>Import Spreadsheet</Button>
+                        <ImportDialog onImport={props.importPeople} open={this.state.isOpen} onClose={this.doClose} />
                         <Button color="primary" onClick={this.onCopy}>Copy E-mails</Button>
                     </Grid>
                     <Grid item xs={9}>

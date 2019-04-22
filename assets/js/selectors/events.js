@@ -1,25 +1,29 @@
 import { createSelector } from 'reselect'
 import { Model } from '../store'
 import distance from '@turf/distance'
+import bearing from '@turf/bearing'
+import { convertLength } from '@turf/helpers'
 import moment from 'moment'
 import Breakpoint from '../Breakpoint'
 import { getCurrentLocation, getAccuracy } from './geocache'
+import { getCurrentUser } from './auth'
 
 const Events = new Model('events')
+const Signups = new Model('signups')
 
-export const DAY_BREAKPOINTS = new Breakpoint([
-    [-60, 'Forever ago'],
-    [-30, 'Earlier this year'],
-    [-14, 'Earlier this month'],
-    [-7, 'Last week'],
-    [-1, 'Yesterday'],
-    [0, 'Today'],
-    [1, 'Tomorrow'],
-    [7, 'This week'],
-    [14, 'Next week'],
-    [7 * 4, 'Later this month'],
-    [7 * 6, 'Later this year'],
-    [undefined, 'In the distant future']
+const SEGMENT = (360 / 8)
+const OFFSET = SEGMENT / 2
+
+const COMPASS_BREAKPOINTS = new Breakpoint([
+    [-OFFSET, 'North'],
+    [SEGMENT - OFFSET, 'Northeast'],
+    [SEGMENT*2 - OFFSET, 'East'],
+    [SEGMENT*3 - OFFSET, 'Southeast'],
+    [SEGMENT*4 - OFFSET, 'South'],
+    [SEGMENT*5 - OFFSET, 'Southwest'],
+    [SEGMENT*6 - OFFSET, 'West'],
+    [SEGMENT*7 - OFFSET, 'North West'],
+    [undefined, 'North'],
 ])
 
 export const WALKTIME_BREAKPOINTS = new Breakpoint([
@@ -44,6 +48,19 @@ export function isWithinWindow(start, end) {
     )
 }
 
+const getSignups = (state, {event_id} = {}) => (
+    Signups.immutableSelect(state)
+        .filter(signup => event_id ? signup.event == event_id : true)
+)
+
+const getSignupsForCurrentUser = createSelector(
+    getCurrentUser,
+    getSignups,
+    (currentUser, allSignups) => (
+        allSignups.filter(signup => signup.email == currentUser.email)
+    )
+)
+
 const getEvents = (state, {start, end} = {}) => (
     Events.immutableSelect(state)
         .map(evt => ({
@@ -59,33 +76,60 @@ export const getEventsInWindow = (state, {start, end} = {}) => (
         .filter(isWithinWindow(start, end))
 )
 
-export const cookEventWithLocation = (currentLocation, accuracy, evt, now) => {
-    const distanceFromHere = Math.max(0, distance(currentLocation ? currentLocation : evt.geo, evt.geo, 'meters') - accuracy) / 1000
-    const isNearby = distanceFromHere <= 0.25
+export const locationDisplay = (evt, currentLocation) => {
+    if (currentLocation) {
+        const distanceDisplay = Math.round(convertLength(evt.distance, 'meters', 'miles')) + ' miles'
+        const compassDisplay = COMPASS_BREAKPOINTS.getValue(evt.bearing)
+        const walktimeDisplay = WALKTIME_BREAKPOINTS.getValue(evt.walktime)
+        const relativeDisplay = walktimeDisplay + ': ' + distanceDisplay + ' ' + compassDisplay
+        if (evt.location) {
+            return evt.location.raw + ' - ' + relativeDisplay
+        } else {
+            return relativeDisplay
+        }
+    } else {
+        if (evt.location) {
+            return evt.location.raw
+        } else {
+            return ''
+        }
+    }
+}
+
+export const cookEventWithLocation = (currentLocation, accuracy, evt, now, signups) => {
+    const hasSignedUp = !!signups.find(signup => signup.event == evt.id)
+    const distanceFromHere = Math.max(0, distance(currentLocation ? currentLocation : evt.geo, evt.geo, {units: 'meters'}) - accuracy)
+    const isNearby = distanceFromHere <= 2500
     const timeFromNow = evt.timestamp.diff(now, 'minutes')
     const endTimeFromNow = evt.end_timestamp.diff(now, 'minutes')
     const hasNotStarted = timeFromNow >= 30
     const isInPast = endTimeFromNow <= -120
     const canCheckIn = isNearby && !isInPast && !hasNotStarted
     const walktime = (distanceFromHere * 1000) / 84
-    // Five minutes is about how long it takes someone to decide and get out the door
-    const absoluteRelevance = (timeFromNow/15) - (walktime / 45)
-    const relevance = 1 / Math.log10(Math.abs(absoluteRelevance))
-    return {
+    const relevance = -timeFromNow
+    const hasCheckedIn = hasSignedUp || evt.user_has_checked_in
+    const evtBearing = bearing(currentLocation ? currentLocation : evt.geo, evt.geo)
+    const evtWithoutDisplay = {
         ...evt,
         distance: distanceFromHere,
         relevance,
+        bearing: evtBearing,
         walktime,
         checkIn: {
             isNearby,
             isInPast,
             hasNotStarted,
-            canCheckIn
+            canCheckIn,
+            hasCheckedIn
         }
+    }
+    return {
+        ...evtWithoutDisplay,
+        locationDisplay: locationDisplay(evtWithoutDisplay, currentLocation),
     }
 }
 
-const getNow = () => moment()
+const getNow = () => Date.now()
 
 // FIXME: This won't update event check in status as time marches forward
 export const getEventsWithLocation = createSelector(
@@ -93,25 +137,11 @@ export const getEventsWithLocation = createSelector(
     getCurrentLocation,
     getAccuracy,
     getEvents,
-    (now, currentLocation, accuracy, allEvents) => (
+    getSignupsForCurrentUser,
+    (now, currentLocation, accuracy, allEvents, signups) => (
         allEvents
             .filter(evt => evt.geo != undefined)
-            .map(evt => cookEventWithLocation(currentLocation, accuracy, evt, now))
+            .map(evt => cookEventWithLocation(currentLocation, accuracy, evt, now, signups))
+            .sortBy(evt => -evt.relevance)
     )
-)
-
-const groupByTime = now => (evt) => DAY_BREAKPOINTS.getPoint(evt.timestamp.diff(now, 'days'))
-
-export const makeGetUpcomingEvents = () => createSelector(
-    getNow,
-    getEventsWithLocation,
-    (now, relevantEvents) => {
-        return relevantEvents.toIndexedSeq()
-            .groupBy(groupByTime(now)).toKeyedSeq()
-            .sortBy((_v, k) => k)
-            .sort((a, b) => a-b)
-            .map(eventsInRange => 
-                eventsInRange.sort((a, b) => a.distance - b.distance))
-            .cacheResult()
-    }
 )

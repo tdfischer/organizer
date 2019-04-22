@@ -2,7 +2,7 @@ import React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import faCompass from '@fortawesome/fontawesome-free-solid/faCompass'
 import { library as faLibrary } from '@fortawesome/fontawesome'
-import { withStyles } from '@material-ui/core/styles'
+import { withStyles } from '@material-ui/styles'
 import Button from '@material-ui/core/Button'
 
 faLibrary.add(faCompass)

@@ -3,5 +3,5 @@ import { CaptainIndex } from './CaptainIndex'
 import { shallow } from 'enzyme'
 
 it('should render defaults safely', () => {
-    const component = shallow(<CaptainIndex currentUser={{}} classes={{}}/>)
+    const component = shallow(<CaptainIndex captainTurfs={[{}]} allStates={[{}]} currentUser={{}} classes={{}}/>)
 })
