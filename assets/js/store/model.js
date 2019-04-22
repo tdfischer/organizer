@@ -243,6 +243,7 @@ export const withModelData = mapModelToFetch => WrappedComponent => {
     return connect()(class Fetcher extends React.Component {
         constructor(props) {
             super(props)
+            this.cancelled = false
             this.state = {
                 hasFetched: false,
                 fetchErrors: {}
@@ -251,6 +252,10 @@ export const withModelData = mapModelToFetch => WrappedComponent => {
 
         componentDidMount() {
             this.fetch()
+        }
+
+        componentWillUnmount() {
+            this.cancelled = true
         }
 
         componentDidUpdate(prevProps) {
@@ -263,16 +268,25 @@ export const withModelData = mapModelToFetch => WrappedComponent => {
             return Promise.all(Object.entries(mapModelToFetch(this.props)).map(([modelName, params]) => {
                 const model = new Model(modelName)
                 const catcher = err => {
+                    if (this.cancelled) {
+                        return
+                    }
                     this.setState(oldState => ({...oldState, [modelName]: err}))
                     console.error('Failed to fetch %s %o', modelName, params, err)
                     return err
                 }
                 if (typeof(params) == 'object') {
                     this.props.dispatch(model.fetchAll(params)).catch(catcher).then(() => {
+                        if (this.cancelled) {
+                            return
+                        }
                         this.setState({hasFetched: true})
                     })
                 } else {
                     this.props.dispatch(model.fetchIfNeeded(params)).catch(catcher).then(() => {
+                        if (this.cancelled) {
+                            return
+                        }
                         this.setState({hasFetched: true})
                     })
                 }
