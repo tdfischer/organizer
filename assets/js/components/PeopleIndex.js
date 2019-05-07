@@ -14,7 +14,6 @@ import Search from './people-browser/Search'
 
 const ImportDialog = importedComponent(() => import('./ImportDialog'))
 
-const States = new Model('states')
 const People = new Model('people')
 const PeopleSelector = new Selectable('people')
 const PeopleFilter = new Filterable('people')
@@ -29,7 +28,6 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     return {
         people: People.bindActionCreators(dispatch),
-        states: States.bindActionCreators(dispatch),
         filter: PeopleFilter.bindActionCreators(dispatch),
         importPeople: people => {
             return Promise.all(people.map(person => dispatch(People.updateAndSave(person.email, person))))

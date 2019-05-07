@@ -9,7 +9,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
-from crm.models import PersonState, Person
+from crm.models import Person
 from filtering.models import FilterNode
 from events.models import Event
 

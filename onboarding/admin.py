@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.contrib import admin
 from . import models
-from crm.models import Person, PersonState
+from crm.models import Person
 from events.models import Event
 from organizer.admin import admin_site, OrganizerModelAdmin
 from import_export.admin import ImportExportModelAdmin

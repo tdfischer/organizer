@@ -12,24 +12,7 @@ from organizer.importing import DatasetImporter, AddressWidget
 from mailchimp3 import MailChimp
 
 
-class PersonStateWidget(widgets.Widget):
-    def clean(self, value, row, *args, **kwargs):
-        if value is None:
-            return None
-        return models.PersonState.objects.get_or_create(name=value)[0]
-
-    def render(self, value, obj=None):
-        if value is None:
-            return None
-        return value.name
-
 class PersonResource(resources.ModelResource):
-    state = fields.Field(
-        column_name = 'state',
-        attribute = 'state',
-        widget=PersonStateWidget(),
-        saves_null_values = False
-    )
     address = fields.Field(
         column_name = 'address',
         attribute = 'address',
@@ -45,7 +28,7 @@ class PersonResource(resources.ModelResource):
     class Meta:
         model = models.Person
         import_id_fields = ('email',)
-        fields = ('email', 'name', 'address', 'state')
+        fields = ('email', 'name', 'address')
         report_skipped = True
         skip_unchanged = True
 
@@ -69,7 +52,6 @@ class AirtableImporter(DatasetImporter):
             email = settings.AIRTABLE_EMAIL_COLUMN,
             name = settings.AIRTABLE_NAME_COLUMN,
             address = settings.AIRTABLE_ADDRESS_COLUMN,
-            state = settings.AIRTABLE_STATE_COLUMN
         )
         ret = tablib.Dataset(headers=COLUMNMAP.keys())
         page = self.__pages.next()

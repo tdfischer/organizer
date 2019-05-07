@@ -207,6 +207,5 @@ class PersonAdmin(ImportExportModelAdmin, OrganizerModelAdmin):
     'donation_record', 'onboarding_status']
 
 admin.site.register(models.Person, PersonAdmin)
-admin.site.register(models.PersonState)
 
 admin_site.register(models.Person, PersonAdmin)

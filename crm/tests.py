@@ -46,22 +46,16 @@ def person(redis_server):
             email='test@example.com')[0]
 
 @composite
-def defaultStates(draw):
-    return models.PersonState.objects.get_or_create(name='Default')[0]
-
-@composite
 def peopleArgs(draw):
     return draw(one_of(
         fixed_dictionaries(dict(
             name=one_of(just(None), text()),
             email=emails().filter(lambda x: len(x) < 100 and '/' not in x),
             address=one_of(just(None), text()),
-            state=one_of(just(None), text())
         )),
         fixed_dictionaries(dict(
             name=one_of(just(None), text()),
             email=emails().filter(lambda x: len(x) < 100 and '/' not in x),
-            state=one_of(just(None), text())
         )),
         fixed_dictionaries(dict(
             name=one_of(just(None), text()),
@@ -77,7 +71,6 @@ def people(draw):
         name=draw(nonblanks()),
         email=draw(emails().filter(lambda x: len(x) < 100 and '/' not in x)),
         address=None,
-        state=draw(defaultStates())
     )
 
 @composite
@@ -205,13 +198,9 @@ def testCreatePersonWithTag(api_client, settings, person, newTag):
         personName = personName.strip()
     else:
         personName = ''
-    personState = person.get('state', None)
-    if personState is None or personState == '':
-        personState = settings.DEFAULT_PERSON_STATE
     assert resp['tags'] == person['tags']
     assert resp['email'] == person['email']
     assert resp['name'] == personName
-    assert resp['state'] == personState
 
     person['tags'].append(newTag+'-added')
     resp = assertValidResponse(api_client.put('/api/people/'+person['email']+'/', 

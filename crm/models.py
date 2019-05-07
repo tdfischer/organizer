@@ -18,13 +18,6 @@ def updatePersonGeo(personID):
     person = Person.objects.get(pk=personID)
     return person.update_geo()
 
-class PersonState(models.Model):
-    name = models.CharField(max_length=200, unique=True)
-    description = models.TextField(blank=True, default='')
-
-    def __unicode__(self):
-        return self.name
-
 class Person(models.Model):
     name = models.CharField(max_length=200, null=True, blank=True, default='')
     email = models.EmailField(max_length=200, unique=True, db_index=True)
@@ -33,7 +26,6 @@ class Person(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     lat = models.FloatField(null=True, blank=True)
     lng = models.FloatField(null=True, blank=True)
-    state = models.ForeignKey(PersonState, db_index=True)
     is_captain = models.BooleanField(default=False)
 
     tags = TaggableManager(blank=True)
@@ -59,8 +51,6 @@ class Person(models.Model):
     def save(self, *args, **kwargs):
         if not self.address_id:
             self.address = Address.objects.create()
-        if not self.state_id:
-            self.state = PersonState.objects.get_or_create(name=settings.DEFAULT_PERSON_STATE)[0]
         runUpdate = kwargs.pop('_updateGeocache', True)
         super(Person, self).save(*args, **kwargs)
         if runUpdate:

@@ -20,13 +20,6 @@ const getLocality = obj => obj.locality || {name: '', postal_code: ''}
 
 const WidgetForField = withFieldState('property')(props => {
     switch(props.fieldState.value) {
-    case 'state':
-        return (
-            <FormControl fullWidth>
-                <InputLabel>State</InputLabel>
-                <MaterialFormModelSelect model="states" field="value" />
-            </FormControl>
-        )
     case 'geo.properties.city':
         return (
             <FormControl fullWidth>
@@ -42,7 +35,6 @@ const WidgetForField = withFieldState('property')(props => {
 const OperatorWidgetForField = withFieldState('property')(props => {
     switch(props.fieldState.value) {
     case 'geo.properties.city':
-    case 'state':
         return (
             <FormControl fullWidth>
                 <InputLabel>Comparison</InputLabel>
@@ -98,7 +90,6 @@ export const BooleanFilter = props => {
                             <MenuItem value="email">E-Mail</MenuItem>
                             <MenuItem value="geo.properties.city">City</MenuItem>
                             <MenuItem value="tags">A tag</MenuItem>
-                            <MenuItem value="state">State</MenuItem>
                             <MenuItem value="twelve_month_event_count">Events in the last 12 months</MenuItem>
                         </MaterialFormSelect>
                     </FormControl>
