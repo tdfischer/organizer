@@ -9,7 +9,6 @@ import Skeleton from './activities/checkin/Skeleton'
 
 const MapIndex = importedComponent(() => import(/* webpackChunkName:'map' */ './MapIndex'))
 const PeopleIndex = importedComponent(() => import(/* webpackChunkName:'people' */ './PeopleIndex'))
-const CaptainIndex = importedComponent(() => import(/* webpackChunkName:'captain' */'./CaptainIndex'))
 const EventCheckin = importedComponent(() =>import(/* webpackChunkName:'checkin' */ './activities/checkin'), {
     LoadingComponent: () => <Skeleton />
 })
@@ -20,7 +19,6 @@ export const AppRoutes = props => (
             <Switch>
                 <Route exact path="/map" component={MapIndex} />
                 <Route exact path="/people" component={PeopleIndex} />
-                <Route exact path="/captain" component={CaptainIndex} />
                 <Route component={EventCheckin} />
             </Switch>
         </ConnectedRouter>

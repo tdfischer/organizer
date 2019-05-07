@@ -116,7 +116,6 @@ INSTALLED_APPS = [
     'taggit_serializer',
     'crm',
     'onboarding',
-    'messaging',
     'events',
     'donations',
     'filtering'
