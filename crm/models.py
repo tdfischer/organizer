@@ -39,7 +39,13 @@ class Person(models.Model):
 
     def update_geo(self):
         resolved = geocache.geocode(self.address.raw)
-        self.address = resolved
+        try:
+            self.address = resolved
+        except UnicodeDecodeError, e:
+            log.exception("Unicode error", e)
+        except Address.MultipleObjectsReturned, e:
+            # FIXME: We should never get here; hypotheis, like life, finds a way
+            log.exception("Address bug", e)
         self.lng = resolved.get('lng')
         self.lat = resolved.get('lat')
         self.save(_updateGeocache=False)
