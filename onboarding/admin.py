@@ -68,10 +68,8 @@ class ComponentAdmin(admin.ModelAdmin):
         enable_components
     ]
 
-admin.site.register(models.NewNeighborNotificationTarget)
 admin.site.register(models.Signup, SignupAdmin)
 admin.site.register(models.OnboardingStatus, StatusAdmin)
 admin.site.register(models.OnboardingComponent, ComponentAdmin)
 
-admin_site.register(models.NewNeighborNotificationTarget, OrganizerModelAdmin)
 admin_site.register(models.Signup, SignupAdmin)

@@ -25,11 +25,6 @@ class PersonState(models.Model):
     def __unicode__(self):
         return self.name
 
-class PersonManager(models.Manager):
-    def get_queryset(self):
-        myTurfs = Turf.objects.filter(members__person__id=OuterRef('pk')).order_by('-members__joined_on')
-        return super(PersonManager, self).get_queryset().annotate(current_turf_id=Subquery(myTurfs.values('id')[:1]))
-
 class Person(models.Model):
     name = models.CharField(max_length=200, null=True, blank=True, default='')
     email = models.EmailField(max_length=200, unique=True, db_index=True)
@@ -41,39 +36,22 @@ class Person(models.Model):
     state = models.ForeignKey(PersonState, db_index=True)
     is_captain = models.BooleanField(default=False)
 
-    objects = PersonManager()
-
     tags = TaggableManager(blank=True)
 
     @property
     def geo(self):
         city = None
-        if self.current_turf is not None:
-            city = self.current_turf.locality.name
-        elif self.address is not None and self.address.locality is not None:
+        if self.address is not None and self.address.locality is not None:
             city = self.address.locality.name
         return {'lat': self.lat, 'lng': self.lng, 'city': city}
 
     def update_geo(self):
         resolved = geocache.geocode(self.address.raw)
-        turf = geocache.turfForAddress(self.address.raw)
-        if turf:
-            neighborhoodMembership, joinedNeighborhood = TurfMembership.objects.get_or_create(turf=turf,
-                    person=self)
-            try:
-                self.address = resolved
-            except UnicodeDecodeError, e:
-                log.exception("Unicode error", e)
-            except Address.MultipleObjectsReturned, e:
-                # FIXME: We should never get here; hypotheis, like life, finds a way
-                log.exception("Address bug", e)
-            self.lng = resolved.get('lng')
-            self.lat = resolved.get('lat')
-            self.save(_updateGeocache=False)
-            return True
-        else:
-            #FIXME: log failure to find turf
-            return False
+        self.address = resolved
+        self.lng = resolved.get('lng')
+        self.lat = resolved.get('lat')
+        self.save(_updateGeocache=False)
+        return True
 
     def queue_geocache_update(self):
         django_rq.enqueue(updatePersonGeo, self.id)
@@ -88,16 +66,6 @@ class Person(models.Model):
         if runUpdate:
             self.queue_geocache_update()
 
-    @property
-    def current_turf(self):
-        try:
-            if hasattr(self, 'current_turf_id'):
-                return Turf.objects.get(pk=self.current_turf_id)
-            else:
-                return self.turf_memberships.latest('joined_on').turf
-        except (Turf.DoesNotExist, TurfMembership.DoesNotExist):
-            return None
-
     def __unicode__(self):
         if self.name is None:
             return ""
@@ -105,29 +73,6 @@ class Person(models.Model):
         if len(ret) == 0:
             return self.email
         return ret
-
-class Turf(models.Model):
-    name = models.CharField(max_length=200)
-    locality = models.ForeignKey(Locality)
-
-    def __unicode__(self):
-        return "%s, %s"%(self.name, self.locality)
-
-class TurfMembership(models.Model):
-    person = models.ForeignKey(Person, related_name='turf_memberships',
-            db_index=True)
-    turf = models.ForeignKey(Turf, related_name='members', db_index=True)
-    joined_on = models.DateField()
-
-    person_turf_index = models.Index(fields=['person', 'turf'])
-
-    def save(self, *args, **kwargs):
-        if not self.id:
-            self.joined_on = timezone.now()
-        return super(TurfMembership, self).save(*args, **kwargs)
-
-    def __unicode__(self):
-        return "%s -> %s"%(self.person, self.turf)
 
 def merge_models(first, *duplicates):
     relations = []

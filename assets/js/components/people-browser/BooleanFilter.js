@@ -27,13 +27,6 @@ const WidgetForField = withFieldState('property')(props => {
                 <MaterialFormModelSelect model="states" field="value" />
             </FormControl>
         )
-    case 'current_turf.id':
-        return (
-            <FormControl fullWidth>
-                <InputLabel>Turf</InputLabel>
-                <MaterialFormModelSelect value={t => t.id} display={t => (t.name + ', ' + getLocality(t).name + ' ' + getLocality(t).postal_code)} model="turfs" field="value" />
-            </FormControl>
-        )
     case 'geo.properties.city':
         return (
             <FormControl fullWidth>
@@ -48,7 +41,6 @@ const WidgetForField = withFieldState('property')(props => {
 
 const OperatorWidgetForField = withFieldState('property')(props => {
     switch(props.fieldState.value) {
-    case 'current_turf.id':
     case 'geo.properties.city':
     case 'state':
         return (
@@ -107,7 +99,6 @@ export const BooleanFilter = props => {
                             <MenuItem value="geo.properties.city">City</MenuItem>
                             <MenuItem value="tags">A tag</MenuItem>
                             <MenuItem value="state">State</MenuItem>
-                            <MenuItem value="current_turf.id">Turf</MenuItem>
                             <MenuItem value="twelve_month_event_count">Events in the last 12 months</MenuItem>
                         </MaterialFormSelect>
                     </FormControl>

@@ -9,18 +9,9 @@ import logging
 
 log = logging.getLogger(__name__)
 
-from crm.models import Turf, PersonState, Person
+from crm.models import PersonState, Person
 from filtering.models import FilterNode
 from events.models import Event
-
-class NewNeighborNotificationTarget(models.Model):
-    turfs = models.ManyToManyField(Turf, related_name='notification_targets')
-    email = models.CharField(max_length=200)
-    last_notified = models.DateField(null=True)
-    states = models.ManyToManyField(PersonState)
-
-    def __unicode__(self):
-        return '%s: %s states, %s turfs'%(self.email, self.states.count(), self.turfs.count())
 
 class Signup(models.Model):
     email = models.CharField(max_length=200)

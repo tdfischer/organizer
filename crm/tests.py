@@ -141,46 +141,12 @@ def locations(draw):
     asPoint = Point(resp['geometry']['location']['lat'], resp['geometry']['location']['lng'])
     return Location(resp['formatted_address'], asPoint, resp)
 
-@pytest.mark.mock_geocoder
-@pytest.mark.django_db
-@given(geocodeTest)
-def testCountry(data):
-    geocache.country(data)
-
-@pytest.mark.mock_geocoder
-@pytest.mark.django_db
-@given(geocodeTest)
-def testState(data):
-    geocache.state(data)
-
-@pytest.mark.mock_geocoder
-@pytest.mark.django_db
-@given(geocodeTest)
-def testLocality(data):
-    geocache.locality(data)
-
-@pytest.mark.mock_geocoder
-@pytest.mark.django_db
-@given(geocodeTest)
-def testTurf(data):
-    geocache.turf(data)
-
-@pytest.mark.mock_geocoder
-@pytest.mark.django_db
-@given(fixed_dictionaries(geocodeDict))
-def testValidResponse(data):
-    turf = geocache.turf(data)
-    assert turf is not None
-    assert turf.name is not None
-    assert turf.locality is not None
-
 @pytest.mark.django_db
 @given(locations())
 def testDecoder(response):
     decoded = geocache.decode_response(response)
     assert response.latitude == decoded['lat']
     assert response.longitude == decoded['lng']
-    turf = geocache.turf(decoded)
 
 @pytest.mark.mock_redis
 @pytest.mark.django_db
@@ -202,18 +168,6 @@ def testUpdatePersonGeo(response, db, person, dummy_geocoder):
     else:
         assert person.lat is None
         assert person.lng is None
-
-@pytest.mark.mock_redis
-@pytest.mark.django_db
-@given(turfData=fixed_dictionaries(geocodeDict))
-def testPersonCurrentTurf(turfData, person):
-    turf = geocache.turf(turfData)
-    models.TurfMembership.objects.create(person=person, turf=turf)
-    person.refresh_from_db()
-    assert person.current_turf is not None
-    p = models.Person.objects.filter(pk=person.id).values('id')[0]
-    assert not hasattr(person, 'current_turf_id')
-    assert person.current_turf is not None
 
 def assertValidResponse(resp, status=200):
     __tracebackhide__ = True

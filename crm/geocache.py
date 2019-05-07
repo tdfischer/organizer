@@ -62,31 +62,3 @@ def geocode(address):
             return None
         geocache.set('geocache:' + address, cachedAddr)
     return cachedAddr
-
-def country(data):
-    return Country.objects.get_or_create(name=data.get('country') or 'Earth')[0]
-
-def state(data):
-    return State.objects.get_or_create(name=data.get('state') or 'National',
-            country=country(data))[0]
-
-def locality(data):
-    return Locality.objects.get_or_create(
-        name = data.get('locality') or 'State-wide',
-        postal_code = data.get('postal_code') or '',
-        state = state(data)
-    )[0]
-
-def turf(data):
-    # We need a minimum of a zipcode to invent a turf, for now.
-    # This implies we also know city, state, country.
-    return crm.models.Turf.objects.get_or_create(
-        name = data.get('neighborhood') or (data.get('postal_code') or 'State-wide'),
-        locality = locality(data)
-    )[0]
-
-
-def turfForAddress(address):
-    geocoded = geocode(address)
-    if geocoded is not None:
-        return turf(geocoded)
