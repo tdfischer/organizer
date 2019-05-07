@@ -46,18 +46,14 @@ merge_people.short_description = "Merge selected people"
 
 def make_captain(modeladmin, request, queryset):
     for person in queryset:
-        membership = person.turf_memberships.latest('joined_on')
-        if membership is not None:
-            membership.is_captain = True
-            membership.save()
-make_captain.short_description = 'Mark selected people as captains in their turf'
+        person.is_captain = True
+        person.save()
+make_captain.short_description = 'Mark selected people as captains'
 
 def unmake_captain(modeladmin, request, queryset):
     for person in queryset:
-        membership = person.turf_memberships.latest('joined_on')
-        if membership is not None:
-            membership.is_captain = False
-            membership.save()
+        person.is_captain = False
+        person.save()
 unmake_captain.short_description = 'Strip turf captainship from selected people'
 
 class TurfMembershipInline(admin.TabularInline):

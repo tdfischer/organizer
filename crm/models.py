@@ -39,6 +39,7 @@ class Person(models.Model):
     lat = models.FloatField(null=True, blank=True)
     lng = models.FloatField(null=True, blank=True)
     state = models.ForeignKey(PersonState, db_index=True)
+    is_captain = models.BooleanField(default=False)
 
     objects = PersonManager()
 
@@ -97,13 +98,6 @@ class Person(models.Model):
         except (Turf.DoesNotExist, TurfMembership.DoesNotExist):
             return None
 
-    @property
-    def is_captain(self):
-        turf = self.current_turf
-        if turf is None:
-            return False
-        return self.turf_memberships.filter(is_captain=True, turf=turf).exists()
-
     def __unicode__(self):
         if self.name is None:
             return ""
@@ -124,7 +118,6 @@ class TurfMembership(models.Model):
             db_index=True)
     turf = models.ForeignKey(Turf, related_name='members', db_index=True)
     joined_on = models.DateField()
-    is_captain = models.BooleanField(default=False)
 
     person_turf_index = models.Index(fields=['person', 'turf'])
 
