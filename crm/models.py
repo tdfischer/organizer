@@ -6,22 +6,20 @@ from django.db.models import Q, Subquery, OuterRef
 from django.utils import timezone
 from django.urls import reverse
 from django.conf import settings
-from address.models import AddressField, Address, Locality
+from address.models import AddressField
 from taggit.managers import TaggableManager
 from crm import geocache
+from geocodable.models import LocationAlias, LocationType
 import django_rq
 import logging
 
 log = logging.getLogger(__name__)
 
-def updatePersonGeo(personID):
-    person = Person.objects.get(pk=personID)
-    return person.update_geo()
-
 class Person(models.Model):
     name = models.CharField(max_length=200, null=True, blank=True, default='')
     email = models.EmailField(max_length=200, unique=True, db_index=True)
     address = AddressField(blank=True)
+    location = models.ForeignKey(LocationAlias, db_index=True, null=True, blank=True)
     phone = models.CharField(max_length=200, null=True, blank=True, default=None)
     created = models.DateTimeField(auto_now_add=True)
     lat = models.FloatField(null=True, blank=True)
@@ -33,34 +31,11 @@ class Person(models.Model):
     @property
     def geo(self):
         city = None
-        if self.address is not None and self.address.locality is not None:
-            city = self.address.locality.name
+        if self.location is not None:
+            locality = self.location.get_ancestors().filter(type=LocationType.LOCALITY)
+            if locality.exists():
+                city = locality.first().name
         return {'lat': self.lat, 'lng': self.lng, 'city': city}
-
-    def update_geo(self):
-        resolved = geocache.geocode(self.address.raw)
-        try:
-            self.address = resolved
-        except UnicodeDecodeError, e:
-            log.exception("Unicode error", e)
-        except Address.MultipleObjectsReturned, e:
-            # FIXME: We should never get here; hypotheis, like life, finds a way
-            log.exception("Address bug", e)
-        self.lng = resolved.get('lng')
-        self.lat = resolved.get('lat')
-        self.save(_updateGeocache=False)
-        return True
-
-    def queue_geocache_update(self):
-        django_rq.enqueue(updatePersonGeo, self.id)
-
-    def save(self, *args, **kwargs):
-        if not self.address_id:
-            self.address = Address.objects.create()
-        runUpdate = kwargs.pop('_updateGeocache', True)
-        super(Person, self).save(*args, **kwargs)
-        if runUpdate:
-            self.queue_geocache_update()
 
     def __unicode__(self):
         if self.name is None:
