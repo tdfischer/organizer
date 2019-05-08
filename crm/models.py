@@ -6,7 +6,6 @@ from django.db.models import Q, Subquery, OuterRef
 from django.utils import timezone
 from django.urls import reverse
 from django.conf import settings
-from address.models import AddressField
 from taggit.managers import TaggableManager
 from crm import geocache
 from geocodable.models import LocationAlias, LocationType
@@ -18,7 +17,6 @@ log = logging.getLogger(__name__)
 class Person(models.Model):
     name = models.CharField(max_length=200, null=True, blank=True, default='')
     email = models.EmailField(max_length=200, unique=True, db_index=True)
-    address = AddressField(blank=True)
     location = models.ForeignKey(LocationAlias, db_index=True, null=True, blank=True)
     phone = models.CharField(max_length=200, null=True, blank=True, default=None)
     created = models.DateTimeField(auto_now_add=True)
