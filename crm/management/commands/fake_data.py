@@ -32,18 +32,11 @@ class Command(BaseCommand): # pragma: no cover
     def handle(self, *args, **options):
         if not settings.DEBUG:
                 raise EnvironmentError("I won't allow you to run fake_data without setting the DEBUG environment variable.")
-        states = self.create_model(models.PersonState, 4, {
-            'name': fake.word
-        })
         country = Country.objects.get_or_create(name=fake.country())[0]
         state = State.objects.get_or_create(name=fake.state(),
                 country=country)[0]
         locality = Locality.objects.get_or_create(name=fake.city(),
                 state=state)[0]
-        turfs = self.create_model(models.Turf, 10, {
-            'name': fake.city,
-            'locality': lambda: locality
-        })
         localFakeAddress = lambda: fakeAddress(dict(
             locality = locality.name,
             country = country.name,
@@ -56,17 +49,11 @@ class Command(BaseCommand): # pragma: no cover
             'name': fakeName,
             'address': localFakeAddress,
             'email': fake.email,
-            'state': lambda: random.choice(states),
             'lat': fakeLatitude,
             'lng': fakeLongitude
         })
 
         events = self.create_model(Event, 20, lambda: fakeEventData(localFakeAddress))
-
-        for person in people:
-            models.TurfMembership.objects.create(person=person,
-                    turf=random.choice(turfs))
-            print person, "moved in to", person.current_turf
 
         for person in people:
             for idx in range(0, 10):

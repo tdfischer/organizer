@@ -116,7 +116,6 @@ INSTALLED_APPS = [
     'taggit_serializer',
     'crm',
     'onboarding',
-    'messaging',
     'events',
     'donations',
     'filtering'
@@ -330,9 +329,6 @@ AIRTABLE_TABLE_NAME = os.environ.get('AIRTABLE_TABLE_NAME', None)
 AIRTABLE_EMAIL_COLUMN = os.environ.get('AIRTABLE_EMAIL_COLUMN', 'Email')
 AIRTABLE_NAME_COLUMN = os.environ.get('AIRTABLE_NAME_COLUMN', 'Name')
 AIRTABLE_ADDRESS_COLUMN = os.environ.get('AIRTABLE_ADDRESS_COLUMN', 'Full Address')
-AIRTABLE_STATE_COLUMN = os.environ.get('AIRTABLE_STATE_COLUMN', 'Membership Basis')
-
-DEFAULT_PERSON_STATE = os.environ.get('DEFAULT_PERSON_STATE', 'Default')
 
 DISCOURSE_BASE_URL = os.environ.get('DISCOURSE_BASE_URL', None)
 DISCOURSE_SSO_SECRET = os.environ.get('DISCOURSE_SSO_SECRET', None)

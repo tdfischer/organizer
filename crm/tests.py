@@ -46,22 +46,16 @@ def person(redis_server):
             email='test@example.com')[0]
 
 @composite
-def defaultStates(draw):
-    return models.PersonState.objects.get_or_create(name='Default')[0]
-
-@composite
 def peopleArgs(draw):
     return draw(one_of(
         fixed_dictionaries(dict(
             name=one_of(just(None), text()),
             email=emails().filter(lambda x: len(x) < 100 and '/' not in x),
             address=one_of(just(None), text()),
-            state=one_of(just(None), text())
         )),
         fixed_dictionaries(dict(
             name=one_of(just(None), text()),
             email=emails().filter(lambda x: len(x) < 100 and '/' not in x),
-            state=one_of(just(None), text())
         )),
         fixed_dictionaries(dict(
             name=one_of(just(None), text()),
@@ -77,7 +71,6 @@ def people(draw):
         name=draw(nonblanks()),
         email=draw(emails().filter(lambda x: len(x) < 100 and '/' not in x)),
         address=None,
-        state=draw(defaultStates())
     )
 
 @composite
@@ -141,46 +134,12 @@ def locations(draw):
     asPoint = Point(resp['geometry']['location']['lat'], resp['geometry']['location']['lng'])
     return Location(resp['formatted_address'], asPoint, resp)
 
-@pytest.mark.mock_geocoder
-@pytest.mark.django_db
-@given(geocodeTest)
-def testCountry(data):
-    geocache.country(data)
-
-@pytest.mark.mock_geocoder
-@pytest.mark.django_db
-@given(geocodeTest)
-def testState(data):
-    geocache.state(data)
-
-@pytest.mark.mock_geocoder
-@pytest.mark.django_db
-@given(geocodeTest)
-def testLocality(data):
-    geocache.locality(data)
-
-@pytest.mark.mock_geocoder
-@pytest.mark.django_db
-@given(geocodeTest)
-def testTurf(data):
-    geocache.turf(data)
-
-@pytest.mark.mock_geocoder
-@pytest.mark.django_db
-@given(fixed_dictionaries(geocodeDict))
-def testValidResponse(data):
-    turf = geocache.turf(data)
-    assert turf is not None
-    assert turf.name is not None
-    assert turf.locality is not None
-
 @pytest.mark.django_db
 @given(locations())
 def testDecoder(response):
     decoded = geocache.decode_response(response)
     assert response.latitude == decoded['lat']
     assert response.longitude == decoded['lng']
-    turf = geocache.turf(decoded)
 
 @pytest.mark.mock_redis
 @pytest.mark.django_db
@@ -202,18 +161,6 @@ def testUpdatePersonGeo(response, db, person, dummy_geocoder):
     else:
         assert person.lat is None
         assert person.lng is None
-
-@pytest.mark.mock_redis
-@pytest.mark.django_db
-@given(turfData=fixed_dictionaries(geocodeDict))
-def testPersonCurrentTurf(turfData, person):
-    turf = geocache.turf(turfData)
-    models.TurfMembership.objects.create(person=person, turf=turf)
-    person.refresh_from_db()
-    assert person.current_turf is not None
-    p = models.Person.objects.filter(pk=person.id).values('id')[0]
-    assert not hasattr(person, 'current_turf_id')
-    assert person.current_turf is not None
 
 def assertValidResponse(resp, status=200):
     __tracebackhide__ = True
@@ -251,13 +198,9 @@ def testCreatePersonWithTag(api_client, settings, person, newTag):
         personName = personName.strip()
     else:
         personName = ''
-    personState = person.get('state', None)
-    if personState is None or personState == '':
-        personState = settings.DEFAULT_PERSON_STATE
     assert resp['tags'] == person['tags']
     assert resp['email'] == person['email']
     assert resp['name'] == personName
-    assert resp['state'] == personState
 
     person['tags'].append(newTag+'-added')
     resp = assertValidResponse(api_client.put('/api/people/'+person['email']+'/', 

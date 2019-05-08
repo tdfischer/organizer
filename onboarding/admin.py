@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.contrib import admin
 from . import models
-from crm.models import Person, PersonState
+from crm.models import Person
 from events.models import Event
 from organizer.admin import admin_site, OrganizerModelAdmin
 from import_export.admin import ImportExportModelAdmin
@@ -68,10 +68,8 @@ class ComponentAdmin(admin.ModelAdmin):
         enable_components
     ]
 
-admin.site.register(models.NewNeighborNotificationTarget)
 admin.site.register(models.Signup, SignupAdmin)
 admin.site.register(models.OnboardingStatus, StatusAdmin)
 admin.site.register(models.OnboardingComponent, ComponentAdmin)
 
-admin_site.register(models.NewNeighborNotificationTarget, OrganizerModelAdmin)
 admin_site.register(models.Signup, SignupAdmin)

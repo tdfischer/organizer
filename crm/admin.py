@@ -46,35 +46,15 @@ merge_people.short_description = "Merge selected people"
 
 def make_captain(modeladmin, request, queryset):
     for person in queryset:
-        membership = person.turf_memberships.latest('joined_on')
-        if membership is not None:
-            membership.is_captain = True
-            membership.save()
-make_captain.short_description = 'Mark selected people as captains in their turf'
+        person.is_captain = True
+        person.save()
+make_captain.short_description = 'Mark selected people as captains'
 
 def unmake_captain(modeladmin, request, queryset):
     for person in queryset:
-        membership = person.turf_memberships.latest('joined_on')
-        if membership is not None:
-            membership.is_captain = False
-            membership.save()
-unmake_captain.short_description = 'Strip turf captainship from selected people'
-
-class TurfMembershipInline(admin.TabularInline):
-    model = models.TurfMembership
-
-class TurfFilter(admin.SimpleListFilter):
-    title = 'Turf'
-    parameter_name = 'turf'
-
-    def lookups(self, request, model_admin):
-        return map(lambda x: (x.id, x.name),
-                models.Turf.objects.all().order_by('name'))
-
-    def queryset(self, request, queryset):
-        if self.value() is not None:
-            return queryset.filter(current_turf_id=self.value())
-        return queryset
+        person.is_captain = False
+        person.save()
+unmake_captain.short_description = 'Strip captainship from selected people'
 
 class CityFilter(admin.SimpleListFilter):
     title = 'City'
@@ -119,7 +99,7 @@ class PersonAdmin(ImportExportModelAdmin, OrganizerModelAdmin):
     resource_class = importing.PersonResource
     search_fields = [
         'name', 'email', 'address__raw', 'address__locality__name',
-        'turf_memberships__turf__name', 'phone'
+        'phone'
     ]
 
     fieldsets = (
@@ -196,7 +176,6 @@ class PersonAdmin(ImportExportModelAdmin, OrganizerModelAdmin):
     list_filter = (
         NamedFilterFilter,
         CityFilter,
-        TurfFilter,
     )
 
     actions = (
@@ -207,7 +186,7 @@ class PersonAdmin(ImportExportModelAdmin, OrganizerModelAdmin):
     )
 
     list_display = [
-        'name', 'email', 'phone', 'city', 'current_turf', 'valid_geo',
+        'name', 'email', 'phone', 'city', 'valid_geo',
         'onboarded', 'is_captain'
     ]
 
@@ -227,45 +206,6 @@ class PersonAdmin(ImportExportModelAdmin, OrganizerModelAdmin):
     readonly_fields = ['lat', 'lng', 'created', 'attendance_record',
     'donation_record', 'onboarding_status']
 
-    inlines  = [
-        TurfMembershipInline,
-    ]
-
-class NeighborNotificationInline(admin.TabularInline):
-    model = models.Turf.notification_targets.through
-
-class TurfAdmin(OrganizerModelAdmin):
-    list_display = [
-        'name', 'locality', 'member_count', 'has_notification'
-    ]
-
-    exclude = ['notification_targets']
-
-    list_filter = (
-        LocalityFilter,
-    )
-
-    def has_notification(self, obj):
-        return obj.notification_targets.count() > 0
-
-    def member_count(self, obj):
-        return obj.member_count
-    member_count.admin_order_field='member_count'
-
-    def get_queryset(self, request):
-        ret = super(TurfAdmin, self).get_queryset(request)
-        return ret.annotate(member_count=Count('members'))
-
-    inlines = [
-        TurfMembershipInline,
-        NeighborNotificationInline
-    ]
-
-
 admin.site.register(models.Person, PersonAdmin)
-admin.site.register(models.Turf, TurfAdmin)
-admin.site.register(models.TurfMembership)
-admin.site.register(models.PersonState)
 
 admin_site.register(models.Person, PersonAdmin)
-admin_site.register(models.Turf, TurfAdmin)

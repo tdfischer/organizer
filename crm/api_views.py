@@ -83,16 +83,6 @@ class PersonViewSet(AllowPUTAsCreateMixin, IntrospectiveViewSet):
     lookup_field = 'email'
     lookup_value_regex = '[^/]+'
 
-class TurfViewSet(IntrospectiveViewSet):
-    permission_classes = (IsAuthenticated,)
-    queryset = models.Turf.objects.all()
-    serializer_class = serializers.TurfSerializer
-
-class PersonStateViewSet(IntrospectiveViewSet):
-    permission_classes = (IsAuthenticated,)
-    queryset = models.PersonState.objects.all()
-    serializer_class = serializers.PersonStateSerializer
-
 class CityViewSet(IntrospectiveViewSet):
     permission_classes = (IsAuthenticated,)
     queryset = address.models.Locality.objects.all()
@@ -100,8 +90,6 @@ class CityViewSet(IntrospectiveViewSet):
 
 views = {
     'users': UserViewSet,
-    'turfs': TurfViewSet,
     'people': PersonViewSet,
-    'states': PersonStateViewSet,
     'cities': CityViewSet
 }

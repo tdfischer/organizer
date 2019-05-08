@@ -48,22 +48,13 @@ class AirtableExporter(DatasetExporter):
 
     def export_person(self, row, dry_run):
         rowEmail = row['email'].strip().lower()
-        rowState = row['state']
         for m in self.members:
             memberEmail = m['fields'].get(settings.AIRTABLE_EMAIL_COLUMN, '').strip().lower()
-            memberState = m['fields'].get(settings.AIRTABLE_STATE_COLUMN, '')
             if memberEmail == rowEmail:
-                if memberState != rowState:
-                    log.info("Updating %s: %s -> %s", memberEmail, memberState, rowState)
-                    if not dry_run:
-                        self.airtable.update(m['id'], {
-                            'Membership Basis': row['state']
-                        })
                 return
-        log.info('Creating %s <%s>: %s', row['name'], row['email'], rowState)
+        log.info('Creating %s <%s>', row['name'], row['email'])
         if not dry_run:
             self.airtable.insert({
                 settings.AIRTABLE_NAME_COLUMN: row['name'],
                 settings.AIRTABLE_EMAIL_COLUMN: row['email'],
-                settings.AIRTABLE_STATE_COLUMN: rowState
             })

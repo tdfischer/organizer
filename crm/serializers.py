@@ -39,47 +39,8 @@ class AddressSerializer(serializers.ModelSerializer):
             return super(AddressSerializer, self).to_internal_value({'raw':
                 data})
 
-class TurfSerializer(serializers.HyperlinkedModelSerializer):
-    locality = LocalitySerializer()
-
-    class Meta:
-        model = models.Turf
-        fields = ('name', 'locality', 'url', 'id')
-
-class TurfMembershipSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(source='turf.name', read_only=True)
-    turf = serializers.PrimaryKeyRelatedField(read_only=True)
-    url = serializers.HyperlinkedRelatedField(source='turf', queryset=models.Turf.objects.all(),
-    view_name='turf-detail')
-
-    class Meta:
-        model = models.TurfMembership
-        fields = ('name', 'joined_on', 'is_captain', 'turf', 'url')
-
-class PersonStateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.PersonState
-        fields = ('name', 'id')
-        lookup_field = 'name'
-        extra_kwargs = {
-                'id': {'read_only': True}
-        }
-
-class PersonStateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.PersonState
-        fields = ('name', 'id')
-        lookup_field = 'name'
-        extra_kwargs = {
-                'id': {'read_only': True}
-        }
-
 class PersonSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer):
     tags = TagListSerializerField()
-    current_turf = TurfSerializer(read_only=True)
-    turf_memberships = TurfMembershipSerializer(many=True, read_only=True)
-    state = serializers.SlugRelatedField(queryset=models.PersonState.objects.all(),
-            slug_field='name', allow_null=True, required=False)
     address = AddressSerializer(write_only=True, allow_null=True, required=False)
     twelve_month_event_count = serializers.SerializerMethodField()
     twelve_month_donation_value = serializers.SerializerMethodField()
@@ -93,8 +54,6 @@ class PersonSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer)
         return obj.events.filter(end_timestamp__gte=oneYearAgo).count()
 
     def to_internal_value(self, data):
-        if 'state' in data and data['state'] is not None and len(data['state']) > 0:
-            models.PersonState.objects.get_or_create(name=data.get('state'))
         if 'address' in data and (data['address'] is None or len(data['address']) == 0):
             del data['address']
         return super(PersonSerializer, self).to_internal_value(data)
@@ -111,7 +70,7 @@ class PersonSerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer)
     class Meta:
         model = models.Person
         fields = ('name',  'id', 'email', 'created', 'url', 'tags',
-        'geo', 'current_turf', 'turf_memberships', 'state', 'address', 'phone',
+        'geo', 'address', 'phone',
         'twelve_month_event_count', 'twelve_month_donation_value')
 
         lookup_field = 'email'

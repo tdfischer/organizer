@@ -28,14 +28,10 @@ const renderCheckboxHeader = props => (
     <Checkbox checked={props.people.reduce((prev, person) => prev && person.selected, true)} onChange={(_e, newValue) => props.people.map(obj => obj.email).forEach(newValue ? props.selector.add : props.selector.remove)} />
 )
 
-const getCurrentTurf = obj => obj.current_turf || {}
-
-const getLocality = obj => getCurrentTurf(obj).locality || {name: '', postal_code: ''}
-
 const renderNameCell = props => (
     <React.Fragment>
         {props.rowData.name} <TagList tags={props.rowData.tags} />
-        <Typography variant="caption">{props.rowData.email} - {getCurrentTurf(props.rowData).name}, {getLocality(props.rowData.name)} {getLocality(props.rowData.postal_code)}</Typography>
+        <Typography variant="caption">{props.rowData.email} - {props.rowData.name} {props.rowData.postal_code}</Typography>
     </React.Fragment>
 )
 

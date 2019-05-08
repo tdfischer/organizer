@@ -27,7 +27,6 @@ const columnNames = {
     email: ['email', 'e-mail', 'email address'],
     phone: ['phone', 'phone number'],
     address: ['address', 'street address'],
-    state: ['state'],
 }
 
 function guessHeaderMap(columns) {
@@ -187,13 +186,13 @@ class ImportDialog extends React.Component {
                         <p>The following data will be imported:</p>
                         <table>
                             <thead>
-                                <tr><th>Name</th><th>E-mail</th><th>Phone number</th><th>Street address</th><th>State</th></tr>
+                                <tr><th>Name</th><th>E-mail</th><th>Phone number</th><th>Street address</th></tr>
                             </thead>
                             <tbody>
                                 {_.map(this.state.mapped, (row, idx) => (
                                     <tr className={idx % 2 ? 'even' : 'odd'}>
                                         <td>{row.name} {_.map(row.tags, t => <Chip label={t} key={t} />)}</td><td>{row.email}</td>
-                                        <td>{row.phone}</td><td>{row.address}</td><td>{row.state}</td>
+                                        <td>{row.phone}</td><td>{row.address}</td>
                                     </tr>
                                 ))}
                             </tbody>
