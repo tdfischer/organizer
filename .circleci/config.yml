@@ -111,12 +111,34 @@ jobs:
           paths:
             - ~/.cache/yarn
           key: yarn-{{.Branch}}-{{checksum "yarn.lock"}}
+  production-build:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - yarn-{{.Branch}}-{{checksum "yarn.lock"}}
+            - yarn-{{.Branch}}-
+            - yarn-
+      - run:
+          name: Install dependencies
+          command: |
+            yarn install
+      - run:
+          name: Build with webpack
+          command: |
+            yarn build
+      - save_cache:
+          paths:
+            - ~/.cache/yarn
+          key: yarn-{{.Branch}}-{{checksum "yarn.lock"}}
 workflows:
   version: 2
   test-and-deploy:
     jobs:
       - test-node
       - test-python
+      - production-build
       - upload-codeclimate:
           requires:
             - test-node
@@ -125,6 +147,7 @@ workflows:
           requires:
             - test-node
             - test-python
+            - production-build
           filters:
             branches:
               only: master
