@@ -36,7 +36,7 @@ import Skeleton from './Skeleton'
 const Signups = new Model('signups')
 
 const SignupForm = importedComponent(() => import('./SignupForm'), {
-    LoadingComponent: () => <LoadingDisplay />
+    LoadingComponent: LoadingDisplay
 })
 
 const listStyles = {
@@ -129,9 +129,9 @@ export const EventPanel = props => {
                 <EventList
                     events={props.nearbyEvents}
                     onCheckIn={doCheckIn} />
-                    <Dialog open={props.isOpen} onClose={() => props.setOpen(false)}>
-                        <SignupForm onSubmit={() => submitSignup(eventID)} />
-                    </Dialog>
+                <Dialog open={props.isOpen} onClose={() => props.setOpen(false)}>
+                    <SignupForm onSubmit={() => submitSignup(eventID)} />
+                </Dialog>
             </NoEvents>
         ) : (
             <Skeleton />
@@ -140,9 +140,9 @@ export const EventPanel = props => {
 }
 
 EventPanel.defaultProps = {
-  currentUser: {},
-  loggedIn: false,
-  isOpen: false,
+    currentUser: {},
+    loggedIn: false,
+    isOpen: false,
 }
 
 const mapDispatchToProps = (dispatch) => {
