@@ -15,7 +15,7 @@ import { withModelData } from '../../../store'
 import Skeleton from './Skeleton'
 
 const EventPanel = importedComponent(() => import('./EventPanel'), {
-    LoadingComponent: () => <Skeleton />
+    LoadingComponent: Skeleton
 })
 
 const Description = props => (

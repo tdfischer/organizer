@@ -16,8 +16,6 @@ import MaterialFormModelSelect from '../MaterialFormModelSelect'
 import MaterialFormText from '../MaterialFormText'
 import BooleanSelect from './BooleanSelect'
 
-const getLocality = obj => obj.locality || {name: '', postal_code: ''}
-
 const WidgetForField = withFieldState('property')(props => {
     switch(props.fieldState.value) {
     case 'geo.properties.city':

@@ -10,7 +10,7 @@ import Skeleton from './activities/checkin/Skeleton'
 const MapIndex = importedComponent(() => import(/* webpackChunkName:'map' */ './MapIndex'))
 const PeopleIndex = importedComponent(() => import(/* webpackChunkName:'people' */ './PeopleIndex'))
 const EventCheckin = importedComponent(() =>import(/* webpackChunkName:'checkin' */ './activities/checkin'), {
-    LoadingComponent: () => <Skeleton />
+    LoadingComponent: Skeleton
 })
 
 export const AppRoutes = props => (
