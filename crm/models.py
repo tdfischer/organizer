@@ -20,11 +20,23 @@ class Person(models.Model):
     location = models.ForeignKey(LocationAlias, db_index=True, null=True, blank=True)
     phone = models.CharField(max_length=200, null=True, blank=True, default=None)
     created = models.DateTimeField(auto_now_add=True)
-    lat = models.FloatField(null=True, blank=True)
-    lng = models.FloatField(null=True, blank=True)
     is_captain = models.BooleanField(default=False)
 
     tags = TaggableManager(blank=True)
+
+    @property
+    def lat(self):
+        if self.location is not None:
+            return self.location.lat
+        else:
+            return None
+
+    @property
+    def lng(self):
+        if self.location is not None:
+            return self.location.lng
+        else:
+            return None
 
     @property
     def geo(self):
