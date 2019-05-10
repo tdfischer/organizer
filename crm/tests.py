@@ -134,6 +134,7 @@ def locations(draw):
     asPoint = Point(resp['geometry']['location']['lat'], resp['geometry']['location']['lng'])
     return Location(resp['formatted_address'], asPoint, resp)
 
+@pytest.mark.skip(reason="Porting to geocodable API")
 @pytest.mark.django_db
 @given(locations())
 def testDecoder(response):
@@ -141,6 +142,7 @@ def testDecoder(response):
     assert response.latitude == decoded['lat']
     assert response.longitude == decoded['lng']
 
+@pytest.mark.skip(reason="Porting to geocodable API")
 @pytest.mark.mock_redis
 @pytest.mark.django_db
 @given(response=locations())
