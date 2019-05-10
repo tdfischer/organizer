@@ -7,7 +7,7 @@ from django.test import override_settings
 from rest_framework.test import APITestCase, APIClient
 from django.contrib.auth.models import User
 import subprocess
-from crm.geocache import DummyAdaptor
+from geocodable.api import DummyAdaptor
 
 settings.register_profile("ci", max_examples=300)
 settings.register_profile("dev", max_examples=10)
@@ -95,7 +95,7 @@ def _mock_redis_markers(request):
 
 @pytest.fixture
 def dummy_geocoder(request):
-    patched = patch('crm.geocache.get_adaptor')
+    patched = patch('geocodable.api.get_adaptor')
     mock = patched.start()
     mock.return_value = DummyAdaptor()
     request.addfinalizer(patched.stop)
