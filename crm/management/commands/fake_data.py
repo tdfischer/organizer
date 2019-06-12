@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
-from address.models import Locality, State, Country
+from geocodable.models import Location, LocationType, LocationAlias
 from faker import Faker
 import random
 from datetime import timedelta
@@ -32,34 +32,36 @@ class Command(BaseCommand): # pragma: no cover
     def handle(self, *args, **options):
         if not settings.DEBUG:
                 raise EnvironmentError("I won't allow you to run fake_data without setting the DEBUG environment variable.")
-        country = Country.objects.get_or_create(name=fake.country())[0]
-        state = State.objects.get_or_create(name=fake.state(),
-                country=country)[0]
-        locality = Locality.objects.get_or_create(name=fake.city(),
-                state=state)[0]
-        localFakeAddress = lambda: fakeAddress(dict(
-            locality = locality.name,
-            country = country.name,
-            state = state.name
-        ))
+        country = Location.objects.get_or_create(name=fake.country(),
+                type=LocationType.COUNTRY)[0]
+        state = Location.objects.get_or_create(name=fake.state(),
+                parent=country, type=LocationType.STATE)[0]
+        locality = Location.objects.get_or_create(name=fake.city(),
+                parent=state, type=LocationType.LOCALITY)[0]
 
-        print "Populating %s, %s, %s with 100 people..."%(locality.name, state.name,
-                country.name)
+        print "Populating %s with 100 people..."%(locality.fullName)
         people = self.create_model(models.Person, 100, {
             'name': fakeName,
-            'address': localFakeAddress,
+            'location': lambda: fakeLocationAlias(locality),
             'email': fake.email,
-            'lat': fakeLatitude,
-            'lng': fakeLongitude
         })
 
-        events = self.create_model(Event, 20, lambda: fakeEventData(localFakeAddress))
+        events = self.create_model(Event, 20, lambda: fakeEventData(lambda:
+            fakeLocationAlias(locality)))
 
         for person in people:
             for idx in range(0, 10):
                 evt = random.choice(events)
                 evt.attendees.add(person)
                 evt.save()
+
+def fakeLocation(parent):
+    return Location.objects.create(parent=parent, lat=fakeLatitude(),
+            lng=fakeLongitude(), type=LocationType.ROUTE, name=fake.name() + ' Street')
+
+def fakeLocationAlias(parent):
+    return LocationAlias.objects.create(location=fakeLocation(parent),
+            raw=parent.fullName, nonce=parent.fullName)
 
 def fakeLatitude():
     return random.triangular(settings.DUMMY_GEOCODE_CENTER[0]-0.01,
@@ -90,8 +92,6 @@ def fakeEventData(locationFaker):
     return {
         'name': fake.catch_phrase(),
         'location': locationFaker(),
-        'lat': fakeLatitude(),
-        'lng': fakeLongitude(),
         'timestamp': start,
         'end_timestamp': start + timedelta(hours=1),
         'uid': fake.uuid4
