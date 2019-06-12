@@ -4,7 +4,7 @@ from crm.models import Person
 from django.conf import settings
 from airtable import Airtable
 from import_export import resources, fields, widgets
-from organizer.importing import DatasetImporter, AddressWidget
+from organizer.importing import DatasetImporter
 import tablib
 import stripe
 from datetime import datetime
