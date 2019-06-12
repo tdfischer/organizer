@@ -14,7 +14,7 @@ from hypothesis.strategies import characters, just, sampled_from, emails, floats
 import string
 from geopy.location import Location
 from geopy.point import Point
-from . import geocache, models, exporting
+from . import models, exporting
 from rest_framework.test import APITestCase
 import pytest
 import functools
@@ -132,36 +132,6 @@ def locations(draw):
     resp = draw(googleResponses())
     asPoint = Point(resp['geometry']['location']['lat'], resp['geometry']['location']['lng'])
     return Location(resp['formatted_address'], asPoint, resp)
-
-@pytest.mark.skip(reason="Porting to geocodable API")
-@pytest.mark.django_db
-@given(locations())
-def testDecoder(response):
-    decoded = geocache.decode_response(response)
-    assert response.latitude == decoded['lat']
-    assert response.longitude == decoded['lng']
-
-@pytest.mark.skip(reason="Porting to geocodable API")
-@pytest.mark.fake_redis
-@pytest.mark.django_db
-@given(response=locations())
-@pytest.mark.filterwarnings("ignore::django.core.cache.backends.base.CacheKeyWarning")
-def testUpdatePersonGeo(response, db, person, dummy_geocoder):
-    """Test that processing a user's geocode result updates lat/lng properly"""
-    dummy_geocoder.set_response(response)
-    note('Raw: %r' % (response.raw,))
-    note('Address: %r' % (response.address,))
-
-    person.address = response.address
-    person.save()
-    person.refresh_from_db()
-
-    if person.update_geo():
-        assert person.lat == response.latitude
-        assert person.lng == response.longitude
-    else:
-        assert person.lat is None
-        assert person.lng is None
 
 def assertValidResponse(resp, status=200):
     __tracebackhide__ = True

@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 from django.db import models
 from django.utils import timezone
 from crm.models import Person
-from crm import geocache
 from geocodable.models import LocationAlias
 import uuid
 

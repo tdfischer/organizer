@@ -7,7 +7,6 @@ from django.utils import timezone
 from django.urls import reverse
 from django.conf import settings
 from taggit.managers import TaggableManager
-from crm import geocache
 from geocodable.models import LocationAlias, LocationType
 import django_rq
 import logging
