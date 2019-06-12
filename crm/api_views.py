@@ -13,7 +13,6 @@ from django.conf import settings
 from django.http import Http404
 import django_rq
 from . import models, serializers
-import address
 from airtable import Airtable
 import requests
 from organizer.viewsets import IntrospectiveViewSet
@@ -83,13 +82,7 @@ class PersonViewSet(AllowPUTAsCreateMixin, IntrospectiveViewSet):
     lookup_field = 'email'
     lookup_value_regex = '[^/]+'
 
-class CityViewSet(IntrospectiveViewSet):
-    permission_classes = (IsAuthenticated,)
-    queryset = address.models.Locality.objects.all()
-    serializer_class = serializers.LocalitySerializer
-
 views = {
     'users': UserViewSet,
     'people': PersonViewSet,
-    'cities': CityViewSet
 }
