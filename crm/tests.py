@@ -17,7 +17,6 @@ from geopy.point import Point
 from . import geocache, models, exporting
 from rest_framework.test import APITestCase
 import pytest
-from address.models import Address
 import functools
 from django.urls.base import reverse
 
@@ -41,7 +40,7 @@ geocodeTest = \
     )
 
 @pytest.fixture
-def person(redis_server):
+def person():
     return models.Person.objects.get_or_create(name='',
             email='test@example.com')[0]
 
@@ -143,7 +142,7 @@ def testDecoder(response):
     assert response.longitude == decoded['lng']
 
 @pytest.mark.skip(reason="Porting to geocodable API")
-@pytest.mark.mock_redis
+@pytest.mark.fake_redis
 @pytest.mark.django_db
 @given(response=locations())
 @pytest.mark.filterwarnings("ignore::django.core.cache.backends.base.CacheKeyWarning")
@@ -169,7 +168,6 @@ def assertValidResponse(resp, status=200):
     assert resp.status_code == status
     return resp
 
-@pytest.mark.mock_redis
 @pytest.mark.django_db
 def testPermissions(api_client, person):
     """Ensure that we do not have access to PII by default"""

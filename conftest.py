@@ -8,6 +8,7 @@ from rest_framework.test import APITestCase, APIClient
 from django.contrib.auth.models import User
 import subprocess
 from geocodable.api import DummyAdaptor
+from birdisle.redis import StrictRedis
 
 settings.register_profile("ci", max_examples=300)
 settings.register_profile("dev", max_examples=10)
@@ -50,12 +51,13 @@ def redis_server(request):
     request.addfinalizer(override.disable)
 
 @pytest.fixture
-def redis_queue(request):
-    patched = patch('django_rq.queues.get_queue')
+def mock_redis(request):
+    patched = patch('django_rq.queues.get_redis_connection')
     override = override_settings(**DUMMY_CACHE_CONFIG)
     override.enable()
     mock = patched.start()
     mock.reset_mock()
+    mock.return_value = StrictRedis()
     request.addfinalizer(patched.stop)
     request.addfinalizer(override.disable)
     return mock.return_value
@@ -87,7 +89,7 @@ def _disable_ssl(request):
 def _mock_redis_markers(request):
     marker = request.node.get_closest_marker('mock_redis')
     if marker:
-        request.getfixturevalue("redis_queue")
+        request.getfixturevalue("mock_redis")
 
     marker = request.node.get_closest_marker('redis_server')
     if marker:
