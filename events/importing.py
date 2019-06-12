@@ -6,13 +6,12 @@ from httplib2 import Http
 import json
 import argparse
 from oauth2client import client, tools, service_account
-from crm.importing import DatasetImporter, AddressWidget
+from crm.importing import DatasetImporter, LocationAliasWidget
 from crm.models import Person
 from datetime import timedelta
 from django.utils import timezone, dateparse
 from import_export import resources, widgets, fields, instance_loaders
 import tablib
-from address.models import Address
 import dateutil.parser
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -45,7 +44,7 @@ class EventResource(resources.ModelResource):
     location = fields.Field(
         column_name = 'location',
         attribute = 'location',
-        widget = AddressWidget()
+        widget = LocationAliasWidget()
     )
 
     def skip_row(self, instance, previous):

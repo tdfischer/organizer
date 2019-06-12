@@ -7,16 +7,15 @@ import itertools
 from airtable import Airtable
 from import_export import resources, fields, widgets
 import tablib
-from address.models import Address
-from organizer.importing import DatasetImporter, AddressWidget
+from organizer.importing import DatasetImporter, LocationAliasWidget
 from mailchimp3 import MailChimp
 
 
 class PersonResource(resources.ModelResource):
-    address = fields.Field(
-        column_name = 'address',
-        attribute = 'address',
-        widget=AddressWidget(),
+    location = fields.Field(
+        column_name = 'location',
+        attribute = 'location',
+        widget=LocationAliasWidget(),
         saves_null_values = False
     )
 
@@ -28,7 +27,7 @@ class PersonResource(resources.ModelResource):
     class Meta:
         model = models.Person
         import_id_fields = ('email',)
-        fields = ('email', 'name', 'address')
+        fields = ('email', 'name', 'location')
         report_skipped = True
         skip_unchanged = True
 
