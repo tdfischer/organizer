@@ -27,8 +27,11 @@ class OrganizerAdmin(admin.AdminSite):
                 adminLink = reverse('organizer-admin:%s_%s_changelist'%(f.content_type.app_label,
                     f.content_type.model)) + "?named_filter=%s"%(f.pk,)
             except Exception, e:
-                adminLink = reverse('admin:%s_%s_changelist'%(f.content_type.app_label,
-                    f.content_type.model)) + "?named_filter=%s"%(f.pk,)
+                try:
+                    adminLink = reverse('admin:%s_%s_changelist'%(f.content_type.app_label,
+                        f.content_type.model)) + "?named_filter=%s"%(f.pk,)
+                except Exception, e:
+                    adminLink = None
             try:
                 filterResults.append({
                     'count': f.results.count(),
