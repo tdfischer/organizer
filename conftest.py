@@ -23,6 +23,15 @@ DUMMY_CACHE_CONFIG = {
     },
 }
 
+SYNC_QUEUE_CONFIG = {
+    'RQ_QUEUES': {
+        'default': {
+            'USE_REDIS_CACHE': 'default',
+            'ASYNC': False
+        }
+    }
+}
+
 DUMMY_SERVER_CONFIG = {
     'CACHES': {
         'default': {
@@ -30,12 +39,6 @@ DUMMY_SERVER_CONFIG = {
             'LOCATION': 'redis://localhost:6379/0'
         }
     },
-    'RQ_QUEUES': {
-        'default': {
-            'USE_REDIS_CACHE': 'default',
-            'ASYNC': False
-        }
-    }
 }
 
 @pytest.fixture
@@ -49,6 +52,13 @@ def redis_server(request):
     override.enable()
     request.addfinalizer(proc.kill)
     request.addfinalizer(override.disable)
+
+@pytest.fixture
+def sync_rq(request):
+    override = override_settings(**SYNC_QUEUE_CONFIG)
+    override.enable()
+    request.addfinalizer(override.stop)
+    return None
 
 @pytest.fixture
 def mock_redis(request):
@@ -94,6 +104,10 @@ def _mock_redis_markers(request):
     marker = request.node.get_closest_marker('redis_server')
     if marker:
         request.getfixturevalue("redis_server")
+
+    marker = request.node.get_closest_marker('sync_rq')
+    if marker:
+        request.getfixturevalue("sync_rq")
 
 @pytest.fixture
 def dummy_geocoder(request):
