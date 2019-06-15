@@ -70,6 +70,8 @@ class ComponentAdmin(admin.ModelAdmin):
 
 admin.site.register(models.Signup, SignupAdmin)
 admin.site.register(models.OnboardingStatus, StatusAdmin)
+admin_site.register(models.OnboardingStatus, StatusAdmin)
 admin.site.register(models.OnboardingComponent, ComponentAdmin)
+admin_site.register(models.OnboardingComponent, ComponentAdmin)
 
 admin_site.register(models.Signup, SignupAdmin)

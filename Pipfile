@@ -28,7 +28,7 @@ geopy = "==1.17.0"
 pyparsing = "==2.2.0"
 pytz = "==2017.2"
 requests = "*"
-six = "==1.10.0"
+six = ">=1.10.0"
 webencodings = "==0.5.1"
 whitenoise = {version = "*",extras = ["brotli"]}
 gunicorn = "*"
@@ -64,6 +64,7 @@ rq = "==0.12.0"
 slackclient = "*"
 django-mptt = "*"
 django-enumfields = "*"
+birdisle = "*"
 
 [requires]
 python_version = "2.7"

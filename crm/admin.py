@@ -22,7 +22,7 @@ from onboarding.jobs import runOnboarding
 from filtering.models import FilterNode
 from django.core.mail import send_mail
 from django.conf import settings
-from address.models import Locality
+from geocodable.models import Location, LocationType
 from organizer.admin import admin_site, OrganizerModelAdmin
 import StringIO
 
@@ -61,25 +61,14 @@ class CityFilter(admin.SimpleListFilter):
     parameter_name = 'city'
 
     def lookups(self, request, model_admin):
-        return map(lambda x: (x.name, x.name),
-                Locality.objects.all().distinct('name').order_by('name'))
+        return map(lambda x: (x.id, x.fullName),
+                Location.objects.filter(type=LocationType.LOCALITY).order_by('name'))
 
     def queryset(self, request, queryset):
         if self.value() is not None:
-            return queryset.filter(address__locality__name=self.value())
-        return queryset
-
-class LocalityFilter(CityFilter):
-    title = 'City'
-    parameter_name = 'locality'
-
-    def lookups(self, request, model_admin):
-        return map(lambda x: (x.id, x.name),
-                Locality.objects.all().order_by('name'))
-
-    def queryset(self, request, queryset):
-        if self.value() is not None:
-            return queryset.filter(locality_id=self.value())
+            city = Location.objects.get(pk=self.value())
+            return queryset.filter(location__location_id__gte=city.lft,
+                    location__location_id__lte=city.rght)
         return queryset
 
 class NamedFilterFilter(admin.SimpleListFilter):
@@ -98,13 +87,13 @@ class NamedFilterFilter(admin.SimpleListFilter):
 class PersonAdmin(ImportExportModelAdmin, OrganizerModelAdmin):
     resource_class = importing.PersonResource
     search_fields = [
-        'name', 'email', 'address__raw', 'address__locality__name',
+        'name', 'email', 'location__raw', 'location__location__name',
         'phone'
     ]
 
     fieldsets = (
         (None, {
-            'fields': (('name', 'email'), ('phone', 'address'))
+            'fields': (('name', 'email'), ('phone', 'location'))
         }),
         ('Membership', {
             'fields': ('attendance_record', 'donation_record',
@@ -186,11 +175,11 @@ class PersonAdmin(ImportExportModelAdmin, OrganizerModelAdmin):
     )
 
     list_display = [
-        'name', 'email', 'phone', 'city', 'valid_geo',
+        'email', 'name', 'phone', 'city', 'valid_geo',
         'onboarded', 'is_captain'
     ]
 
-    select_related = ['address__locality']
+    select_related = ['location__location']
 
     def onboarded(self, obj):
         curCount = obj.onboarding_statuses.filter(success=True).aggregate(count=Count('component'))['count']
@@ -201,7 +190,7 @@ class PersonAdmin(ImportExportModelAdmin, OrganizerModelAdmin):
         return not (obj.lat is None or obj.lng is None)
 
     def city(self, obj):
-        return obj.address.locality
+        return str(obj.location)
 
     readonly_fields = ['lat', 'lng', 'created', 'attendance_record',
     'donation_record', 'onboarding_status']

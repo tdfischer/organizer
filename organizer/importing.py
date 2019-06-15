@@ -1,7 +1,7 @@
 from django.conf import settings
 from importlib import import_module
 from import_export import widgets
-from address.models import Address
+from geocodable.models import LocationAlias
 
 class DatasetImporter(object):
     """Importing backend. Implement a subclass of this to add more importing
@@ -45,15 +45,11 @@ def collect_importers():
             ret.update(imported.importers)
     return ret
 
-class AddressWidget(widgets.Widget):
+class LocationAliasWidget(widgets.Widget):
     def clean(self, value, row, *args, **kwargs):
         if value is None:
             return None
-        ret = Address.objects.filter(raw=value).first()
-        if ret is None:
-            return Address.objects.create(raw=value)
-        else:
-            return ret
+        return LocationAlias.objects.fromRaw(value)
 
     def render(self, value, obj=None):
         if value is None:

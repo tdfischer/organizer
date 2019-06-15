@@ -114,11 +114,13 @@ INSTALLED_APPS = [
     'import_export',
     'taggit',
     'taggit_serializer',
+    'mptt',
     'crm',
     'onboarding',
     'events',
     'donations',
-    'filtering'
+    'filtering',
+    'geocodable'
 ]
 
 #Force SSL if debug is disabled
@@ -303,9 +305,9 @@ RAVEN_CONFIG = {
 DEFAULT_CHARSET="utf-8"
 
 if DEBUG:
-    DEFAULT_GEOCODE_ADAPTOR = 'crm.geocache.DummyAdaptor'
+    DEFAULT_GEOCODE_ADAPTOR = 'geocodable.api.DummyAdaptor'
 else:
-    DEFAULT_GEOCODE_ADAPTOR = 'crm.geocache.GoogleAdaptor'
+    DEFAULT_GEOCODE_ADAPTOR = 'geocodable.api.GoogleAdaptor'
 
 GEOCODE_ADAPTOR = os.environ.get('GEOCODE_ADAPTOR', DEFAULT_GEOCODE_ADAPTOR)
 

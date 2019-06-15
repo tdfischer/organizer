@@ -7,9 +7,12 @@
     "build": "webpack -p --config webpack.prod.js",
     "build:docs": "sphinx-build -b html . ./_build",
     "frontend": "webpack-dev-server --config webpack.dev.js",
+    "frontend:public": "webpack-dev-server --config webpack.dev.js --host 0.0.0.0",
     "backend": "python manage.py runserver",
+    "backend:public": "python manage.py runserver 0.0.0.0:8000",
     "worker": "python manage.py rqworker",
     "redis": "redis-server",
+    "start:docker": "concurrently -p name --names \"JEST,WEBPACK,DJANGO\" --kill-others npm:watch-test npm:frontend:public npm:backend:public",
     "start": "concurrently -c \"bgYellow,bgBlue.bold,bgGreen.bold,bgMagenta.bold,bgRed\" -p name --names \"JEST,WEBPACK,DJANGO,WORKER,REDIS\" --kill-others npm:watch-test npm:frontend npm:backend npm:redis",
     "watch-test": "jest --watch --color --coverage",
     "test": "jest"

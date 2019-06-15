@@ -12,7 +12,7 @@ from crm.models import Person
 from events.models import Event
 
 @pytest.mark.django_db
-@pytest.mark.redis_server
+@pytest.mark.mock_redis
 @pytest.mark.mock_geocoder
 def testBasicFilters():
     node = models.FilterNode.objects.create(
@@ -34,7 +34,7 @@ def testBasicFilters():
     assert(not notNode.results.exists())
 
 @pytest.mark.django_db
-@pytest.mark.redis_server
+@pytest.mark.mock_redis
 @pytest.mark.mock_geocoder
 def testDateAdjustments():
     beforeOrAfter = models.FilterNode.objects.create(
@@ -64,7 +64,7 @@ def testDateAdjustments():
     assert(len(beforeOrAfter.as_string()) > 0)
 
 @pytest.mark.django_db
-@pytest.mark.redis_server
+@pytest.mark.mock_redis
 @pytest.mark.mock_geocoder
 def testCountAnnotations():
     eventCount = models.Annotation.objects.create(

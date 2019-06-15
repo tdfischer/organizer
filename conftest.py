@@ -7,7 +7,8 @@ from django.test import override_settings
 from rest_framework.test import APITestCase, APIClient
 from django.contrib.auth.models import User
 import subprocess
-from crm.geocache import DummyAdaptor
+from geocodable.api import DummyAdaptor
+from birdisle.redis import StrictRedis
 
 settings.register_profile("ci", max_examples=300)
 settings.register_profile("dev", max_examples=10)
@@ -22,6 +23,15 @@ DUMMY_CACHE_CONFIG = {
     },
 }
 
+SYNC_QUEUE_CONFIG = {
+    'RQ_QUEUES': {
+        'default': {
+            'USE_REDIS_CACHE': 'default',
+            'ASYNC': False
+        }
+    }
+}
+
 DUMMY_SERVER_CONFIG = {
     'CACHES': {
         'default': {
@@ -29,12 +39,6 @@ DUMMY_SERVER_CONFIG = {
             'LOCATION': 'redis://localhost:6379/0'
         }
     },
-    'RQ_QUEUES': {
-        'default': {
-            'USE_REDIS_CACHE': 'default',
-            'ASYNC': False
-        }
-    }
 }
 
 @pytest.fixture
@@ -50,12 +54,20 @@ def redis_server(request):
     request.addfinalizer(override.disable)
 
 @pytest.fixture
-def redis_queue(request):
-    patched = patch('django_rq.queues.get_queue')
+def sync_rq(request):
+    override = override_settings(**SYNC_QUEUE_CONFIG)
+    override.enable()
+    request.addfinalizer(override.stop)
+    return None
+
+@pytest.fixture
+def mock_redis(request):
+    patched = patch('django_rq.queues.get_redis_connection')
     override = override_settings(**DUMMY_CACHE_CONFIG)
     override.enable()
     mock = patched.start()
     mock.reset_mock()
+    mock.return_value = StrictRedis()
     request.addfinalizer(patched.stop)
     request.addfinalizer(override.disable)
     return mock.return_value
@@ -87,15 +99,19 @@ def _disable_ssl(request):
 def _mock_redis_markers(request):
     marker = request.node.get_closest_marker('mock_redis')
     if marker:
-        request.getfixturevalue("redis_queue")
+        request.getfixturevalue("mock_redis")
 
     marker = request.node.get_closest_marker('redis_server')
     if marker:
         request.getfixturevalue("redis_server")
 
+    marker = request.node.get_closest_marker('sync_rq')
+    if marker:
+        request.getfixturevalue("sync_rq")
+
 @pytest.fixture
 def dummy_geocoder(request):
-    patched = patch('crm.geocache.get_adaptor')
+    patched = patch('geocodable.api.get_adaptor')
     mock = patched.start()
     mock.return_value = DummyAdaptor()
     request.addfinalizer(patched.stop)

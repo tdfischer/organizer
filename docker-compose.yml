@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  db:
+    image: postgres
+    ports:
+      - "5432:5432"
+  redis:
+    image: redis
+  app:
+    build: .
+    environment:
+      DATABASE_URL: "postgres://postgres@db:5432/postgres"
+      REDISTOGO_URL: "redis://redis:6379/0"
+      ALLOWED_HOSTS: "*"
+      DEBUG: 1
+      SECRET_KEY: 'fyq9-o@ky!j*xx0y2mpyi92&wpbbjgo%z1@vrmzk18hpje+%x'
+    command: pipenv run npm run start:docker
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+      - "8080:8080"
+    depends_on:
+      - db
+      - redis

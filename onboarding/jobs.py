@@ -16,9 +16,8 @@ logger = logging.getLogger(__name__)
 @receiver(post_save, sender=Person)
 def queuePersonChange(sender, instance, **kwargs):
     if settings.AUTOMATIC_ONBOARDING:
-        runOnboarding.delay(instance)
+        django_rq.enqueue(runOnboarding, instance)
 
-@django_rq.job
 def runOnboarding(person):
     logger.info("Executing onboarding for %s", person)
     components = models.OnboardingComponent.objects.filter(enabled=True)
