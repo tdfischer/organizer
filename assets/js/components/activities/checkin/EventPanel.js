@@ -114,10 +114,10 @@ export const EventList = withStyles(listStyles)(EventListBase)
 
 export const EventPanel = props => {
     const eventID = props.eventID
-    const submitSignup = (id) => props.createSignup({email: props.currentUser.email}, id)
+    const submitSignup = (email, id) => props.createSignup({email: email}, id)
     const doCheckIn = (evt) => {
         if (props.loggedIn) {
-            submitSignup(evt.id)
+            submitSignup(props.currentUser.email, evt.id)
         } else {
             props.setEventID(evt.id)
             props.setOpen(true)
@@ -130,7 +130,7 @@ export const EventPanel = props => {
                     events={props.nearbyEvents}
                     onCheckIn={doCheckIn} />
                 <Dialog open={props.isOpen} onClose={() => props.setOpen(false)}>
-                    <SignupForm onSubmit={() => submitSignup(eventID)} />
+                    <SignupForm onSubmit={(values) => submitSignup(values.email, eventID)} />
                 </Dialog>
             </NoEvents>
         ) : (
