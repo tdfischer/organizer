@@ -122,7 +122,8 @@ INSTALLED_APPS = [
     'donations',
     'filtering',
     'geocodable',
-    'sync'
+    'sync',
+    'notifications'
 ]
 
 #Force SSL if debug is disabled
