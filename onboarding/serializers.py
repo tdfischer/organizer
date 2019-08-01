@@ -1,5 +1,5 @@
 from rest_framework import serializers, relations
-from crm.serializers import AddressSerializer, PersonSerializer
+from crm.serializers import PersonSerializer
 from . import models
 from events.models import Event
 

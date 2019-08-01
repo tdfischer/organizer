@@ -1,10 +1,11 @@
 from rest_framework import serializers, relations
-from crm.serializers import AddressSerializer, PersonSerializer
+from crm.serializers import PersonSerializer
+from geocodable.serializers import GeoSerializer
 from . import models
 from crm.models import Person
 
 class EventSerializer(serializers.HyperlinkedModelSerializer):
-    location = AddressSerializer(read_only=True)
+    geo = GeoSerializer(read_only=True)
     attendee_count = serializers.SerializerMethodField()
     user_has_checked_in = serializers.SerializerMethodField()
 

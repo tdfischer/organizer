@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
-from crm.api_views import IntrospectiveViewSet
+from organizer.viewsets import IntrospectiveViewSet
 from . import models, serializers
 
 class SignupViewSet(IntrospectiveViewSet):

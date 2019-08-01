@@ -7,6 +7,12 @@ class LocationViewSet(IntrospectiveViewSet):
     queryset = models.Location.objects.all()
     serializer_class = serializers.LocationSerializer
 
+class LocationAliasViewSet(IntrospectiveViewSet):
+    permission_classes = (IsAuthenticated,)
+    queryset = models.LocationAlias.objects.all()
+    serializer_class = serializers.GeoSerializer
+
 views = {
-    'locations': LocationViewSet
+    'locations': LocationViewSet,
+    'locationaliases': LocationAliasViewSet
 }
