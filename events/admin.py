@@ -31,7 +31,14 @@ class EventAdmin(OrganizerModelAdmin):
         })
     )
 
+    def lat(self, obj):
+        return obj.lat
+
+    def lng(self, obj):
+        return obj.lng
+
     filter_horizontal = ('attendees',)
+    readonly_fields = ['lat', 'lng']
 
     def attendee_count(self, obj):
         return obj.attendees.count()
