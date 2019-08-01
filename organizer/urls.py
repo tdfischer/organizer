@@ -20,6 +20,9 @@ from importlib import import_module
 from rest_framework import routers
 from organizer.admin import admin_site
 
+from django.core import urlresolvers
+from django.http import HttpResponse
+
 from crm import views
 
 router = routers.DefaultRouter()
@@ -36,7 +39,34 @@ for app in settings.INSTALLED_APPS:
             else:
                 router.register(slug, viewset)
 
+def show_url_patterns(request):
+    patterns = _get_named_patterns()
+    r = HttpResponse("Named URLS:\n", content_type = 'text/plain')
+    longest = max([len(pair[0]) for pair in patterns])
+    for key, value in patterns:
+        r.write('%s %s\n' % (key.ljust(longest + 1), value))
+    r.write('All URLs:\n')
+    show_urls(r, urlpatterns)
+    return r
+
+def _get_named_patterns():
+    "Returns list of (pattern-name, pattern) tuples"
+    resolver = urlresolvers.get_resolver(None)
+    patterns = sorted([
+        (key, value[0][0][0])
+        for key, value in resolver.reverse_dict.items()
+        if isinstance(key, basestring)
+    ])
+    return patterns
+
+def show_urls(response, urllist, depth=0):
+     for entry in urllist:
+         response.write('%s %s\n' % ('    ' * depth, entry.regex.pattern))
+         if hasattr(entry, 'url_patterns'):
+             show_urls(response, entry.url_patterns, depth+1)
+
 urlpatterns = [
+    url(r'^urls/', show_url_patterns),
     url(r'^admin/', admin_site.urls),
     url(r'^superuser/', admin.site.urls),
     url(r'^api/', include(router.urls)),

@@ -140,6 +140,7 @@ def testResolveAliasFailure(db, dummy_geocoder):
 @pytest.mark.mock_redis
 @pytest.mark.django_db
 @given(response=locations(), secondResponse=locations())
+@hypothesisSettings(deadline=1000)
 @pytest.mark.filterwarnings("ignore::django.core.cache.backends.base.CacheKeyWarning")
 def testResolveAlias(response, secondResponse, dummy_geocoder):
     """Test an alias can resolve to a location"""

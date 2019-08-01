@@ -65,6 +65,7 @@ slackclient = "*"
 django-mptt = "*"
 django-enumfields = "*"
 birdisle = "*"
+django-taggit-helpers = "*"
 
 [requires]
 python_version = "2.7"
