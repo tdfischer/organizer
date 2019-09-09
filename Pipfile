@@ -66,6 +66,7 @@ django-mptt = "*"
 django-enumfields = "*"
 birdisle = "*"
 django-taggit-helpers = "*"
+tablib = "==0.12.1"
 
 [requires]
 python_version = "2.7"
