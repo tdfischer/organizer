@@ -6,7 +6,7 @@ exporterCache = None
 def get_exporter_class(name):
     global exporterCache
     if exporterCache is None:
-        exporterCache = collect_importers()
+        exporterCache = collect_exporters()
     return exporterCache.get(name)
 
 def collect_exporters():
