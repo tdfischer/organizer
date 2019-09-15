@@ -5,7 +5,7 @@ from mailchimp3 import MailChimp
 import hashlib
 
 from organizer.exporting import DatasetExporter
-from crm.importing import PersonResource
+from crm.resources import PersonResource
 
 log = logging.getLogger(__name__)
 

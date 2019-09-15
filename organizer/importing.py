@@ -56,14 +56,3 @@ def collect_importers():
         if hasattr(imported, 'importers'):
             ret.update(imported.importers)
     return ret
-
-class LocationAliasWidget(widgets.Widget):
-    def clean(self, value, row, *args, **kwargs):
-        if value is None:
-            return None
-        return LocationAlias.objects.fromRaw(value)
-
-    def render(self, value, obj=None):
-        if value is None:
-            return None
-        return value.raw

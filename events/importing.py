@@ -5,7 +5,8 @@ from httplib2 import Http
 import json
 import argparse
 from oauth2client import client, tools, service_account
-from crm.importing import DatasetImporter, LocationAliasWidget
+from organizer.importing import DatasetImporter
+from geocodable.resources import LocationAliasWidget
 from crm.models import Person
 from datetime import timedelta
 from django.utils import timezone, dateparse

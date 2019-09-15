@@ -15,7 +15,7 @@ from django.utils.html import format_html_join
 from django.utils.safestring import mark_safe
 from django.db import transaction
 from django.db.models import Count, Sum
-from . import models, importing
+from . import models, resources
 from import_export.admin import ImportExportModelAdmin
 from onboarding.models import OnboardingComponent
 from onboarding.jobs import runOnboarding
@@ -86,7 +86,7 @@ class NamedFilterFilter(admin.SimpleListFilter):
         return queryset
 
 class PersonAdmin(ImportExportModelAdmin, OrganizerModelAdmin):
-    resource_class = importing.PersonResource
+    resource_class = resources.PersonResource
     search_fields = [
         'name', 'email', 'location__raw', 'location__location__name',
         'phone','tags__name'

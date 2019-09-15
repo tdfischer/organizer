@@ -1,86 +1,16 @@
 import logging
 import csv
-from . import models
 from geopy.geocoders import GoogleV3
+from . import models, resources
 from django.conf import settings
 import itertools
 from airtable import Airtable
 from import_export import resources, fields, widgets
 import tablib
-from organizer.importing import DatasetImporter, LocationAliasWidget
+from organizer.importing import DatasetImporter
 from mailchimp3 import MailChimp
 from django import forms
 import requests
-
-class CommaSeparatedListWidget(widgets.ManyToManyWidget):
-    def __init__(self, *args, **kwargs):
-        super(CommaSeparatedListWidget, self).__init__(*args, model=None, **kwargs)
-
-    def clean(self, value, row=None, *args, **kwargs):
-        return value.split(',')
-
-    def render(self, obj = None, *args, **kwargs):
-        try:
-            i = iter(obj)
-        except TypeError:
-            return ''
-        return ','.join(i)
-
-class TagSetField(fields.Field):
-    def __init__(self, append=True, remove=False, replace=False, *args,
-            **kwargs):
-        super(TagSetField, self).__init__(*args, **kwargs)
-        self.append = append
-        self.remove = remove
-        self.replace = replace
-
-    def export(self, obj):
-        value = self.get_value(obj)
-        if value is None:
-            return ''
-        return self.widget.render(value.names(), obj)
-
-    def save(self, obj, data, is_m2m=False):
-        if not self.readonly and is_m2m:
-            attrs = self.attribute.split('__')
-            for attr in attrs[:-1]:
-                obj = getattr(obj, attr, None)
-            cleaned = self.clean(data)
-            if cleaned is not None or self.saves_null_values:
-                if self.append:
-                    getattr(obj, attrs[-1]).add(*cleaned)
-                elif self.remove:
-                    getattr(obj, attrs[-1]).remove(*cleaned)
-                elif self.replace:
-                    getattr(obj, attrs[-1]).set(*cleaned)
-
-
-class PersonResource(resources.ModelResource):
-    location = fields.Field(
-        column_name = 'location',
-        attribute = 'location',
-        widget=LocationAliasWidget(),
-        saves_null_values = False
-    )
-
-    tags = TagSetField(
-        column_name = 'tags',
-        attribute = 'tags',
-        widget=CommaSeparatedListWidget(),
-        saves_null_values=False
-    )
-
-    def skip_row(self, instance, previous):
-        if instance.email is None:
-            return True
-        return super(PersonResource, self).skip_row(instance, previous)
-
-    class Meta:
-        model = models.Person
-        import_id_fields = ('email',)
-        fields = ('email', 'name', 'location', 'tags')
-        report_skipped = True
-        skip_unchanged = True
 
 class TypeformImportForm(forms.Form):
     form_id = forms.ChoiceField()
@@ -119,7 +49,7 @@ class TypeformImportForm(forms.Form):
 
 class TypeformImporter(DatasetImporter):
     class Meta:
-        resource = PersonResource()
+        resource = resources.PersonResource()
 
     def init(self):
         self.nextToken = None
@@ -172,7 +102,7 @@ class AirtableImporterForm(forms.Form):
 
 class AirtableImporter(DatasetImporter):
     class Meta:
-        resource = PersonResource()
+        resource = resources.PersonResource()
 
     def init(self):
         self.__airtable = Airtable(
@@ -214,7 +144,7 @@ class MailchimpImporterForm(forms.Form):
 
 class MailchimpImporter(DatasetImporter):
     class Meta:
-        resource = PersonResource()
+        resource = resources.PersonResource()
 
     def __init__(self, *args, **kwargs):
         super(MailchimpImporter, self).__init__(*args, **kwargs)
