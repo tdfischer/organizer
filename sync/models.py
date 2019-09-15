@@ -5,8 +5,8 @@ from django.db import models
 from django.contrib.auth.models import User
 import json
 from organizer.importing import DatasetImporter
+from organizer.exporting import DatasetExporter
 
-#FIXME: This only supports importing data, no exporting or full sync is implemented yet
 class ImportSource(models.Model):
     name = models.CharField(max_length=255)
     backend = models.CharField(max_length=255)
@@ -20,6 +20,17 @@ class ImportSource(models.Model):
 
     def __unicode__(self):
         return '%s: %s' % (self.name, self.backend)
+
+class ExportSink(models.Model):
+    name = models.CharField(max_length=255)
+    backend = models.CharField(max_length=255)
+    enabled = models.BooleanField(default=False)
+    configuration = models.TextField(blank=True, null=True)
+    lastRun = models.DateTimeField(blank=True, null=True)
+
+    def make_exporter(self):
+        importCls = DatasetExporter.get_plugin(self.backend)
+        return importCls(json.loads(self.configuration))
 
     def __unicode__(self):
         return '%s: %s' % (self.name, self.backend)

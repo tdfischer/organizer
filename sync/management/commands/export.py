@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
-from crm.exporting import AirtableExporter
-from organizer.exporting import get_exporter_class, collect_exporters
+from crm import models
+from organizer.exporting import DatasetExporter
 from tqdm import tqdm
 import logging
 
@@ -19,18 +19,20 @@ class Command(BaseCommand):
         dryRun = options['dry_run']
 
         exporters = []
-        for dest in options['destination']:
-            exporterCls = get_exporter_class(dest)
-            if exporterCls is None:
-                print "No such exporter:", dest
-                print "Available exporters:", ', '.join(collect_exporters().keys())
-                return
-            exporters.append((dest, exporterCls()))
+        if len(options['target']) == 0:
+            for target in models.ExportSink.objects.filter(enabled=True):
+                exporters.append((target, target.make_exporter()))
+        else:
+            for targetName in options['target']:
+                target = models.ExportSink.objects.get(name=targetName)
+                exporters.append((target, target.make_exporter))
 
         with tqdm(exporters, desc='destinations', unit=' destination') as expIt:
-            for (exporterName, exporter) in expIt:
+            for (target, exporter) in expIt:
                 exportedResource = exporter.Meta.resource()
-                with tqdm(exporter, desc=exporterName, unit=' page') as it:
+                with tqdm(exporter, desc=target.name, unit=' page') as it:
                     log.debug('Exporting %s items', len(exporter))
                     for page in it:
                         exporter.export_page(page, dry_run=dryRun)
+                    target.lastRun = timezone.now()
+                    target.save()
