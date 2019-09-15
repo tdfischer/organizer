@@ -61,7 +61,8 @@ def _get_named_patterns():
 
 def show_urls(response, urllist, depth=0):
      for entry in urllist:
-         response.write('%s %s\n' % ('    ' * depth, entry.regex.pattern))
+         response.write('%s %s %s\n' % ('    ' * depth, entry.regex.pattern,
+             getattr(entry, 'name', '')))
          if hasattr(entry, 'url_patterns'):
              show_urls(response, entry.url_patterns, depth+1)
 
