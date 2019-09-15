@@ -3,7 +3,6 @@ from django.conf import settings
 from importlib import import_module
 from tqdm import tqdm
 import sys
-from organizer.importing import get_importer_class, collect_importers
 from sync import models
 import logging
 from django.utils import timezone

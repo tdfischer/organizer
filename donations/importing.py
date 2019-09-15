@@ -32,6 +32,7 @@ class DonationResource(resources.ModelResource):
         skup_unchanged = True
 
 class DonorboxImporter(DatasetImporter):
+    name = 'donorbox-donations'
     class Meta:
         resource = DonationResource()
 
@@ -62,7 +63,3 @@ class DonorboxImporter(DatasetImporter):
         if not page['has_more']:
             self.__finished = True
         return ret
-
-importers = {
-    'donorbox-donations': DonorboxImporter,
-}

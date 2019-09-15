@@ -67,6 +67,7 @@ class GoogleCalendarImportForm(forms.Form):
     calendar_id = forms.ChoiceField()
 
 class GoogleCalendarImporter(DatasetImporter):
+    name = 'google-calendar-events'
     class Meta:
         resource = EventResource()
 
@@ -205,7 +206,3 @@ class EventAttendanceResource(resources.ModelResource):
         instance_loader_class = PartialMatchModelInstanceLoader
         import_id_fields = ('event_uid', 'event_instance_id')
         fields = ('uid', 'instance_id', 'attendees')
-
-importers = {
-    'google-calendar-events': GoogleCalendarImporter,
-}

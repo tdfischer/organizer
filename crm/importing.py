@@ -1,11 +1,8 @@
 import logging
-import csv
-from geopy.geocoders import GoogleV3
 from . import models, resources
+from crm.forms import MailchimpListSelectionForm, AirtableImportExportForm
 from django.conf import settings
-import itertools
 from airtable import Airtable
-from import_export import resources, fields, widgets
 import tablib
 from organizer.importing import DatasetImporter
 from mailchimp3 import MailChimp
@@ -48,6 +45,9 @@ class TypeformImportForm(forms.Form):
         self.fields['name_field'].choices = fieldChoices
 
 class TypeformImporter(DatasetImporter):
+    name = 'typeform-people'
+    options_form_class = TypeformImportForm
+
     class Meta:
         resource = resources.PersonResource()
 
@@ -90,17 +90,9 @@ class TypeformImporter(DatasetImporter):
         self.nextToken = lastToken
         return dataset
 
-    def options_form(self, *args, **kwargs):
-        return TypeformImportForm(*args, **kwargs)
-
-class AirtableImporterForm(forms.Form):
-    base_id = forms.CharField()
-    table_name = forms.CharField()
-    email_column = forms.CharField()
-    name_column = forms.CharField()
-    address_column = forms.CharField()
-
 class AirtableImporter(DatasetImporter):
+    name = 'airtable-people'
+    options_form_class = AirtableImportExportForm
     class Meta:
         resource = resources.PersonResource()
 
@@ -110,9 +102,6 @@ class AirtableImporter(DatasetImporter):
                 self.configuration['table_name'],
                 api_key=settings.AIRTABLE_API_KEY)
         self.__pages = self.__airtable.get_iter()
-
-    def options_form(self, *args, **kwargs):
-        return AirtableImporterForm(*args, **kwargs)
 
     def next_page(self):
         #FIXME: These field names are hardcoded, very EBFE specific
@@ -130,19 +119,9 @@ class AirtableImporter(DatasetImporter):
             ret.append(rowData)
         return ret
 
-class MailchimpImporterForm(forms.Form):
-    list_id = forms.ChoiceField(required=True)
-
-    def __init__(self, *args, **kwargs):
-        super(MailchimpImporterForm, self).__init__(*args, **kwargs)
-        mailchimp = MailChimp(mc_api=settings.MAILCHIMP_SECRET_KEY)
-        lists = mailchimp.lists.all()
-        choices = []
-        for l in lists['lists']:
-            choices.append((l['id'], l['name']))
-        self.fields['list_id'].choices = choices
-
 class MailchimpImporter(DatasetImporter):
+    name = 'mailchimp-people'
+    options_form_class = MailchimpListSelectionForm
     class Meta:
         resource = resources.PersonResource()
 
@@ -157,9 +136,6 @@ class MailchimpImporter(DatasetImporter):
 
     def __len__(self):
         return self.totalMembers / self.pageSize
-
-    def options_form(self, *args, **kwargs):
-        return MailchimpImporterForm(*args, **kwargs)
 
     def next_page(self):
         #FIXME: These field names are hardcoded
@@ -187,9 +163,3 @@ class MailchimpImporter(DatasetImporter):
                 obj += (' '.join(props),)
             dataset.append(obj)
         return dataset
-
-importers = {
-    'airtable-people': AirtableImporter,
-    'mailchimp-people': MailchimpImporter,
-    'typeform-people': TypeformImporter,
-}
