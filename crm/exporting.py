@@ -6,10 +6,14 @@ import hashlib
 
 from organizer.exporting import DatasetExporter
 from crm.resources import PersonResource
+from crm.forms import MailchimpListSelectionForm, AirtableImportExportForm
 
 log = logging.getLogger(__name__)
 
 class MailchimpExporter(DatasetExporter):
+    name = 'mailchimp-people'
+    options_form_class = MailchimpListSelectionForm
+
     class Meta:
         resource = PersonResource
 
@@ -23,7 +27,7 @@ class MailchimpExporter(DatasetExporter):
             hashedAddr = hasher.hexdigest()
             if not dry_run:
                 self.mailchimp.lists.members.create_or_update(
-                    settings.MAILCHIMP_LIST_ID,
+                    self.configuration['list_id'],
                     hashedAddr,
                     dict(
                         email_address = row['email'],
@@ -32,13 +36,15 @@ class MailchimpExporter(DatasetExporter):
                 )
 
 class AirtableExporter(DatasetExporter):
+    name = 'airtable-people'
+    options_form_class = AirtableImportExportForm
     class Meta:
         resource = PersonResource
 
     def init(self):
         self.airtable = Airtable(
-                settings.AIRTABLE_BASE_ID,
-                settings.AIRTABLE_TABLE_NAME,
+                self.configuration['base_id'],
+                self.configuration['table_name'],
                 api_key=settings.AIRTABLE_API_KEY)
         self.members = self.airtable.get_all()
 
@@ -49,12 +55,12 @@ class AirtableExporter(DatasetExporter):
     def export_person(self, row, dry_run):
         rowEmail = row['email'].strip().lower()
         for m in self.members:
-            memberEmail = m['fields'].get(settings.AIRTABLE_EMAIL_COLUMN, '').strip().lower()
+            memberEmail = m['fields'].get(self.configuration['email_column'], '').strip().lower()
             if memberEmail == rowEmail:
                 return
         log.info('Creating %s <%s>', row['name'], row['email'])
         if not dry_run:
             self.airtable.insert({
-                settings.AIRTABLE_NAME_COLUMN: row['name'],
-                settings.AIRTABLE_EMAIL_COLUMN: row['email'],
+                self.configuration['name_column']: row['name'],
+                self.configuration['email_column']: row['email'],
             })

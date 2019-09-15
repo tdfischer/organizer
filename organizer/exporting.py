@@ -1,31 +1,16 @@
 from importlib import import_module
 from django.conf import settings
+from . import plugins
 
-exporterCache = None
+class DatasetExporter(plugins.ConfigurablePlugin):
+    __metaclass__ = plugins.PluginMount
+    app_module_name = 'exporting'
 
-def get_exporter_class(name):
-    global exporterCache
-    if exporterCache is None:
-        exporterCache = collect_exporters()
-    return exporterCache.get(name)
-
-def collect_exporters():
-    ret = {}
-    for app in settings.INSTALLED_APPS:
-        try:
-            imported = import_module('.'.join((app, 'exporting')))
-        except ImportError, e:
-            continue
-        if hasattr(imported, 'exporters'):
-            ret.update(imported.exporters)
-    return ret
-
-class DatasetExporter(object):
     def export_page(self, page, dry_run=False):
         raise NotImplementedError()
 
-    def init(self):
-        pass
+    def __init__(self, configuration={}):
+        self.configuration = configuration
 
     def __iter__(self):
         self.init()
