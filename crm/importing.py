@@ -13,7 +13,7 @@ class TypeformImportForm(forms.Form):
     form_id = forms.ChoiceField()
     email_field = forms.ChoiceField(disabled=True)
     name_field = forms.ChoiceField(disabled=True)
-    tags = forms.CharField()
+    tags = forms.CharField(required=False)
 
     def __init__(self, *args, **kwargs):
         super(TypeformImportForm, self).__init__(*args, **kwargs)
