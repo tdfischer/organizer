@@ -30,6 +30,3 @@ class DatasetImporter(plugins.ConfigurablePlugin):
     def init(self):
         """Utility method to perform initial setup of the import"""
         pass
-
-    def options_form(self, *args, **kwargs):
-        return forms.Form(*args, **kwargs)
