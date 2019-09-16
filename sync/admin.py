@@ -23,6 +23,11 @@ def disable_target(modeladmin, request, queryset):
         target.save()
 disable_target.short_description = "Disable selected targets"
 
+def run_target(modeladmin, request, queryset):
+    for target in queryset:
+        target.run()
+run_target.short_description = "Run selected targets"
+
 class PluginModelAdmin(admin.ModelAdmin):
     list_filter = ['enabled', 'backend']
     list_display = [
@@ -32,6 +37,7 @@ class PluginModelAdmin(admin.ModelAdmin):
     actions = (
         enable_target,
         disable_target,
+        run_target,
     )
 
     def get_form(self, request, obj=None, **kwargs):
