@@ -12,6 +12,19 @@ log = logging.getLogger(__name__)
 from crm.models import Person
 from filtering.models import FilterNode
 from events.models import Event
+from notifications.models import Notification
+
+class NewEventSignup(Notification):
+    name = 'new-event-signup'
+
+class NewSignup(Notification):
+    name = 'new-signup'
+
+class OnboardingFailure(Notification):
+    name = 'onboarding-failure'
+
+class OnboardingSuccess(Notification):
+    name = 'onboarding-success'
 
 class Signup(models.Model):
     email = models.CharField(max_length=200)
@@ -20,6 +33,17 @@ class Signup(models.Model):
     created = models.DateField(auto_now_add=True)
     approved = models.BooleanField(default=False)
     event = models.ForeignKey(Event, null=True, blank=True, related_name='signups')
+
+    def save(self, *args, **kwargs):
+        notify = False
+        if self.id is None:
+            notify = True
+        super(Signup, self).save(*args, **kwargs)
+        if notify:
+            if self.event is None:
+                NewSignup().send(self, 'signed up to join')
+            else:
+                NewEventSignup().send(self, 'RSVP\'d for', self.event)
 
     def __unicode__(self):
         return '%s: %s'%(self.email, self.event)

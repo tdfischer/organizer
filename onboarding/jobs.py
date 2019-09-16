@@ -39,5 +39,9 @@ def runOnboarding(person):
                     success = result[0],
                     message = result[1]
                 )
+                if result[0]:
+                    models.OnboardingSuccess().send(person, 'was onboarded with', component)
+                else:
+                    models.OnboardingFailure().send(person, 'failed to be onboarded with', component, result[1])
                 logger.info("Onboarded %s to %s: %r", person, component,
                         result)
