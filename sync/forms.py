@@ -11,7 +11,7 @@ class ExportSinkForm(forms.ModelForm):
     backend = forms.CharField(disabled=True)
     class Meta:
         model = models.ExportSink
-        fields = ['name', 'enabled', 'backend']
+        fields = ['name', 'enabled', 'backend', 'filter']
 
 class DefaultImportSourceConfigForm(forms.Form):
     pass

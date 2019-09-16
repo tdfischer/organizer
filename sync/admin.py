@@ -5,6 +5,7 @@ from . import models, forms
 from django.conf.urls import url
 from django.contrib import admin
 from organizer import importing, exporting
+from django.utils import timezone
 from django.template.response import TemplateResponse
 from django.core.urlresolvers import reverse
 from django.http.response import HttpResponseRedirect
@@ -41,7 +42,7 @@ class PluginModelAdmin(admin.ModelAdmin):
     )
 
     def get_form(self, request, obj=None, **kwargs):
-        kwargs['form'] = forms.ImportSourceForm
+        kwargs['form'] = self.base_form
         return super(PluginModelAdmin, self).get_form(request, obj, **kwargs)
 
     def get_options_form(self, backend_name):
@@ -103,7 +104,9 @@ class PluginModelAdmin(admin.ModelAdmin):
                 self.log_addition(request, source, change_message)
             else:
                 self.log_change(request, source, change_message)
-            return HttpResponseRedirect(reverse('admin:sync_importsource_changelist'))
+            info = self.model._meta.app_label, self.model._meta.model_name
+            change_url = 'admin:%s_%s_changelist'%(info)
+            return HttpResponseRedirect(reverse(change_url))
 
         extra_context['options_form'] = form
         extra_context['backend_name'] = backend_name
@@ -132,12 +135,14 @@ class ImportAdmin(PluginModelAdmin):
     plugin_class = importing.DatasetImporter
     plugin_name_field = 'backend'
     plugin_config_field = 'configuration'
+    base_form = forms.ImportSourceForm
     default_config_form = forms.DefaultImportSourceConfigForm
 
 class ExportAdmin(PluginModelAdmin):
     plugin_class = exporting.DatasetExporter
     plugin_name_field = 'backend'
     plugin_config_field = 'configuration'
+    base_form = forms.ExportSinkForm
     default_config_form = forms.DefaultExportSinkConfigForm
 
 admin.site.register(models.ImportSource, ImportAdmin)
