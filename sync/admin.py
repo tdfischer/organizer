@@ -10,6 +10,7 @@ from django.template.response import TemplateResponse
 from django.core.urlresolvers import reverse
 from django.http.response import HttpResponseRedirect
 from django.http import Http404
+import django_rq
 import json
 
 def enable_target(modeladmin, request, queryset):
@@ -26,7 +27,7 @@ disable_target.short_description = "Disable selected targets"
 
 def run_target(modeladmin, request, queryset):
     for target in queryset:
-        target.run()
+        django_rq.enqueue(target.run)
 run_target.short_description = "Run selected targets"
 
 class PluginModelAdmin(admin.ModelAdmin):
