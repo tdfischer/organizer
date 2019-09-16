@@ -2,6 +2,7 @@ from django.conf import settings
 from airtable import Airtable
 import logging
 from mailchimp3 import MailChimp
+from mailchimp3.mailchimpclient import MailChimpError
 import hashlib
 
 from organizer.exporting import DatasetExporter
@@ -30,15 +31,18 @@ class MailchimpExporter(DatasetExporter):
             else:
                 tags = row['tags'].split(',')
             if not dry_run:
-                self.mailchimp.lists.members.create_or_update(
-                    self.configuration['list_id'],
-                    hashedAddr,
-                    dict(
-                        email_address = row['email'],
-                        status_if_new = 'subscribed',
-                        tags = tags
+                try:
+                    self.mailchimp.lists.members.create_or_update(
+                        self.configuration['list_id'],
+                        hashedAddr,
+                        dict(
+                            email_address = row['email'],
+                            status_if_new = 'subscribed',
+                            tags = tags
+                        )
                     )
-                )
+                except MailChimpError:
+                    pass
 
 class AirtableExporter(DatasetExporter):
     name = 'airtable-people'
