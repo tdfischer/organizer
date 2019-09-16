@@ -25,13 +25,15 @@ class MailchimpExporter(DatasetExporter):
             hasher = hashlib.md5()
             hasher.update(row['email'].lower())
             hashedAddr = hasher.hexdigest()
+            tags = row['tags']
             if not dry_run:
                 self.mailchimp.lists.members.create_or_update(
                     self.configuration['list_id'],
                     hashedAddr,
                     dict(
                         email_address = row['email'],
-                        status_if_new = 'subscribed'
+                        status_if_new = 'subscribed',
+                        tags = tags
                     )
                 )
 
