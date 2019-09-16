@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('sync', '0005_auto_20190807_0306'),
+        ('sync', '0004_auto_20190731_1553'),
     ]
 
     operations = [
@@ -22,10 +22,5 @@ class Migration(migrations.Migration):
                 ('configuration', models.TextField(blank=True, null=True)),
                 ('lastRun', models.DateTimeField(blank=True, null=True)),
             ],
-        ),
-        migrations.AlterField(
-            model_name='importsource',
-            name='configuration',
-            field=models.TextField(blank=True, null=True),
         ),
     ]
