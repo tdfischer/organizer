@@ -5,7 +5,11 @@ class CommaSeparatedListWidget(widgets.ManyToManyWidget):
         super(CommaSeparatedListWidget, self).__init__(*args, model=None, **kwargs)
 
     def clean(self, value, row=None, *args, **kwargs):
-        return value.split(',')
+        try:
+            i = iter(value)
+        except TypeError:
+            return value.split(',')
+        return i
 
     def render(self, obj = None, *args, **kwargs):
         try:

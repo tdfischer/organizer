@@ -138,28 +138,20 @@ class MailchimpImporter(DatasetImporter):
         return self.totalMembers / self.pageSize
 
     def next_page(self):
-        #FIXME: These field names are hardcoded
-        COLUMNMAP = dict(
-            email = ['email_address'],
-            name = ['merge_fields.FNAME', 'merge_fields.LNAME'],
-        )
-        dataset = tablib.Dataset(headers=COLUMNMAP.keys())
+        dataset = tablib.Dataset(headers=('email', 'name', 'tags'))
         page = self.mailchimp.lists.members.all(self.configuration['list_id'], count=self.pageSize,
                 offset=self.page*self.pageSize,
                 fields=','.join(['members.email_address', 'members.merge_fields.FNAME',
-                    'members.merge_fields.LNAME']))
+                    'members.merge_fields.LNAME', 'members.tags']))
         self.page += 1
         if len(page['members']) == 0:
             raise StopIteration()
         for person in page['members']:
-            obj = ()
-            for fieldNames in COLUMNMAP.values():
-                props = ()
-                for fieldName in fieldNames:
-                    prop = person
-                    for p in fieldName.split('.'):
-                        prop = prop.get(p, {})
-                    props += (prop,)
-                obj += (' '.join(props),)
-            dataset.append(obj)
+            props = ()
+            props += (person['email_address'],)
+            props += (' '.join((person['merge_fields'].get('FNAME'),
+                person['merge_fields'].get('LNAME'))),)
+            props += (map(lambda x: x.get('name'), person['tags']),)
+            print "ROW", props
+            dataset.append(props)
         return dataset
