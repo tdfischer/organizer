@@ -9,8 +9,9 @@ class DatasetExporter(plugins.ConfigurablePlugin):
     def export_page(self, page, dry_run=False):
         raise NotImplementedError()
 
-    def __init__(self, configuration={}):
+    def __init__(self, queryset, configuration={}):
         self.configuration = configuration
+        self.queryset = queryset
 
     def __iter__(self):
         self.init()
@@ -18,7 +19,7 @@ class DatasetExporter(plugins.ConfigurablePlugin):
         return self
 
     def get_queryset(self):
-        return self.Meta.resource().get_queryset()
+        return self.queryset
 
     def next(self):
         if self.__offset >= len(self):
