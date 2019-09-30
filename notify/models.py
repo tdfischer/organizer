@@ -3,14 +3,28 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.utils import timezone
+import json
 import django_rq
 from django.template import loader
 from django.contrib.auth.models import User
 from django.core.mail import EmailMessage
 import logging
 import importlib
-from organizer import plugins
 from django.db.models.signals import post_migrate
+from organizer import plugins
+
+class Notification(plugins.ConfigurablePlugin):
+    __metaclass__ = plugins.PluginMount
+    app_module_name = 'notifications'
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def send(self, noun, verb, target=None):
+        logger.info("Sending %s notification", self.name)
+        channels = NotificationChannel.objects.filter(sources__name=self.name)
+        for channel in channels:
+            channel.send(noun, verb, target)
 
 def migrateSources(*args, **kwargs):
     Notification.import_plugins()
@@ -21,15 +35,6 @@ post_migrate.connect(migrateSources)
 
 logger = logging.getLogger(__name__)
 
-class Notification(object):
-    __metaclass__ = plugins.PluginMount
-    app_module_name = 'notifications'
-
-    def send(self, noun, verb, target=None):
-        channels = NotificationChannel.objects.find(sources__name=self.name)
-        for channel in channels:
-            channel.send(noun, verb, target)
-
 class NotificationSource(models.Model):
     name = models.CharField(max_length=200)
 
@@ -37,30 +42,24 @@ class NotificationSource(models.Model):
         return self.name
 
 class NotificationChannel(models.Model):
-    name = models.CharField(max_length=200, blank=True, null=True)
+    name = models.CharField(max_length=200)
     configuration = models.TextField(blank=True, default="")
-    handler = models.CharField(max_length=200, choices=[
-        ('notifications.channels.Slack', 'Slack'),
-    ])
+    backend = models.CharField(max_length=200)
     enabled = models.BooleanField()
     sources = models.ManyToManyField(NotificationSource, related_name='channels')
 
     def __unicode__(self):
         return self.name
 
-    def getChannelClass(self):
-        module, cls = self.handler.rsplit('.', 1)
-        return getattr(importlib.import_module(module), cls)
+    def make_channel(self):
+        importCls = Notification.get_plugin(self.handler)
+        return importcls(json.loads(self.configuration))
 
     def send(self, noun, verb, target=None):
-        Channel = self.getChannelClass()
-        config = {}
-        if len(self.configuration) > 0:
-            config = json.loads(self.configuration)
-        instance = Channel()
+        instance = self.make_channel()
+        logger.debug("Dispatching noun=%r verb=%r target=%r to %r", noun, verb, instance)
         try:
-            log.debug("Dispatching noun=%r verb=%r target=%r to %r", noun, verb, instance)
-            return instance.send(noun, verb)
+            return instance.send(noun, verb, target)
         except Exception, e:
-            log.error("Could not send message: %s", e)
+            logger.error("Could not send message: %s", e)
             return e

@@ -123,7 +123,7 @@ INSTALLED_APPS = [
     'filtering',
     'geocodable',
     'sync',
-    'notifications'
+    'notify'
 ]
 
 #Force SSL if debug is disabled

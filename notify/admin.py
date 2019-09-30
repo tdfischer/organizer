@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
-from . import models
+from . import models, channels
 from django.utils.html import format_html, format_html_join
 
 class SourceAdmin(admin.ModelAdmin):
@@ -26,5 +26,25 @@ class SourceAdmin(admin.ModelAdmin):
             )
         )
 
-admin.site.register(models.NotificationChannel)
+from sync.admin import PluginModelAdmin
+
+from django import forms
+class ChannelForm(forms.ModelForm):
+    backend = forms.CharField(disabled=True)
+    class Meta:
+        model = models.NotificationChannel
+        fields = ['name', 'enabled', 'backend']
+
+class ChannelAdmin(PluginModelAdmin):
+    plugin_class = channels.Channel
+    plugin_name_field = 'backend'
+    plugin_config_field = 'configuration'
+    base_form = ChannelForm
+    default_config_form = forms.Form
+
+    list_display = [
+        'name', 'backend', 'enabled'
+    ]
+
+admin.site.register(models.NotificationChannel, ChannelAdmin)
 admin.site.register(models.NotificationSource, SourceAdmin)
