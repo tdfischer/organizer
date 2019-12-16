@@ -8,6 +8,7 @@ from organizer.importing import DatasetImporter
 from organizer.exporting import DatasetExporter
 from django.utils import timezone
 from filtering.models import FilterNode
+from . import notifications
 
 class ImportSource(models.Model):
     name = models.CharField(max_length=255)
@@ -21,10 +22,15 @@ class ImportSource(models.Model):
         return importCls(json.loads(self.configuration))
 
     def run(self):
-        importer = self.make_importer()
-        resource = importer.Meta.resource
-        for page in importer:
-            resource.import_data(page, raiseErrors=True)
+        try:
+            importer = self.make_importer()
+            resource = importer.Meta.resource
+            for page in importer:
+                resource.import_data(page, raiseErrors=True)
+            self.lastRun = timezone.now()
+            self.save()
+        except e:
+            notifications.ImportFailure().send(self, 'failed to import')
 
     def __unicode__(self):
         return '%s: %s' % (self.name, self.backend)
@@ -42,12 +48,14 @@ class ExportSink(models.Model):
         return importCls(self.filter.results, json.loads(self.configuration))
 
     def run(self):
-        exporter = self.make_exporter()
-        for page in exporter:
-            exporter.export_page(page)
-        self.lastRun = timezone.now()
-        self.save()
-
+        try:
+            exporter = self.make_exporter()
+            for page in exporter:
+                exporter.export_page(page)
+            self.lastRun = timezone.now()
+            self.save()
+        except e:
+            notifications.ExportFailure().send(self, 'failed to export')
 
     def __unicode__(self):
         return '%s: %s' % (self.name, self.backend)
