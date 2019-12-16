@@ -5,8 +5,8 @@ class Notification(object):
     __metaclass__ = plugins.PluginMount
     app_module_name = 'notifications'
 
-    def send(self, noun, verb, target=None):
+    def send(self, noun, verb, target=None, detail=None):
         channels = models.NotificationChannel.objects.find(sources__name=self.name)
         for channel in channels:
-            channel.send(noun, verb, target)
+            channel.send(noun, verb, target, detail)
 

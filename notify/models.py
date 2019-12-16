@@ -21,11 +21,11 @@ class Notification(plugins.ConfigurablePlugin):
     def __init__(self, *args, **kwargs):
         pass
 
-    def send(self, noun, verb, target=None):
+    def send(self, noun, verb, target=None, detail=None):
         logger.info("Sending %s notification", self.name)
         channels = NotificationChannel.objects.filter(sources__name=self.name)
         for channel in channels:
-            channel.send(noun, verb, target)
+            channel.send(noun, verb, target, detail)
 
 def migrateSources(*args, **kwargs):
     Notification.import_plugins()
@@ -56,12 +56,12 @@ class NotificationChannel(models.Model):
         importCls = channels.Channel.get_plugin(self.backend)
         return importCls(json.loads(self.configuration))
 
-    def send(self, noun, verb, target=None):
+    def send(self, noun, verb, target=None, detail=None):
         instance = self.make_channel()
-        logger.debug("Dispatching noun=%r verb=%r target=%r to %r", noun, verb,
-                target, instance)
+        logger.debug("Dispatching noun=%r verb=%r target=%r detail=%r to %r", noun, verb,
+                target, detail, instance)
         try:
-            return instance.send(noun, verb, target)
+            return instance.send(noun, verb, target, detail)
         except Exception, e:
             logger.error("Could not send message: %s", e)
             return e

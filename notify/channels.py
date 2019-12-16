@@ -13,7 +13,7 @@ class Channel(plugins.ConfigurablePlugin):
     def __init__(self, config):
         self.config = config
 
-    def send(self, noun, verb, target):
+    def send(self, noun, verb, target, detail):
         raise NotImplementedError()
 
 class SlackConfigForm(forms.Form):
@@ -33,7 +33,7 @@ class Slack(Channel):
     name = 'slack'
     options_form_class = SlackConfigForm
 
-    def send(self, noun, verb, target=None):
+    def send(self, noun, verb, target=None, detail=None):
         if target is None:
             message = ' '.join((str(noun), str(verb)))
         else:
