@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.contrib import admin
-from . import models
+from . import models, notifications
 from crm.models import Person
 from events.models import Event
 from organizer.admin import admin_site, OrganizerModelAdmin
@@ -18,6 +18,7 @@ def signup_approver(modeladmin, request, queryset):
             event.save()
         signup.approved = True
         signup.save()
+        notifications.SignupApproved().send(request.user, 'approved', signup)
 signup_approver.short_description = "Approve selected signups"
 
 class EventSignupResource(resources.ModelResource):
@@ -72,6 +73,5 @@ admin.site.register(models.Signup, SignupAdmin)
 admin.site.register(models.OnboardingStatus, StatusAdmin)
 admin_site.register(models.OnboardingStatus, StatusAdmin)
 admin.site.register(models.OnboardingComponent, ComponentAdmin)
-admin_site.register(models.OnboardingComponent, ComponentAdmin)
 
 admin_site.register(models.Signup, SignupAdmin)

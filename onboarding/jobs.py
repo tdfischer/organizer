@@ -8,7 +8,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 import django_rq
 
-from . import models
+from . import models, notifications
 from crm.models import Person
 
 logger = logging.getLogger(__name__)
@@ -40,8 +40,8 @@ def runOnboarding(person):
                     message = result[1]
                 )
                 if result[0]:
-                    models.OnboardingSuccess().send(person, 'was onboarded with', component)
+                    notifications.OnboardingSuccess().send(person, 'was onboarded with', component)
                 else:
-                    models.OnboardingFailure().send(person, 'failed to be onboarded with', component, result[1])
+                    notifications.OnboardingFailure().send(person, 'failed to be onboarded with', component, result[1])
                 logger.info("Onboarded %s to %s: %r", person, component,
                         result)
