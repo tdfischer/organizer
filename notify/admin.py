@@ -33,7 +33,12 @@ class ChannelForm(forms.ModelForm):
     backend = forms.CharField(disabled=True)
     class Meta:
         model = models.NotificationChannel
-        fields = ['name', 'enabled', 'backend']
+        fields = ['name', 'enabled', 'backend', 'sources']
+
+def send_test(modeladmin, request, queryset):
+    for channel in queryset:
+        channel.send(request.user, 'tested', channel)
+send_test.short_description = 'Send test notification'
 
 class ChannelAdmin(PluginModelAdmin):
     plugin_class = channels.Channel
@@ -41,6 +46,11 @@ class ChannelAdmin(PluginModelAdmin):
     plugin_config_field = 'configuration'
     base_form = ChannelForm
     default_config_form = forms.Form
+    add_form_template = 'admin/notify/add.html'
+
+    actions = (
+        send_test,
+    )
 
     list_display = [
         'name', 'backend', 'enabled'

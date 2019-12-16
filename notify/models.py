@@ -12,6 +12,7 @@ import logging
 import importlib
 from django.db.models.signals import post_migrate
 from organizer import plugins
+from . import channels
 
 class Notification(plugins.ConfigurablePlugin):
     __metaclass__ = plugins.PluginMount
@@ -52,12 +53,13 @@ class NotificationChannel(models.Model):
         return self.name
 
     def make_channel(self):
-        importCls = Notification.get_plugin(self.handler)
-        return importcls(json.loads(self.configuration))
+        importCls = channels.Channel.get_plugin(self.backend)
+        return importCls(json.loads(self.configuration))
 
     def send(self, noun, verb, target=None):
         instance = self.make_channel()
-        logger.debug("Dispatching noun=%r verb=%r target=%r to %r", noun, verb, instance)
+        logger.debug("Dispatching noun=%r verb=%r target=%r to %r", noun, verb,
+                target, instance)
         try:
             return instance.send(noun, verb, target)
         except Exception, e:
