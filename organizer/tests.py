@@ -85,17 +85,7 @@ def testDiscourseGetUserDetails(response):
     ret = authBackend.get_user_details(response)
     assert len(ret.keys()) == 6
 
-def testCollectExporters():
-    exporters = exporting.collect_exporters()
-    for (exporterName, exporter) in exporters.iteritems():
-        assert exporting.get_exporter_class(exporterName) == exporter
-
-@pytest.mark.parameterize("exporterCls", exporting.collect_exporters())
+@pytest.mark.parameterize("exporterCls", exporting.DatasetExporter.plugins)
 def verifyExporter(exporterCls):
     exporter = exporterCls()
     assert iter(exporter)
-
-def testCollectImporters():
-    importers = importing.collect_importers()
-    for (importerName, importer) in importers.iteritems():
-        assert importing.get_importer_class(importerName) == importer
