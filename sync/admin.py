@@ -98,6 +98,8 @@ class PluginModelAdmin(admin.ModelAdmin):
             change_message = self.construct_change_message(request, form, [],
                     isNew)
             source = base_form.save(commit=False)
+            for k,v in base_form.cleaned_data.iteritems():
+                setattr(source, k, v)
             setattr(source, self.plugin_name_field, backend_name)
             setattr(source, self.plugin_config_field, json.dumps(form.cleaned_data))
             source.save()
