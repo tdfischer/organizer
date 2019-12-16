@@ -3,6 +3,16 @@
 
 {% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />
 <style>
+.quicksearch {
+    width: 100%;
+    display: flex;
+}
+
+.quicksearch input {
+    flex-grow: 1;
+    margin-right: 1rem;
+}
+
 .summaries {
   display: flex;
   flex-wrap: wrap;
@@ -37,8 +47,14 @@
 
 {% block content %}
 <div id="content-main">
+  <form method="GET" action="/admin/crm/person/">
+    <div class="quicksearch">
+        <input placeholder="Search people..." type="text" name="q" />
+        <button type="submit">Search</button>
+    </div>
+  </form>
   <div class="summaries">
-      <a class="summary" href="{% url "admin:onboarding_signup_changelist" %}"><div><h1>{{new_signups.count}}</h1>new signups to approve</div></a>
+      <a class="summary" href="{% url "admin:onboarding_signup_changelist" %}?approved__exact=0"><div><h1>{{new_signups.count}}</h1>new signups to approve</div></a>
       <a class="summary" href="{% url "admin:crm_person_changelist" %}"><div><h1>{{recent_people.count}}</h1>new people this week</div></a>
       <div class="summary"><h1>{{recent_onboardings.count}}</h1>onboardings this week</div>
       {% for filter in filters %}
