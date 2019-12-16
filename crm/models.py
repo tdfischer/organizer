@@ -10,6 +10,7 @@ from taggit.managers import TaggableManager
 from geocodable.models import LocationAlias, LocationType
 import django_rq
 import logging
+from . import notifications
 
 log = logging.getLogger(__name__)
 
@@ -22,6 +23,14 @@ class Person(models.Model):
     is_captain = models.BooleanField(default=False)
 
     tags = TaggableManager(blank=True)
+
+    def save(self, *args, **kwargs):
+        triggered = False
+        if self.id is None:
+            triggered = True
+        super(Person, self).save(*args, **kwargs)
+        if triggered:
+            notifications.NewPerson().send(self, 'joined %s!'%settings.ORG_NAME)
 
     @property
     def lat(self):

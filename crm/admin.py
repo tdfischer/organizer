@@ -15,7 +15,7 @@ from django.utils.html import format_html_join
 from django.utils.safestring import mark_safe
 from django.db import transaction
 from django.db.models import Count, Sum
-from . import models, resources
+from . import models, resources, notifications
 from import_export.admin import ImportExportModelAdmin
 from onboarding.models import OnboardingComponent
 from onboarding.jobs import runOnboarding
@@ -49,12 +49,14 @@ def make_captain(modeladmin, request, queryset):
     for person in queryset:
         person.is_captain = True
         person.save()
+        notifications.CaptainMade().send(request.user, 'granted captainship to', person)
 make_captain.short_description = 'Mark selected people as captains'
 
 def unmake_captain(modeladmin, request, queryset):
     for person in queryset:
         person.is_captain = False
         person.save()
+        notifications.CaptainUnmade().send(request.user, 'stripped captainship from', person)
 unmake_captain.short_description = 'Strip captainship from selected people'
 
 class CityFilter(admin.SimpleListFilter):
