@@ -183,10 +183,11 @@ def testExportPersonToMailchimp(person, settings):
     settings.MAILCHIMP_SECRET_KEY = '0' * 32
     settings.MAILCHIMP_LIST_ID = 'list-id'
     with patch('mailchimp3.entities.listmembers.ListMembers.create_or_update') as patched:
-        exporter = exporting.MailchimpExporter()
+        exporter = exporting.MailchimpExporter(models.Person.objects.all(),
+                {'list_id': settings.MAILCHIMP_LIST_ID})
         assert len(exporter) == 1
         page = iter(exporter).next()
         assert page.dict[0]['email'] == person.email
         exporter.export_page(page)
         patched.assert_called_with('list-id', '55502f40dc8b7c769880b10874abc9d0',
-                dict(email_address=person.email, status_if_new='subscribed'))
+                dict(email_address=person.email, tags=[], status_if_new='subscribed'))
