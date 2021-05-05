@@ -1,0 +1,6 @@
+FROM node:lts-alpine
+
+WORKDIR /organizer
+COPY . /organizer
+
+RUN npm install
