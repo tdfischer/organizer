@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('crm', '0005_auto_20180802_0319'),
+        ('crm', '0003_auto_20180802_0200_squashed_0005_auto_20180802_0319'),
     ]
 
     operations = [

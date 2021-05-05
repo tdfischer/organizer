@@ -6,7 +6,7 @@ from hashlib import sha256
 import hmac
 from base64 import b64encode, b64decode
 import urllib
-import urlparse
+import urllib.parse
 from crm.models import Person
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -71,7 +71,7 @@ class DiscourseSSOAuth(BaseAuth):
 
         decodedParams = b64decode(ssoParams)
         kwargs.update({'sso':'', 'sig': '', 'backend': self, 'response':
-            urlparse.parse_qs(decodedParams)})
+            urllib.parse.parse_qs(decodedParams)})
 
         return self.strategy.authenticate(*args, **kwargs)
 

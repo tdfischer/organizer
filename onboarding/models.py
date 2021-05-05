@@ -19,7 +19,7 @@ class Signup(models.Model):
     phone = models.CharField(max_length=200, blank=True, null=True)
     created = models.DateField(auto_now_add=True)
     approved = models.BooleanField(default=False)
-    event = models.ForeignKey(Event, null=True, blank=True, related_name='signups')
+    event = models.ForeignKey(Event, null=True, blank=True, related_name='signups', on_delete=models.CASCADE)
 
     def __unicode__(self):
         return '%s: %s'%(self.email, self.event)
@@ -33,7 +33,7 @@ class OnboardingComponent(models.Model):
     enabled = models.BooleanField()
     handler = models.CharField(max_length=200)
     configuration = models.TextField(default='', blank=True)
-    filter = models.ForeignKey(FilterNode)
+    filter = models.ForeignKey(FilterNode, on_delete=models.CASCADE)
 
     def personHasBeenOnboarded(self, person):
         return self.statuses.filter(person=person, success=True).exists()
@@ -58,9 +58,9 @@ class StatusManager(models.Manager):
         return super(StatusManager, self).get_queryset().order_by('created').filter(success=True)
 
 class OnboardingStatus(models.Model):
-    person = models.ForeignKey(Person, related_name='onboarding_statuses')
+    person = models.ForeignKey(Person, related_name='onboarding_statuses', on_delete=models.CASCADE)
     created = models.DateField(auto_now_add=True)
-    component = models.ForeignKey(OnboardingComponent, related_name='statuses')
+    component = models.ForeignKey(OnboardingComponent, related_name='statuses', on_delete=models.CASCADE)
     success = models.BooleanField()
     message = models.TextField()
 

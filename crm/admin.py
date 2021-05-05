@@ -4,8 +4,8 @@ from __future__ import unicode_literals
 import csv
 import logging
 from django.utils.html import format_html
-from django.core.urlresolvers import reverse
 from django.template import loader
+from django.urls import reverse
 from django.urls.resolvers import NoReverseMatch
 from django.conf.urls import url
 from django.shortcuts import render
@@ -24,7 +24,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from geocodable.models import Location, LocationType
 from organizer.admin import admin_site, OrganizerModelAdmin
-import StringIO
+from io import StringIO
 from taggit_helpers.admin import TaggitListFilter
 
 def onboard_people(modeladmin, request, queryset):

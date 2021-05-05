@@ -20,7 +20,7 @@ from importlib import import_module
 from rest_framework import routers
 from organizer.admin import admin_site
 
-from django.core import urlresolvers
+from django.urls import resolvers as urlresolvers
 from django.http import HttpResponse
 
 from crm import views
@@ -30,7 +30,7 @@ router = routers.DefaultRouter()
 for app in settings.INSTALLED_APPS:
     try:
         imported = import_module('.'.join((app, 'api_views')))
-    except ImportError, e:
+    except ImportError as e:
         continue
     if hasattr(imported, 'views'):
         for slug, viewset in imported.views.iteritems():

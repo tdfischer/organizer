@@ -14,7 +14,7 @@ def collect_exporters():
     for app in settings.INSTALLED_APPS:
         try:
             imported = import_module('.'.join((app, 'exporting')))
-        except ImportError, e:
+        except ImportError as e:
             continue
         if hasattr(imported, 'exporters'):
             ret.update(imported.exporters)

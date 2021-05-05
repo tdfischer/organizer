@@ -1,6 +1,6 @@
 from django.contrib import admin
-from django.core.urlresolvers import reverse
 from django.utils import timezone
+from django.urls import reverse
 from django.urls.resolvers import NoReverseMatch
 from crm.models import Person
 from filtering.models import FilterNode
@@ -26,11 +26,11 @@ class OrganizerAdmin(admin.AdminSite):
             try:
                 adminLink = reverse('organizer-admin:%s_%s_changelist'%(f.content_type.app_label,
                     f.content_type.model)) + "?named_filter=%s"%(f.pk,)
-            except NoReverseMatch, e:
+            except NoReverseMatch as e:
                 try:
                     adminLink = reverse('admin:%s_%s_changelist'%(f.content_type.app_label,
                         f.content_type.model)) + "?named_filter=%s"%(f.pk,)
-                except NoReverseMatch, e:
+                except NoReverseMatch as e:
                     adminLink = None
             try:
                 filterResults.append({
@@ -38,7 +38,7 @@ class OrganizerAdmin(admin.AdminSite):
                     'name': f.name,
                     'link': adminLink
                 })
-            except Exception, e:
+            except Exception as e:
                 filterResults.append({
                     'count': e.message,
                     'name': f.name,

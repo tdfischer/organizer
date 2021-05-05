@@ -14,7 +14,7 @@ class Event(models.Model):
     attendees = models.ManyToManyField(Person, related_name='events', blank=True)
     uid = models.CharField(max_length=200, blank=True)
     location = models.ForeignKey(LocationAlias, default=None, blank=True,
-            null=True)
+            null=True, on_delete=models.CASCADE)
     instance_id = models.CharField(max_length=200, blank=True)
 
     @property

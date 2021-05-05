@@ -31,7 +31,7 @@ class FilterNodeAdmin(admin.ModelAdmin):
         res = None
         try:
             res = obj.results.values()
-        except Exception, e:
+        except Exception as e:
             return format_html('<em>{}</em>', e)
 
         if not res.exists():

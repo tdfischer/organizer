@@ -57,7 +57,7 @@ class MailchimpAutomation(Component):
                 settings.MAILCHIMP_LIST_ID,
                 {'email_address': person.email, 'status': 'subscribed'}
             )
-        except MailChimpError, e:
+        except MailChimpError as e:
             pass
         try:
             mailchimp.automations.emails.queues.create(
@@ -67,7 +67,7 @@ class MailchimpAutomation(Component):
             )
             log.debug("Added %s to mailchimp automation", person)
             return (True, "Added to automation.")
-        except MailChimpError, e:
+        except MailChimpError as e:
             if 'already sent this email' in e.args[0]['detail']:
                 log.debug("Already added %s to mailchimp automation", person)
                 return (True, "Already added to automation.")

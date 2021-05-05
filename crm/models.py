@@ -16,7 +16,7 @@ log = logging.getLogger(__name__)
 class Person(models.Model):
     name = models.CharField(max_length=200, null=True, blank=True, default='')
     email = models.EmailField(max_length=200, unique=True, db_index=True)
-    location = models.ForeignKey(LocationAlias, db_index=True, null=True, blank=True)
+    location = models.ForeignKey(LocationAlias, db_index=True, null=True, blank=True, on_delete=models.CASCADE)
     phone = models.CharField(max_length=200, null=True, blank=True, default=None)
     created = models.DateTimeField(auto_now_add=True)
     is_captain = models.BooleanField(default=False)

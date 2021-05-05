@@ -29,7 +29,7 @@ def runOnboarding(person):
                 result = None
                 try:
                     result = component.onboardPerson(person)
-                except Exception, e:
+                except Exception as e:
                     logger.error("Caught error while onboarding %s: %s",
                             person, e)
                     result = (False, str(e))

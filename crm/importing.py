@@ -28,7 +28,7 @@ class TagField(fields.Field):
         return obj.tags.names()
 
     def save(self, obj, data, is_m2m=False):
-        print "Adding %s to %s"%(data, obj)
+        print("Adding {} to {}".format(data, obj))
         obj.tags.add(data['tags'])
 
 class PersonResource(resources.ModelResource):

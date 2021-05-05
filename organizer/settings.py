@@ -339,19 +339,20 @@ SOCIAL_AUTH_SLACK_TEAM = os.environ.get('SLACK_TEAM_ID', None)
 
 SLACK_API_TOKEN = os.environ.get('SLACK_API_TOKEN', None)
 
-AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',)
+AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend']
 
 # This also must match the condition in the LocalDevAuth class.
 if DEBUG and ('USE_REALLY_INSECURE_DEVELOPMENT_AUTHENTICATION_BACKEND' in
         os.environ):
-    AUTHENTICATION_BACKENDS += ('organizer.auth.LocalDevAuth',)
+    AUTHENTICATION_BACKENDS.append('organizer.auth.LocalDevAuth')
+    print("!!! USING REALLY INSECURE DEVELOPMENT AUTHENTICATION BACKEND !!!")
 
 if DISCOURSE_SSO_SECRET is not None:
-    AUTHENTICATION_BACKENDS += ('organizer.auth.DiscourseSSOAuth',)
+    AUTHENTICATION_BACKENDS.append('organizer.auth.DiscourseSSOAuth')
 
 if SOCIAL_AUTH_SLACK_KEY is not None:
     if SOCIAL_AUTH_SLACK_TEAM is None:
         raise EnvironmentError("You must set a slack team/workspace ID to enable slack logins. I will not allow this to be open to all workspaces.")
-    AUTHENTICATION_BACKENDS += ('social_core.backends.slack.SlackOAuth2',)
+    AUTHENTICATION_BACKENDS.append('social_core.backends.slack.SlackOAuth2')
 
 TYPEFORM_ACCESS_TOKEN = os.environ.get('TYPEFORM_ACCESS_TOKEN', None)

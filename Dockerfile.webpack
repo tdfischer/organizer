@@ -1,0 +1,6 @@
+FROM node:lts
+
+WORKDIR /organizer
+COPY . /organizer
+
+RUN npm install

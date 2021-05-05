@@ -6,7 +6,7 @@ from django.conf.urls import url
 from django.contrib import admin
 from organizer import importing 
 from django.template.response import TemplateResponse
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http.response import HttpResponseRedirect
 from django.http import Http404
 import json

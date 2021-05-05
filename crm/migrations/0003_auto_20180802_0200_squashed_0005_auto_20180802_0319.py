@@ -8,8 +8,6 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    replaces = [(b'crm', '0003_auto_20180802_0200'), (b'crm', '0004_auto_20180802_0208'), (b'crm', '0005_auto_20180802_0319')]
-
     dependencies = [
         ('address', '0001_initial'),
         ('crm', '0002_auto_20180729_2011_squashed_0005_auto_20180729_2125'),

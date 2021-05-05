@@ -28,7 +28,7 @@ class Annotation(models.Model):
     prop_name = models.CharField(max_length=200)
     operator = EnumField(AnnotationOperator, max_length=200)
     field_name = models.CharField(max_length=200)
-    filter = models.ForeignKey('FilterNode', null=True, blank=True)
+    filter = models.ForeignKey('FilterNode', null=True, blank=True, on_delete=models.CASCADE)
 
     def as_dict(self):
         Operator = None
@@ -66,7 +66,7 @@ class FilterOperator(Enum):
 
 class FilterNode(MPTTModel):
     parent = TreeForeignKey('self', related_name='children', blank=True,
-            null=True)
+            null=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=200, null=True, blank=True)
     prop_name = models.CharField(max_length=200, null=True, blank=True)
     operator = EnumField(FilterOperator, max_length=200, null=True, blank=True)
@@ -74,7 +74,7 @@ class FilterNode(MPTTModel):
     annotations = models.ManyToManyField('Annotation',
             related_name='attachment', blank=True)
 
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
 
     objects = FilterManager()
 
