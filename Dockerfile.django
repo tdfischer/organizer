@@ -1,0 +1,9 @@
+FROM ubuntu:20.04
+
+RUN apt-get update && apt-get install -y python3 pipenv python3-pip
+
+WORKDIR /organizer
+COPY . /organizer
+
+RUN pipenv lock -r > requirements.txt
+RUN pip2 install -r requirements.txt

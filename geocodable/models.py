@@ -149,7 +149,7 @@ class LocationAliasManager(models.Manager):
 
 class LocationAlias(models.Model):
     location = models.ForeignKey(Location, related_name='aliases', null=True,
-            blank=True)
+            blank=True, on_delete=models.CASCADE)
     raw = models.CharField(max_length=200, blank=True, default='')
     nonce = models.CharField(max_length=200, blank=True, default='')
 
