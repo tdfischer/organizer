@@ -4,7 +4,7 @@ defaults: &defaults
     HYPOTHESIS_PROFILE: ci
     NODE_ENV: test
   docker:
-    - image: circleci/python:2-node-browsers
+    - image: cimg/python:3.10-browsers
 version: 2
 jobs:
   upload-codeclimate:
@@ -54,6 +54,10 @@ jobs:
             pipenv sync --dev
       - run:
           name: Run tests
+          environment:
+            # Copied from docker-compose.yml, I am pretty sure that this is
+            # meaningless.
+            SECRET_KEY: 'fyq9-o@ky!j*xx0y2mpyi92&wpbbjgo%z1@vrmzk18hpje+%x'
           command: |
             mkdir -p test-results/nose codeclimate/
             ./cc-test-reporter before-build
